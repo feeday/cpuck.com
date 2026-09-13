@@ -251,6 +251,7 @@
         .card:has(.tag-multi):hover, .card.active-focus:has(.tag-multi) { border-color: rgba(251, 191, 36, 0.4); }
         .card:has(.tag-tool):hover,  .card.active-focus:has(.tag-tool)  { border-color: rgba(52, 211, 153, 0.4); }
         .card:has(.tag-ad):hover,    .card.active-focus:has(.tag-ad)    { border-color: rgba(248, 113, 113, 0.4); }
+        .card:has(.tag-log):hover,   .card.active-focus:has(.tag-log)   { border-color: rgba(56, 189, 248, 0.45); }
         .card-tag {
             position: absolute; top: 20px; right: 20px;
             font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 6px;
@@ -276,6 +277,7 @@
         .tag-multi { color: #fbbf24; }
         .tag-tool { color: #34d399; }
         .tag-ad { color: #f87171; }
+        .tag-log { color: #38bdf8; }
         .card-title { font-size: 1.15rem; font-weight: 600; color: #fff; margin-bottom: 8px; margin-right: 50px; }
         .card-desc { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 24px; flex-grow: 1; line-height: 1.6; }
         
@@ -446,7 +448,7 @@
                 
                 <div class="search-inner-divider"></div>
 
-                <input type="text" class="search-input" id="searchInput" placeholder="搜索标题或简介..." autocomplete="off">
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索资源或已发布文章..." autocomplete="off">
                 <span class="search-clear" id="searchClear" onmousedown="event.preventDefault()" onclick="clearSearch()">✕</span>
                 
                 <div class="external-search-btn" id="externalSearchBtn" title="搜索">
@@ -560,7 +562,8 @@
             audio: ['tag-audio', '音频'],
             multi: ['tag-multi', '多模态'],
             tool: ['tag-tool', '实用工具'],
-            ad: ['tag-ad', '广告']
+            ad: ['tag-ad', '广告'],
+            log: ['tag-log', '文章']
         };
         const linkTypes = [
             ['hf', 'HF', 'card-link-hf'],
@@ -629,21 +632,32 @@
             }
         }, { rootMargin: '200px' }); 
         observer.observe(scrollSentinel);
-        // ================== 异步获取数据 ==================
-        fetch('/data/list.json')
-            .then(response => {
-                if (!response.ok) throw new Error('网络响应失败');
-                return response.json();
-            })
-            .then(data => {
-                resources = data; 
-                initRender(resources); 
-            })
-            .catch(error => {
-                console.error('获取资源文件失败:', error);
-                grid.innerHTML = '<div style="color:#ef4444; text-align:center; width:100%; padding: 2rem;">data err json </div>';
-                scrollSentinel.style.display = 'none';
+        // ================== 异步获取资源与已发布文章 ==================
+        async function fetchJson(path) {
+            const separator = path.includes('?') ? '&' : '?';
+            const response = await fetch(`${path}${separator}v=${Date.now()}`, { cache: 'no-store' });
+            if (!response.ok) throw new Error(`${path} 加载失败：${response.status}`);
+            const data = await response.json();
+            return Array.isArray(data) ? data : [];
+        }
+
+        Promise.allSettled([
+            fetchJson('/data/list.json'),
+            fetchJson('/data/posts.json')
+        ]).then(results => {
+            const listData = results[0].status === 'fulfilled' ? results[0].value : [];
+            const postData = results[1].status === 'fulfilled' ? results[1].value : [];
+
+            results.forEach(result => {
+                if (result.status === 'rejected') console.error(result.reason);
             });
+
+            resources = [
+                ...listData,
+                ...postData.map(post => ({ ...post, cat: post.cat || 'log', isArticle: true }))
+            ];
+            initRender(resources);
+        });
         // ================== 滑块逻辑 ==================
         const glider = document.getElementById('filterGlider');
         function moveGlider(targetBtn) {
@@ -717,9 +731,13 @@
             searchClear.style.display = val.length > 0 ? 'block' : 'none';
             const k = val.trim().toLowerCase();
             
-            const filtered = k ? resources.filter(i => 
-                `${i.title} ${i.desc}`.toLowerCase().includes(k)
-            ) : resources;
+            const filtered = k ? resources.filter(i => {
+                const searchableText = [
+                    i.title, i.name, i.desc, i.tag, i.date,
+                    i.keywords, i.content, i.cat
+                ].filter(Boolean).join(' ').toLowerCase();
+                return searchableText.includes(k);
+            }) : resources;
             
             initRender(filtered);
         });
