@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-25mEIkYk1cMyDLZ83MIjUlpb+QKnQguQw0XB+r6N2Bo='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>2 · CPuck</title>
+<style>
+body{margin:0;background:#020617;color:#f8fafc;font:16px/1.8 system-ui,sans-serif}
+main{max-width:900px;margin:32px auto;padding:24px;border:1px solid #334155;border-radius:16px;background:#0f172a;overflow-wrap:anywhere}
+a{color:#38bdf8} img,video{max-width:100%;height:auto} pre{overflow:auto;padding:16px;background:#020617}
+table{display:block;overflow:auto;border-collapse:collapse}td,th{border:1px solid #475569;padding:8px}
+blockquote{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}
+html { scroll-behavior: smooth; color-scheme: dark; }
+* { box-sizing: border-box; }
+:is(h1,h2,h3,h4,h5,h6) { scroll-margin-top: 24px; }
+button, summary { cursor: pointer; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid #38bdf8; outline-offset: 3px; }
+main { width: min(900px, calc(100% - 40px)); }
+main > nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #64748b; }
+main > nav a { padding: 4px 8px; border-radius: 6px; text-decoration: none; color: #94a3b8; }
+main > nav a:hover { background: #1e293b; color: #38bdf8; }
+.article-toc { position: fixed; right: max(24px, calc((100vw - 1200px) / 2)); top: 32px; width: 244px; z-index: 20; border: 1px solid #263245; border-radius: 12px; background: #0f172af5; box-shadow: 0 8px 24px #0003; font: 13px/1.5 system-ui,sans-serif; }
+.article-toc summary { padding: 12px 16px; font-size: 13px; font-weight: 600; color: #cbd5e1; }
+.article-toc nav { max-height: calc(100vh - 180px); overflow: auto; padding: 0 8px 10px; scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+.article-toc nav a { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; padding: 6px 12px; margin: 2px 0; border-left: 2px solid transparent; border-radius: 4px; color: #94a3b8; text-decoration: none; overflow-wrap: anywhere; }
+.article-toc nav a:hover { color: #e2e8f0; background: #1e293b80; }
+.article-toc nav a[aria-current] { color: #38bdf8; background: #38bdf80c; border-left-color: #38bdf8; }
+.code-frame { position: relative; margin: 12px 0; border: 1px solid #334155; border-radius: 8px; overflow: hidden; background: #020617; }
+.code-fold { margin: 0; }
+.code-fold summary { min-height: 40px; padding: 10px 105px 10px 12px; background: #172235; font: 12px/20px system-ui,sans-serif; color: #94a3b8; }
+.code-fold pre { margin: 0; padding: 8px 14px; white-space: pre; overflow: auto; font: 13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size: 4; }
+.code-fold code { padding: 0; margin: 0; font: inherit; white-space: inherit; background: transparent; }
+.copy-code { position: absolute; top: 6px; right: 8px; margin: 0; padding: 4px 8px; color: #cbd5e1; border: 1px solid #334155; border-radius: 5px; background: #0f172a; font: 12px/18px system-ui,sans-serif; }
+.copy-code:hover { color: #38bdf8; border-color: #38bdf8; }
+.back-top { position: fixed; right: 24px; bottom: 24px; z-index: 21; padding: 8px 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; text-decoration: none; font: 13px/1.6 system-ui,sans-serif; }
+@media (min-width: 1251px) { .has-toc main { width: 900px; margin-right: auto; margin-left: calc((100vw - 1200px) / 2); } }
+@media (max-width: 1250px) { .article-toc { top: auto; bottom: 78px; right: 16px; width: min(280px, calc(100vw - 32px)); } .article-toc nav { max-height: 45vh; } }
+@media (max-width: 600px) { main { width: calc(100% - 24px); margin: 12px auto 140px; padding: 16px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+</style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
+<a href="https://github.com/feeday/cpuck.com/issues/5">原始 Issue / 编辑</a> · <a href="/blog/md/5.md">Markdown</a></nav>
+<h1>2</h1><p>更新：2026-09-13T05:50:56Z</p><article><p dir="auto">233</p></article>
+</main><script>(() => {
+  const article = document.querySelector('article');
+  if (!article) return;
+  const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const toc = document.createElement('details');
+  toc.className = 'article-toc';
+  const summary = document.createElement('summary');
+  summary.textContent = '文章目录';
+  toc.append(summary);
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', '文章目录');
+  const links = [];
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      let id = 'article-section-' + (index + 1);
+      while (document.getElementById(id)) id += '-';
+      heading.id = id;
+    }
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(heading.id);
+    link.textContent = heading.textContent.trim();
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
+    link.addEventListener('click', () => {
+      if (matchMedia('(max-width: 1250px)').matches) toc.open = false;
+    });
+    nav.append(link);
+    links.push(link);
+  });
+  if (headings.length) {
+    toc.append(nav);
+    toc.open = matchMedia('(min-width: 1251px)').matches;
+    document.body.classList.add('has-toc');
+    document.body.append(toc);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const current = entries.find(entry => entry.isIntersecting);
+        if (!current) return;
+        const index = headings.indexOf(current.target);
+        links.forEach((link, i) => {
+          if (i === index) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, {rootMargin: '0px 0px -65% 0px'});
+      headings.forEach(heading => observer.observe(heading));
+    }
+  }
+  article.querySelectorAll('pre').forEach(pre => {
+    const details = document.createElement('details');
+    details.className = 'code-fold';
+    details.open = false;
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
+    const toggle = document.createElement('summary');
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\n$/, '').split('\n').length;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = '复制代码';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent);
+        button.textContent = '已复制';
+      } catch {
+        details.open = true;
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = '已选中，请手动复制';
+      }
+      setTimeout(() => { button.textContent = '复制代码'; }, 2200);
+    });
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
+  });
+  const top = document.createElement('a');
+  top.href = '#article-top';
+  top.className = 'back-top';
+  top.textContent = '↑ 顶部';
+  top.setAttribute('aria-label', '返回顶部');
+  document.body.append(top);
+})();
+</script></body></html>
