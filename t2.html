@@ -543,7 +543,12 @@
             selectedCardIndex = -1;
             currentPage = 0;
             
-            currentDataList = [...list].sort((a, b) => {
+            const keyword = searchInput.value.trim().toLowerCase();
+            currentDataList = list.filter(item => {
+                if (item.isArticle && !keyword) return false;
+                return !keyword || [item.title, item.name, item.desc, item.tag, item.date,
+                    item.keywords, item.content, item.cat].filter(Boolean).join(' ').toLowerCase().includes(keyword);
+            }).sort((a, b) => {
                 if (a.isTop && !b.isTop) return -1;
                 if (!a.isTop && b.isTop) return 1;
                 return 0;
