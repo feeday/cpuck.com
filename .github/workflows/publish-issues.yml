@@ -7,6 +7,8 @@ on:
     branches: [main]
     paths:
       - scripts/publish_issues.py
+      - scripts/article.js
+      - scripts/article.css
       - .github/workflows/publish-issues.yml
 permissions:
   contents: read

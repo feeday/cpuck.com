@@ -1,0 +1,18 @@
+html { scroll-behavior: smooth; }
+:is(h1,h2,h3,h4,h5,h6) { scroll-margin-top: 24px; }
+button, summary { cursor: pointer; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid #38bdf8; outline-offset: 3px; }
+.article-toc { position: fixed; right: 16px; top: 32px; width: 220px; z-index: 20; border: 1px solid #475569; border-radius: 12px; background: #0f172a; box-shadow: 0 8px 24px #0006; }
+.article-toc summary { padding: 12px 16px; font-weight: 600; }
+.article-toc nav { max-height: 65vh; overflow: auto; padding-bottom: 12px; }
+.article-toc nav a { display: block; padding: 6px 12px; color: #94a3b8; text-decoration: none; overflow-wrap: anywhere; }
+.article-toc nav a:hover, .article-toc nav a[aria-current] { color: #38bdf8; background: #1e293b; }
+.code-fold { margin: 16px 0; border: 1px solid #334155; border-radius: 10px; overflow: hidden; background: #020617; }
+.code-fold summary { padding: 10px 14px; background: #1e293b; font: 14px/1.6 system-ui,sans-serif; color: #cbd5e1; }
+.code-fold pre { margin: 0; white-space: pre; clear: both; }
+.copy-code { display: block; margin: 10px 14px 0 auto; padding: 6px 10px; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; background: #1e293b; }
+.back-top { position: fixed; right: 18px; bottom: 24px; z-index: 21; padding: 10px 16px; border-radius: 12px; border: 1px solid #475569; background: #0f172a; text-decoration: none; }
+@media (min-width: 1251px) { main { margin-right: 260px; margin-left: max(24px, calc((100vw - 1200px) / 2)); } }
+@media (max-width: 1250px) { .article-toc { top: auto; bottom: 84px; width: min(300px, calc(100vw - 32px)); } }
+@media (max-width: 600px) { main { margin: 12px 10px 150px; padding: 16px; } .article-toc nav { max-height: 45vh; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

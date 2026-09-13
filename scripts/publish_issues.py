@@ -1,5 +1,6 @@
 """Publish owner-authored documentation Issues; keep immutable MD/HTML revisions."""
 import hashlib
+import base64
 import html
 import json
 import os
@@ -18,6 +19,9 @@ def api(path):
 
 
 def render(issue):
+    script = Path(__file__).with_name("article.js").read_text(encoding="utf-8")
+    css = Path(__file__).with_name("article.css").read_text(encoding="utf-8")
+    script_hash = base64.b64encode(hashlib.sha256(script.encode()).digest()).decode()
     title = html.escape(issue["title"])
     source = html.escape(issue["html_url"], quote=True)
     # body_html is rendered and sanitized by GitHub, never raw Issue HTML.
@@ -27,7 +31,7 @@ def render(issue):
     return f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-{script_hash}'; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>{title} · CPuck</title>
 <style>
 body{{margin:0;background:#020617;color:#f8fafc;font:16px/1.8 system-ui,sans-serif}}
@@ -35,10 +39,11 @@ main{{max-width:900px;margin:32px auto;padding:24px;border:1px solid #334155;bor
 a{{color:#38bdf8}} img,video{{max-width:100%;height:auto}} pre{{overflow:auto;padding:16px;background:#020617}}
 table{{display:block;overflow:auto;border-collapse:collapse}}td,th{{border:1px solid #475569;padding:8px}}
 blockquote{{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}}
-</style></head><body><main><nav><a href="/">← 资源导航</a> ·
+{css}
+</style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
 <a href="{source}">原始 Issue / 编辑</a> · <a href="/blog/md/{issue['number']}.md">Markdown</a></nav>
 <h1>{title}</h1><p>更新：{html.escape(issue['updated_at'])}</p><article>{body}</article>
-</main></body></html>
+</main><script>{script}</script></body></html>
 """
 
 
