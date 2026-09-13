@@ -7,12 +7,24 @@
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<div class="container">
-<h1>CPuck</h1>
-<p>AI 实验日志与技术记录</p>
-<input id="search" placeholder="搜索 AI / 模型 / 硬件">
-<div id="result"></div>
-</div>
+<header class="header">
+  <div class="nav">
+    <div class="logo">CPuck</div>
+    <div class="search-box">
+      <input id="search" placeholder="搜索 AI / 模型 / 硬件 / 数据集">
+    </div>
+  </div>
+</header>
+<main class="main">
+  <section class="hero">
+    <h1>CPuck AI Knowledge</h1>
+    <p>AI 实验日志、模型测试、硬件评测与技术记录</p>
+  </section>
+  <section class="card">
+    <h2>最新日志</h2>
+    <div id="result"></div>
+  </section>
+</main>
 <script src="assets/search.js"></script>
 </body>
 </html>
