@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-vnxsb7hyAga86JxOqOekgXqgGBCQS6+Jum7oBNusM1g='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>win11-key · CPuck</title>
 <style>
 body{margin:0;background:#020617;color:#f8fafc;font:16px/1.8 system-ui,sans-serif}
@@ -9,7 +9,26 @@ main{max-width:900px;margin:32px auto;padding:24px;border:1px solid #334155;bord
 a{color:#38bdf8} img,video{max-width:100%;height:auto} pre{overflow:auto;padding:16px;background:#020617}
 table{display:block;overflow:auto;border-collapse:collapse}td,th{border:1px solid #475569;padding:8px}
 blockquote{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}
-</style></head><body><main><nav><a href="/">← 资源导航</a> ·
+html { scroll-behavior: smooth; }
+:is(h1,h2,h3,h4,h5,h6) { scroll-margin-top: 24px; }
+button, summary { cursor: pointer; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid #38bdf8; outline-offset: 3px; }
+.article-toc { position: fixed; right: 16px; top: 32px; width: 220px; z-index: 20; border: 1px solid #475569; border-radius: 12px; background: #0f172a; box-shadow: 0 8px 24px #0006; }
+.article-toc summary { padding: 12px 16px; font-weight: 600; }
+.article-toc nav { max-height: 65vh; overflow: auto; padding-bottom: 12px; }
+.article-toc nav a { display: block; padding: 6px 12px; color: #94a3b8; text-decoration: none; overflow-wrap: anywhere; }
+.article-toc nav a:hover, .article-toc nav a[aria-current] { color: #38bdf8; background: #1e293b; }
+.code-fold { margin: 16px 0; border: 1px solid #334155; border-radius: 10px; overflow: hidden; background: #020617; }
+.code-fold summary { padding: 10px 14px; background: #1e293b; font: 14px/1.6 system-ui,sans-serif; color: #cbd5e1; }
+.code-fold pre { margin: 0; white-space: pre; clear: both; }
+.copy-code { display: block; margin: 10px 14px 0 auto; padding: 6px 10px; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; background: #1e293b; }
+.back-top { position: fixed; right: 18px; bottom: 24px; z-index: 21; padding: 10px 16px; border-radius: 12px; border: 1px solid #475569; background: #0f172a; text-decoration: none; }
+@media (min-width: 1251px) { main { margin-right: 260px; margin-left: max(24px, calc((100vw - 1200px) / 2)); } }
+@media (max-width: 1250px) { .article-toc { top: auto; bottom: 84px; width: min(300px, calc(100vw - 32px)); } }
+@media (max-width: 600px) { main { margin: 12px 10px 150px; padding: 16px; } .article-toc nav { max-height: 45vh; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+</style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
 <a href="https://github.com/feeday/cpuck.com/issues/6">原始 Issue / 编辑</a> · <a href="/blog/md/6.md">Markdown</a></nav>
 <h1>win11-key</h1><p>更新：2026-09-13T06:30:53Z</p><article><h1 dir="auto">Windows 11 是否“正版”？普通人判断指南</h1>
 <blockquote>
@@ -531,4 +550,84 @@ KMS 看是不是正规组织内部服务器。
 “已激活”解决的是技术状态，
 “是不是正版授权”还要看许可证来源和使用权。
 </code></pre></div></article>
-</main></body></html>
+</main><script>(() => {
+  const article = document.querySelector('article');
+  if (!article) return;
+  const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const toc = document.createElement('details');
+  toc.className = 'article-toc';
+  const summary = document.createElement('summary');
+  summary.textContent = '文章目录';
+  toc.append(summary);
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', '文章目录');
+  const links = [];
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      let id = 'article-section-' + (index + 1);
+      while (document.getElementById(id)) id += '-';
+      heading.id = id;
+    }
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(heading.id);
+    link.textContent = heading.textContent.trim();
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - 1) * 10 + 12 + 'px';
+    link.addEventListener('click', () => {
+      if (matchMedia('(max-width: 1250px)').matches) toc.open = false;
+    });
+    nav.append(link);
+    links.push(link);
+  });
+  if (headings.length) {
+    toc.append(nav);
+    toc.open = matchMedia('(min-width: 1251px)').matches;
+    document.body.append(toc);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const current = entries.find(entry => entry.isIntersecting);
+        if (!current) return;
+        const index = headings.indexOf(current.target);
+        links.forEach((link, i) => {
+          if (i === index) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, {rootMargin: '0px 0px -65% 0px'});
+      headings.forEach(heading => observer.observe(heading));
+    }
+  }
+  article.querySelectorAll('pre').forEach(pre => {
+    const details = document.createElement('details');
+    details.className = 'code-fold';
+    details.open = true;
+    const toggle = document.createElement('summary');
+    toggle.textContent = '代码 · 展开 / 收起';
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = '复制代码';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent);
+        button.textContent = '已复制';
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = '已选中，请手动复制';
+      }
+      setTimeout(() => { button.textContent = '复制代码'; }, 2200);
+    });
+    pre.before(details);
+    details.append(toggle, button, pre);
+  });
+  const top = document.createElement('a');
+  top.href = '#article-top';
+  top.className = 'back-top';
+  top.textContent = '↑ 顶部';
+  top.setAttribute('aria-label', '返回顶部');
+  document.body.append(top);
+})();
+</script></body></html>
