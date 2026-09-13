@@ -280,6 +280,8 @@
         .tag-log { color: #38bdf8; }
         .card-title { font-size: 1.15rem; font-weight: 600; color: #fff; margin-bottom: 8px; margin-right: 50px; }
         .card-desc { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 24px; flex-grow: 1; line-height: 1.6; }
+        .article-card .card-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; max-height: 3.2em; overflow: hidden; overflow-wrap: anywhere; }
+        .article-card .card-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
         
         .card-actions {
             display: grid;
@@ -607,6 +609,7 @@
                 const globalIndex = startIndex + indexInSlice; 
                 const el = document.createElement('div');
                 el.className = item.hideOnMobile ? 'card hide-on-mobile' : 'card';
+                if (item.isArticle) el.classList.add('article-card');
                 el.style.animationDelay = `${Math.min(indexInSlice, 12) * 0.015}s`;
                 const [tagClass, tagName] = categoryMap[item.cat] || categoryMap.text;
                 const target = item.target || '_blank';

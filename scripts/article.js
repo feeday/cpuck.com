@@ -19,7 +19,9 @@
     const link = document.createElement('a');
     link.href = '#' + encodeURIComponent(heading.id);
     link.textContent = heading.textContent.trim();
-    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - 1) * 10 + 12 + 'px';
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
     link.addEventListener('click', () => {
       if (matchMedia('(max-width: 1250px)').matches) toc.open = false;
     });
@@ -29,6 +31,7 @@
   if (headings.length) {
     toc.append(nav);
     toc.open = matchMedia('(min-width: 1251px)').matches;
+    document.body.classList.add('has-toc');
     document.body.append(toc);
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(entries => {
@@ -46,9 +49,17 @@
   article.querySelectorAll('pre').forEach(pre => {
     const details = document.createElement('details');
     details.className = 'code-fold';
-    details.open = true;
+    details.open = false;
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
     const toggle = document.createElement('summary');
-    toggle.textContent = '代码 · 展开 / 收起';
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\n$/, '').split('\n').length;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'copy-code';
@@ -59,6 +70,7 @@
         await navigator.clipboard.writeText(pre.textContent);
         button.textContent = '已复制';
       } catch {
+        details.open = true;
         const range = document.createRange();
         range.selectNodeContents(pre);
         const selection = window.getSelection();
@@ -68,8 +80,9 @@
       }
       setTimeout(() => { button.textContent = '复制代码'; }, 2200);
     });
-    pre.before(details);
-    details.append(toggle, button, pre);
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
   });
   const top = document.createElement('a');
   top.href = '#article-top';
