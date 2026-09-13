@@ -29,15 +29,25 @@
 </main>
 <script>
 let allData=[];
+
 async function loadData(){
  let list=await fetch('data/list.json').then(r=>r.json()).catch(()=>[]);
  let posts=await fetch('data/posts.json').then(r=>r.json()).catch(()=>[]);
  allData=[...list,...posts];
  document.getElementById('list').innerHTML=list.map(renderItem).join('');
 }
+
 function renderItem(x){
- return `<a class="item" href="${x.url||x.link||'#'}" target="_blank"><b>${x.title||x.name||''}</b><br><span>${x.desc||''}</span></a>`;
+ let links=x.links||{};
+ let url=links.http||links.hf||x.url||x.link||'#';
+ return `<a class="item" href="${url}" target="_blank">
+<b>${x.title||x.name||''}</b><br>
+<span>${x.desc||''}</span>
+${links.hf?`<br><small>HF</small>`:''}
+${links.hfCn?`<small> HF-CN</small>`:''}
+</a>`;
 }
+
 document.getElementById('search').oninput=e=>{
  let q=e.target.value.trim().toLowerCase();
  let box=document.getElementById('search-result');
@@ -45,6 +55,7 @@ document.getElementById('search').oninput=e=>{
  box.style.display='block';
  document.getElementById('result').innerHTML=allData.filter(x=>JSON.stringify(x).toLowerCase().includes(q)).map(renderItem).join('')||'无结果';
 };
+
 loadData();
 </script>
 </body>
