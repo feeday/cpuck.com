@@ -12,7 +12,7 @@
     ],
     "date": "2026-09-13",
     "updated_at": "2026-09-13T05:50:56Z",
-    "url": "blog/posts/issue-5.html",
+    "url": "/5/",
     "markdown": "blog/posts/issue-5.md",
     "issue_url": "https://github.com/feeday/cpuck.com/issues/5"
   },
@@ -29,7 +29,7 @@
     ],
     "date": "2026-09-13",
     "updated_at": "2026-09-13T03:16:36Z",
-    "url": "blog/posts/issue-1.html",
+    "url": "/1/",
     "markdown": "blog/posts/issue-1.md",
     "issue_url": "https://github.com/feeday/cpuck.com/issues/1"
   },
