@@ -622,7 +622,7 @@
         }, { rootMargin: '200px' }); 
         observer.observe(scrollSentinel);
         // ================== 异步获取数据 ==================
-        fetch('list.json')
+        fetch('/data/list.json')
             .then(response => {
                 if (!response.ok) throw new Error('网络响应失败');
                 return response.json();
