@@ -10,7 +10,10 @@
 <header class="header">
 <div class="nav">
 <div class="logo">CPuck AI</div>
-<div class="search-box"><input id="search" placeholder="搜索工具 / 模型 / 数据集 / 日志"></div>
+<div class="search-box" style="position:relative">
+<input id="search" placeholder="搜索工具 / 模型 / 数据集 / 日志">
+<div id="suggest" class="suggest-box"></div>
+</div>
 </div>
 </header>
 <main class="main">
@@ -19,6 +22,15 @@
 <p>工具、模型、数据集、硬件测试与实验日志</p>
 </section>
 <section class="card">
+<div class="filter-bar">
+<button onclick="setCat('all')">全部</button>
+<button onclick="setCat('tool')">工具</button>
+<button onclick="setCat('image')">图像</button>
+<button onclick="setCat('video')">视频</button>
+<button onclick="setCat('audio')">音频</button>
+<button onclick="setCat('text')">文本</button>
+<button onclick="setCat('dataset')">数据集</button>
+</div>
 <h2>资源导航</h2>
 <div id="list" class="grid"></div>
 </section>
@@ -29,32 +41,43 @@
 </main>
 <script>
 let allData=[];
+let currentCat='all';
 
 async function loadData(){
  let list=await fetch('data/list.json').then(r=>r.json()).catch(()=>[]);
  let posts=await fetch('data/posts.json').then(r=>r.json()).catch(()=>[]);
  allData=[...list,...posts];
- document.getElementById('list').innerHTML=list.map(renderItem).join('');
+ renderList();
 }
 
 function renderItem(x){
  let links=x.links||{};
  let url=links.http||links.hf||x.url||x.link||'#';
- return `<a class="item" href="${url}" target="_blank">
-<b>${x.title||x.name||''}</b><br>
-<span>${x.desc||''}</span>
-${links.hf?`<br><small>HF</small>`:''}
-${links.hfCn?`<small> HF-CN</small>`:''}
-</a>`;
+ return `<a class="item" href="${url}" target="_blank"><b>${x.title||x.name||''}</b><br><span>${x.desc||''}</span>${links.hf?'<br><small>HF</small>':''}${links.hfCn?'<small> HF-CN</small>':''}</a>`;
 }
 
-document.getElementById('search').oninput=e=>{
+function renderList(){
+ let data=currentCat==='all'?allData:allData.filter(x=>x.cat===currentCat);
+ document.getElementById('list').innerHTML=data.map(renderItem).join('')||'无结果';
+}
+
+function setCat(c){
+ currentCat=c;
+ renderList();
+}
+
+const search=document.getElementById('search');
+const suggest=document.getElementById('suggest');
+
+search.oninput=e=>{
  let q=e.target.value.trim().toLowerCase();
- let box=document.getElementById('search-result');
- if(!q){box.style.display='none';return;}
- box.style.display='block';
- document.getElementById('result').innerHTML=allData.filter(x=>JSON.stringify(x).toLowerCase().includes(q)).map(renderItem).join('')||'无结果';
+ if(!q){suggest.style.display='none';return;}
+ let arr=allData.filter(x=>JSON.stringify(x).toLowerCase().includes(q)).slice(0,8);
+ suggest.innerHTML=arr.map(x=>`<div onclick="openLink('${x.links?.http||x.url||x.link||'#'}')"><b>${x.title||''}</b><br><span>${x.desc||''}</span></div>`).join('');
+ suggest.style.display=arr.length?'block':'none';
 };
+
+function openLink(url){window.open(url,'_blank');}
 
 loadData();
 </script>
