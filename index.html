@@ -24,32 +24,27 @@
 </section>
 <section class="card" id="search-result" style="display:none">
 <h2>搜索结果</h2>
-<div id="result"></div>
+<div id="result" class="grid"></div>
 </section>
 </main>
 <script>
 let allData=[];
 async function loadData(){
- try{
-  let [list,posts]=await Promise.all([
-   fetch('data/list.json').then(r=>r.json()),
-   fetch('data/posts.json').then(r=>r.json()).catch(()=>[])
-  ]);
-  allData=[...list,...posts];
-  document.getElementById('list').innerHTML=list.map(x=>renderItem(x)).join('');
- }catch(e){}
+ let list=await fetch('data/list.json').then(r=>r.json()).catch(()=>[]);
+ let posts=await fetch('data/posts.json').then(r=>r.json()).catch(()=>[]);
+ allData=[...list,...posts];
+ document.getElementById('list').innerHTML=list.map(renderItem).join('');
 }
 function renderItem(x){
  return `<a class="item" href="${x.url||x.link||'#'}" target="_blank"><b>${x.title||x.name||''}</b><br><span>${x.desc||''}</span></a>`;
 }
-function doSearch(q){
- let result=document.getElementById('search-result');
- if(!q){result.style.display='none';return;}
- result.style.display='block';
- let arr=allData.filter(x=>JSON.stringify(x).toLowerCase().includes(q.toLowerCase()));
- document.getElementById('result').innerHTML=arr.map(x=>renderItem(x)).join('')||'无结果';
-}
-document.getElementById('search').addEventListener('input',e=>doSearch(e.target.value));
+document.getElementById('search').oninput=e=>{
+ let q=e.target.value.trim().toLowerCase();
+ let box=document.getElementById('search-result');
+ if(!q){box.style.display='none';return;}
+ box.style.display='block';
+ document.getElementById('result').innerHTML=allData.filter(x=>JSON.stringify(x).toLowerCase().includes(q)).map(renderItem).join('')||'无结果';
+};
 loadData();
 </script>
 </body>
