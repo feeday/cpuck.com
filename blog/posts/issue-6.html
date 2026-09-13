@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-vnxsb7hyAga86JxOqOekgXqgGBCQS6+Jum7oBNusM1g='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-25mEIkYk1cMyDLZ83MIjUlpb+QKnQguQw0XB+r6N2Bo='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>win11-key · CPuck</title>
 <style>
 body{margin:0;background:#020617;color:#f8fafc;font:16px/1.8 system-ui,sans-serif}
@@ -9,23 +9,32 @@ main{max-width:900px;margin:32px auto;padding:24px;border:1px solid #334155;bord
 a{color:#38bdf8} img,video{max-width:100%;height:auto} pre{overflow:auto;padding:16px;background:#020617}
 table{display:block;overflow:auto;border-collapse:collapse}td,th{border:1px solid #475569;padding:8px}
 blockquote{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; color-scheme: dark; }
+* { box-sizing: border-box; }
 :is(h1,h2,h3,h4,h5,h6) { scroll-margin-top: 24px; }
 button, summary { cursor: pointer; }
 a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid #38bdf8; outline-offset: 3px; }
-.article-toc { position: fixed; right: 16px; top: 32px; width: 220px; z-index: 20; border: 1px solid #475569; border-radius: 12px; background: #0f172a; box-shadow: 0 8px 24px #0006; }
-.article-toc summary { padding: 12px 16px; font-weight: 600; }
-.article-toc nav { max-height: 65vh; overflow: auto; padding-bottom: 12px; }
-.article-toc nav a { display: block; padding: 6px 12px; color: #94a3b8; text-decoration: none; overflow-wrap: anywhere; }
-.article-toc nav a:hover, .article-toc nav a[aria-current] { color: #38bdf8; background: #1e293b; }
-.code-fold { margin: 16px 0; border: 1px solid #334155; border-radius: 10px; overflow: hidden; background: #020617; }
-.code-fold summary { padding: 10px 14px; background: #1e293b; font: 14px/1.6 system-ui,sans-serif; color: #cbd5e1; }
-.code-fold pre { margin: 0; white-space: pre; clear: both; }
-.copy-code { display: block; margin: 10px 14px 0 auto; padding: 6px 10px; color: #e2e8f0; border: 1px solid #475569; border-radius: 6px; background: #1e293b; }
-.back-top { position: fixed; right: 18px; bottom: 24px; z-index: 21; padding: 10px 16px; border-radius: 12px; border: 1px solid #475569; background: #0f172a; text-decoration: none; }
-@media (min-width: 1251px) { main { margin-right: 260px; margin-left: max(24px, calc((100vw - 1200px) / 2)); } }
-@media (max-width: 1250px) { .article-toc { top: auto; bottom: 84px; width: min(300px, calc(100vw - 32px)); } }
-@media (max-width: 600px) { main { margin: 12px 10px 150px; padding: 16px; } .article-toc nav { max-height: 45vh; } }
+main { width: min(900px, calc(100% - 40px)); }
+main > nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #64748b; }
+main > nav a { padding: 4px 8px; border-radius: 6px; text-decoration: none; color: #94a3b8; }
+main > nav a:hover { background: #1e293b; color: #38bdf8; }
+.article-toc { position: fixed; right: max(24px, calc((100vw - 1200px) / 2)); top: 32px; width: 244px; z-index: 20; border: 1px solid #263245; border-radius: 12px; background: #0f172af5; box-shadow: 0 8px 24px #0003; font: 13px/1.5 system-ui,sans-serif; }
+.article-toc summary { padding: 12px 16px; font-size: 13px; font-weight: 600; color: #cbd5e1; }
+.article-toc nav { max-height: calc(100vh - 180px); overflow: auto; padding: 0 8px 10px; scrollbar-width: thin; scrollbar-color: #334155 transparent; }
+.article-toc nav a { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; padding: 6px 12px; margin: 2px 0; border-left: 2px solid transparent; border-radius: 4px; color: #94a3b8; text-decoration: none; overflow-wrap: anywhere; }
+.article-toc nav a:hover { color: #e2e8f0; background: #1e293b80; }
+.article-toc nav a[aria-current] { color: #38bdf8; background: #38bdf80c; border-left-color: #38bdf8; }
+.code-frame { position: relative; margin: 12px 0; border: 1px solid #334155; border-radius: 8px; overflow: hidden; background: #020617; }
+.code-fold { margin: 0; }
+.code-fold summary { min-height: 40px; padding: 10px 105px 10px 12px; background: #172235; font: 12px/20px system-ui,sans-serif; color: #94a3b8; }
+.code-fold pre { margin: 0; padding: 12px 14px; white-space: pre; overflow: auto; font: 13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size: 4; }
+.code-fold code { padding: 0; margin: 0; font: inherit; white-space: inherit; background: transparent; }
+.copy-code { position: absolute; top: 6px; right: 8px; margin: 0; padding: 4px 8px; color: #cbd5e1; border: 1px solid #334155; border-radius: 5px; background: #0f172a; font: 12px/18px system-ui,sans-serif; }
+.copy-code:hover { color: #38bdf8; border-color: #38bdf8; }
+.back-top { position: fixed; right: 24px; bottom: 24px; z-index: 21; padding: 8px 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; text-decoration: none; font: 13px/1.6 system-ui,sans-serif; }
+@media (min-width: 1251px) { .has-toc main { width: 900px; margin-right: auto; margin-left: calc((100vw - 1200px) / 2); } }
+@media (max-width: 1250px) { .article-toc { top: auto; bottom: 78px; right: 16px; width: min(280px, calc(100vw - 32px)); } .article-toc nav { max-height: 45vh; } }
+@media (max-width: 600px) { main { width: calc(100% - 24px); margin: 12px auto 140px; padding: 16px; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 </style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
@@ -571,7 +580,9 @@ KMS 看是不是正规组织内部服务器。
     const link = document.createElement('a');
     link.href = '#' + encodeURIComponent(heading.id);
     link.textContent = heading.textContent.trim();
-    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - 1) * 10 + 12 + 'px';
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
     link.addEventListener('click', () => {
       if (matchMedia('(max-width: 1250px)').matches) toc.open = false;
     });
@@ -581,6 +592,7 @@ KMS 看是不是正规组织内部服务器。
   if (headings.length) {
     toc.append(nav);
     toc.open = matchMedia('(min-width: 1251px)').matches;
+    document.body.classList.add('has-toc');
     document.body.append(toc);
     if ('IntersectionObserver' in window) {
       const observer = new IntersectionObserver(entries => {
@@ -598,9 +610,17 @@ KMS 看是不是正规组织内部服务器。
   article.querySelectorAll('pre').forEach(pre => {
     const details = document.createElement('details');
     details.className = 'code-fold';
-    details.open = true;
+    details.open = false;
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
     const toggle = document.createElement('summary');
-    toggle.textContent = '代码 · 展开 / 收起';
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\n$/, '').split('\n').length;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'copy-code';
@@ -611,6 +631,7 @@ KMS 看是不是正规组织内部服务器。
         await navigator.clipboard.writeText(pre.textContent);
         button.textContent = '已复制';
       } catch {
+        details.open = true;
         const range = document.createRange();
         range.selectNodeContents(pre);
         const selection = window.getSelection();
@@ -620,8 +641,9 @@ KMS 看是不是正规组织内部服务器。
       }
       setTimeout(() => { button.textContent = '复制代码'; }, 2200);
     });
-    pre.before(details);
-    details.append(toggle, button, pre);
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
   });
   const top = document.createElement('a');
   top.href = '#article-top';
