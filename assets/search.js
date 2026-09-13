@@ -1,0 +1,1 @@
+fetch('data/search.json').then(r=>r.json()).then(data=>{const i=document.querySelector('#search');const o=document.querySelector('#result');function run(){let q=i.value.toLowerCase();o.innerHTML=data.filter(x=>JSON.stringify(x).toLowerCase().includes(q)).map(x=>`<div class="item"><b>${x.title}</b><p>${x.desc}</p><a href="${x.url}">查看</a></div>`).join('')}i.oninput=run;run()})
