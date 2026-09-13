@@ -35,8 +35,8 @@ main{{max-width:900px;margin:32px auto;padding:24px;border:1px solid #334155;bor
 a{{color:#38bdf8}} img,video{{max-width:100%;height:auto}} pre{{overflow:auto;padding:16px;background:#020617}}
 table{{display:block;overflow:auto;border-collapse:collapse}}td,th{{border:1px solid #475569;padding:8px}}
 blockquote{{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}}
-</style></head><body><main><nav><a href="/t2.html">← 资源导航</a> ·
-<a href="{source}">原始 Issue / 编辑</a> · <a href="/blog/posts/issue-{issue['number']}.md">Markdown</a></nav>
+</style></head><body><main><nav><a href="/">← 资源导航</a> ·
+<a href="{source}">原始 Issue / 编辑</a> · <a href="/blog/md/{issue['number']}.md">Markdown</a></nav>
 <h1>{title}</h1><p>更新：{html.escape(issue['updated_at'])}</p><article>{body}</article>
 </main></body></html>
 """
@@ -63,7 +63,8 @@ def publish(root, issues, owner):
         issue = {**issue, "number": number}
         md = "# " + issue["title"] + "\n\n" + (issue.get("body") or "") + "\n"
         page = render(issue)
-        write(root / str(number) / "index.html", page)
+        write(root / f"blog/{number}.html", page)
+        write(root / f"blog/md/{number}.md", md)
         stem = f"issue-{number}"
         revision = hashlib.sha256((md + page).encode()).hexdigest()[:16]
         for extension, content in [("md", md), ("html", page)]:
@@ -76,8 +77,8 @@ def publish(root, issues, owner):
             "title": issue["title"], "desc": (issue.get("body_text") or issue.get("body") or "")[:180],
             "content": issue.get("body_text") or issue.get("body") or "",
             "tag": sorted(labels), "date": issue["created_at"][:10],
-            "updated_at": issue["updated_at"], "url": f"/{number}/",
-            "markdown": f"blog/posts/{stem}.md", "issue_url": issue["html_url"]})
+            "updated_at": issue["updated_at"], "url": f"/blog/{number}.html",
+            "markdown": f"/blog/md/{number}.md", "issue_url": issue["html_url"]})
     posts.sort(key=lambda p: p.get("updated_at", p.get("date", "")), reverse=True)
     for path in ["data/posts.json", "data/search.json"]:
         write(root / path, json.dumps(posts, ensure_ascii=False, indent=2) + "\n")

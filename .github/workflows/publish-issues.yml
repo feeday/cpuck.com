@@ -33,9 +33,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/posts.json data/search.json
-          python3 -c 'import json,subprocess; [subprocess.run(["git","add","--",str(p["issue"])+"/index.html"],check=True) for p in json.load(open("data/posts.json")) if p.get("source")=="github-issue"]'
-          if [ -d blog/posts ]; then git add blog/posts; fi
-          if [ -d blog/backups ]; then git add blog/backups; fi
+          git add -- blog
           if ! git diff --cached --quiet; then
             git commit -m "Publish Issue articles and backups"
             git pull --rebase origin main

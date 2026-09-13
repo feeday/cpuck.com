@@ -5,13 +5,14 @@
 已有符合条件的 Issue 会在首次运行时补发。编辑标题、正文或标签会自动重建。
 关闭 Issue 不会下架文章；移除 documentation 标签后从搜索索引隐藏，文件及历史备份保留。
 
-- 最新正文：blog/posts/issue-编号.md
-- 文章地址：/编号/（例如 Issue #1 → https://datxy.com/1/），对应 编号/index.html
+- 最新正文：blog/md/编号.md
+- 文章地址：/blog/编号.html（例如 Issue #1 → https://datxy.com/blog/1.html），对应 blog/编号.html
+- 不再生成根目录数字文件夹；旧 /1/、/5/ 地址停止使用。
 - 兼容旧链接及 HTML 副本：blog/posts/issue-编号.html
 - 历史备份：blog/backups/issue-编号/内容哈希.md 和 .html
 - 搜索索引：data/posts.json、data/search.json（自动更新，无需手工维护）
 
-t2.html 默认隐藏文章；搜索时显示匹配文章，清空搜索后再次隐藏。
+导航页默认隐藏文章；搜索时显示匹配文章，清空搜索后再次隐藏。
 索引中的正文由发布脚本生成；图片和附件仍引用 Issue 中的原始地址，不备份二进制附件。
 备份 HTML 用于历史恢复，查看时可复制回 blog/posts 对应路径，内部导航是相对路径。
 
