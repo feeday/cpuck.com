@@ -28,25 +28,29 @@
 </section>
 </main>
 <script>
-async function loadList(){
+let allData=[];
+async function loadData(){
  try{
- let data=await fetch('data/list.json').then(r=>r.json());
- document.getElementById('list').innerHTML=data.map(x=>`<a class="item" href="${x.url||x.link}" target="_blank"><b>${x.title}</b><br><span>${x.desc||''}</span></a>`).join('');
+  let [list,posts]=await Promise.all([
+   fetch('data/list.json').then(r=>r.json()),
+   fetch('data/posts.json').then(r=>r.json()).catch(()=>[])
+  ]);
+  allData=[...list,...posts];
+  document.getElementById('list').innerHTML=list.map(x=>renderItem(x)).join('');
  }catch(e){}
 }
-async function doSearch(q){
- if(!q)return;
+function renderItem(x){
+ return `<a class="item" href="${x.url||x.link||'#'}" target="_blank"><b>${x.title||x.name||''}</b><br><span>${x.desc||''}</span></a>`;
+}
+function doSearch(q){
  let result=document.getElementById('search-result');
+ if(!q){result.style.display='none';return;}
  result.style.display='block';
- document.getElementById('result').innerHTML='搜索中...';
- try{
- let data=await fetch('data/search.json').then(r=>r.json());
- let arr=data.filter(x=>JSON.stringify(x).toLowerCase().includes(q.toLowerCase()));
- document.getElementById('result').innerHTML=arr.map(x=>`<a class="item" href="${x.url||'#'}"><b>${x.title||x.name||''}</b><br>${x.desc||''}</a>`).join('')||'无结果';
- }catch(e){document.getElementById('result').innerHTML='无结果'}
+ let arr=allData.filter(x=>JSON.stringify(x).toLowerCase().includes(q.toLowerCase()));
+ document.getElementById('result').innerHTML=arr.map(x=>renderItem(x)).join('')||'无结果';
 }
 document.getElementById('search').addEventListener('input',e=>doSearch(e.target.value));
-loadList();
+loadData();
 </script>
 </body>
 </html>
