@@ -3,27 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CPuck AI Knowledge</title>
+<title>CPuck AI</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <header class="header">
-  <div class="nav">
-    <div class="logo">CPuck</div>
-    <div class="search-box">
-      <input id="search" placeholder="搜索 AI / 模型 / 硬件 / 数据集">
-    </div>
-  </div>
+<div class="nav"><div class="logo">CPuck AI</div><div class="search-box"><input id="search" placeholder="搜索工具 / 模型 / 数据集 / 日志"><button onclick="search()">搜索</button></div></div>
 </header>
 <main class="main">
-  <section class="hero">
-    <h1>CPuck AI Knowledge</h1>
-    <p>AI 实验日志、模型测试、硬件评测与技术记录</p>
-  </section>
-  <section class="card">
-    <h2>最新日志</h2>
-    <div id="result"></div>
-  </section>
+<section class="hero"><h1>AI Knowledge</h1><p>工具、模型、数据集、硬件测试与实验日志</p></section>
+<section class="card"><h2>资源导航</h2><div id="list" class="grid"></div></section>
+<section class="card"><h2>搜索结果</h2><div id="result"></div></section>
 </main>
 <script src="assets/search.js"></script>
 </body>
