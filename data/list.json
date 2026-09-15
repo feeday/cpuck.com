@@ -8,6 +8,17 @@
 {"cat":"video","title":"Seedance 2.0","desc":"每天5条10秒视频豆包免费生成。","url":"https://www.doubao.com/chat/create-image","isTop":true},
 {"cat":"image","title":"Photopea","desc":"在线PS，图形图层在线编辑器。","url":"https://www.photopea.com/","isTop":true,"hideOnMobile":true},
  {"cat":"ad","title":"Aigx","desc":"模型测试文档编辑器","url":"/aigx-x.html","isTop":true},
+
+ {
+  "cat": "tool",
+  "title": "Aigx",
+  "desc": "模型测试文档编辑器",
+  "links": {
+    "http": "/aigx-x.html",
+    "hfCn": "https://cloudstudio.net/",
+    "hf": "https://github.com/feeday/cpuck.com/issues"
+  },
+ 
  {
   "cat": "tool",
   "title": "OpenCut",
@@ -54,9 +65,7 @@
 {"cat":"multi","title":"弹幕视频留言","desc":"看剧听音乐吐槽。","url":"https://tcq233.com/btv","isTop":true},
 
 {"cat":"ad","title":"Colab","desc":"谷歌云端 Python 代码笔记。","url":"https://colab.new/","hideOnMobile":true},
-  
-{"cat":"ad","title":"Cloud Studio","desc":"每天免费领2小时T4-GPU算力。","url":"https://cloudstudio.net/user-center","hideOnMobile":true},
-  
+    
 {"cat":"text","title":"Artificial Intelligence","desc":"人工智能领域相关论文","url":"https://arxiv.org/list/cs.AI/recent"},
 {"cat":"ad","title":"Detection Fake","desc":"腾讯朱雀文视图鉴伪。","url":"https://matrix.tencent.com/ai-detect/","hideOnMobile":true},
 {"cat":"image","title":"Mspaint","desc":"在线画图工具。","url":"/mspaint","hideOnMobile":true},
