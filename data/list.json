@@ -7,7 +7,6 @@
 
 {"cat":"video","title":"Seedance 2.0","desc":"每天5条10秒视频豆包免费生成。","url":"https://www.doubao.com/chat/create-image","isTop":true},
 {"cat":"image","title":"Photopea","desc":"在线PS，图形图层在线编辑器。","url":"https://www.photopea.com/","isTop":true,"hideOnMobile":true},
- {"cat":"ad","title":"Aigx","desc":"模型测试文档编辑器","url":"/aigx-x.html","isTop":true},
 
  {
   "cat": "tool",
@@ -18,7 +17,10 @@
     "hfCn": "https://cloudstudio.net/",
     "hf": "https://github.com/feeday/cpuck.com/issues"
   },
- 
+  "isTop": true,
+  "hideOnMobile": true
+},
+
  {
   "cat": "tool",
   "title": "OpenCut",
