@@ -27,7 +27,7 @@
   "desc": "视频编辑工具",
   "links": {
     "http": "https://opencut.app/projects",
-    "hfCn": "https://hf-mirror.com/datasets/feeday/datxy/blob/main/win/",
+    "hfCn": "https://hf-mirror.com/datasets/feeday/datxy/",
     "hf": "https://feeday.github.io/webCut/"
   },
   "isTop": true,
