@@ -1,6 +1,4 @@
 [
-{"cat":"image","title":"NanoBananaPro","desc":"Banana 官网图像生成","url":"https://labs.google/fx/zh/tools/flow","isTop":true,"hideOnMobile":true},
-{"cat":"video","title":"Seedance 2.0","desc":"每天5条10秒视频豆包免费生成。","url":"https://www.doubao.com/chat/create-image","isTop":true},
  {
   "cat": "tool",
   "title": "AI News",
@@ -9,6 +7,20 @@
     "http": "https://artificialanalysis.ai/?intelligence=coding-index",
     "hfCn": "https://aihot.virxact.com/",
     "hf": "https://arxiv.org/list/cs.AI/recent"
+  },
+  "isTop": true,
+  "hideOnMobile": true
+},
+
+
+  {
+  "cat": "tool",
+  "title": "在线协作办公",
+  "desc": "豆包腾讯文档",
+  "links": {
+    "http": "https://docs.qq.com/desktop/",
+    "hfCn": "https://www.doubao.com/chat",
+    "hf": "https://labs.google/fx/zh/tools/flow"
   },
   "isTop": true,
   "hideOnMobile": true
