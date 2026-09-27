@@ -78,7 +78,7 @@
 },
  {
   "cat": "tool",
-  "title": "腾讯云服务",
+  "title": "Tencent",
   "desc": "模型测速检测",
   "links": {
     "http": "https://matrix.tencent.com/ai-detect/",
