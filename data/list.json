@@ -1,0 +1,75 @@
+[
+{"cat":"image","title":"NanoBananaPro","desc":"Banana 官网图像生成","url":"https://labs.google/fx/zh/tools/flow","isTop":true,"hideOnMobile":true},
+{"cat":"video","title":"Seedance 2.0","desc":"每天5条10秒视频豆包免费生成。","url":"https://www.doubao.com/chat/create-image","isTop":true},
+ {
+  "cat": "tool",
+  "title": "AI News",
+  "desc": "模型资讯排行榜",
+  "links": {
+    "http": "https://artificialanalysis.ai/?intelligence=coding-index",
+    "hfCn": "https://aihot.virxact.com/",
+    "hf": "https://arxiv.org/list/cs.AI/recent"
+  },
+  "isTop": true,
+  "hideOnMobile": true
+},
+ 
+ {
+  "cat": "tool",
+  "title": "Aigx",
+  "desc": "模型测试文档编辑器",
+  "links": {
+    "http": "/aigx-x.html",
+    "hfCn": "https://github.com/ChatPuck/Web/issues/new",
+    "hf": "https://chat.openai.com/"
+  },
+  "isTop": true,
+  "hideOnMobile": true
+},
+
+  {
+  "cat": "tool",
+  "title": "Network",
+  "desc": "网络地址测速",
+  "links": {
+    "http": "http://cs1.bbn.com.cn:8800/gzweb/",
+    "hfCn": "https://hf-mirror.com/datasets/datxy/demo/blob/main/test/eso1242a.psb",
+    "hf": "http://ping0.cc/"
+  },
+  "isTop": true,
+  "hideOnMobile": true
+},
+ {
+  "cat": "tool",
+  "title": "OpenCut",
+  "desc": "视频图像编辑",
+  "links": {
+    "http": "https://opencut.app/projects",
+    "hfCn": "https://www.photopea.com/",
+    "hf": "https://feeday.github.io/webCut/"
+  },
+  "isTop": true,
+  "hideOnMobile": true
+},
+ {
+  "cat": "tool",
+  "title": "CPU Test",
+  "desc": "终端性能测试",
+  "links": {
+    "http": "https://github.com/feeday/cpuckTest/archive/refs/tags/v1.0.0.zip",
+    "hfCn": "http://gpu.jy6d.com/",
+    "hf": "http://cpu.jy6d.com/"
+  },
+  "isTop": true,
+  "hideOnMobile": true
+},
+{"cat":"text","title":"Translate","desc":"谷歌文档文字在线翻译。","url":"https://translate.google.com/"},
+{"cat":"audio","title":"云听","desc":"中央广播电台。","url":"https://www.radio.cn/pc-portal/erji/radioStation.html","hideOnMobile":true},
+{"cat":"audio","title":"有声书","desc":"喜马拉雅有声故事。","url":"https://www.ximalaya.com/youshengshu/updates/","hideOnMobile":true},
+{"cat":"video","title":"LTX-2.3","desc":"在线图生视频带音效。","url":"https://huggingface.co/spaces/Lightricks/LTX-2-3"},
+{"cat":"audio","title":"Qwen-ASR","desc":"在线语音识别转换。","url":"https://huggingface.co/spaces/Qwen/Qwen3-ASR-Demo"},
+{"cat":"video","title":"央视新闻","desc":"央视频电视直播。","url":"https://www.yangshipin.cn/tv/home?pid=600001811","hideOnMobile":true},
+{"cat":"video","title":"虎牙直播","desc":"虎牙影视轮播。","url":"https://www.huya.com/g/2135"},
+{"cat":"video","title":"掌机游戏","desc":"最新掌机游戏筛选。","url":"https://www.gamer520.com/gameswitch"},
+{"cat":"video","title":"最新电影","desc":"人气高分电影筛选。","url":"https://www.yfsp.tv/list/movie","hideOnMobile":true}
+]
