@@ -15,8 +15,8 @@
 
   {
   "cat": "tool",
-  "title": "在线协作办公",
-  "desc": "豆包腾讯文档",
+  "title": "Office Web",
+  "desc": "腾讯在线文档",
   "links": {
     "http": "https://docs.qq.com/desktop/",
     "hfCn": "https://www.doubao.com/chat",
