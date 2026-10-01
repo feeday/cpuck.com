@@ -88,13 +88,17 @@
   "isTop": true,
   "hideOnMobile": true
 },
+{"cat":"text","title":"Doubao","desc":"豆包视频生成。","url":"https://doubao.com/"},
 {"cat":"text","title":"Translate","desc":"谷歌文档文字在线翻译。","url":"https://translate.google.com/"},
 {"cat":"audio","title":"云听","desc":"中央广播电台。","url":"https://www.radio.cn/pc-portal/erji/radioStation.html","hideOnMobile":true},
+{"cat":"audio","title":"Suno","desc":"合成音乐。","url":"https://www.suno.com","hideOnMobile":true},
+ {"cat":"audio","title":"Spotify","desc":"音乐收藏。","url":"https://open.spotify.com/playlist/2VmPK9zHiT09je0OtZco9J","hideOnMobile":true},
 {"cat":"audio","title":"有声书","desc":"喜马拉雅有声故事。","url":"https://www.ximalaya.com/youshengshu/updates/","hideOnMobile":true},
 {"cat":"video","title":"LTX-2.3","desc":"在线图生视频带音效。","url":"https://huggingface.co/spaces/Lightricks/LTX-2-3"},
 {"cat":"audio","title":"Qwen-ASR","desc":"在线语音识别转换。","url":"https://huggingface.co/spaces/Qwen/Qwen3-ASR-Demo"},
 {"cat":"video","title":"央视新闻","desc":"央视频电视直播。","url":"https://www.yangshipin.cn/tv/home?pid=600001811","hideOnMobile":true},
 {"cat":"video","title":"虎牙直播","desc":"虎牙影视轮播。","url":"https://www.huya.com/g/2135"},
 {"cat":"video","title":"掌机游戏","desc":"最新掌机游戏筛选。","url":"https://www.gamer520.com/gameswitch"},
+{"cat":"video","title":"抖音短剧","desc":"最新掌机游戏筛选。","url":"https://www.douyin.com/series"},
 {"cat":"video","title":"最新电影","desc":"人气高分电影筛选。","url":"https://www.yfsp.tv/list/movie","hideOnMobile":true}
 ]
