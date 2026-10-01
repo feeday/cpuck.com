@@ -71,7 +71,7 @@
   "title": "CPU Test",
   "desc": "终端性能测试",
   "links": {
-    "http": "https://github.com/feeday/cpuckTest/archive/refs/tags/v1.0.0.zip",
+    "http": "https://hf-mirror.com/feeday",
     "hfCn": "http://gpu.jy6d.com/",
     "hf": "http://cpu.jy6d.com/"
   },
