@@ -13,19 +13,7 @@
 },
 
 
-  {
-  "cat": "tool",
-  "title": "Office Web",
-  "desc": "腾讯在线文档",
-  "links": {
-    "http": "https://docs.qq.com/desktop/",
-    "hfCn": "https://www.doubao.com/chat",
-    "hf": "https://labs.google/fx/zh/tools/flow"
-  },
-  "isTop": true,
-  "hideOnMobile": true
-},
- 
+
 
 
   {
@@ -40,13 +28,27 @@
   "isTop": true,
   "hideOnMobile": true
 },
+
+   {
+  "cat": "tool",
+  "title": "Office Web",
+  "desc": "在线文档表格",
+  "links": {
+    "http": "https://docs.qq.com/desktop/",
+    "hfCn": "https://github.com/feeday/cpuck.com/issues",
+    "hf": "/xlsx.html"
+  },
+  "isTop": true,
+  "hideOnMobile": true
+},
+ 
   {
   "cat": "tool",
   "title": "Aigx",
-  "desc": "模型测试文档编辑器",
+  "desc": "模型测试编辑器",
   "links": {
     "http": "/aigx-x.html",
-    "hfCn": "https://github.com/feeday/cpuck.com/issues",
+    "hfCn": "https://labs.google/fx/zh/tools/flow",
     "hf": "https://chat.openai.com/"
   },
   "isTop": true,
