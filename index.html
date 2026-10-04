@@ -572,6 +572,13 @@
                 if (!a.isTop && b.isTop) return 1;
                 return 0;
             });
+
+            // 首页 / 分类浏览：最多只展示 20 条。
+            // 输入搜索词后不截断，搜索仍覆盖全部 resources。
+            if (!keyword) {
+                currentDataList = currentDataList.slice(0, 20);
+            }
+
             if (currentDataList.length === 0) {
                 scrollSentinel.innerText = "没有找到匹配的资源";
                 return;
