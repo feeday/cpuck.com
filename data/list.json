@@ -102,5 +102,5 @@
 {"cat":"video","title":"虎牙直播","desc":"虎牙影视轮播。","url":"https://www.huya.com/g/2135"},
 {"cat":"video","title":"掌机游戏","desc":"最新掌机游戏筛选。","url":"https://www.gamer520.com/gameswitch"},
 {"cat":"video","title":"抖音短剧","desc":"最新掌机游戏筛选。","url":"https://www.douyin.com/series"},
-{"cat":"video","title":"最新电影","desc":"人气高分电影筛选。","url":"https://www.yfsp.tv/list/movie","hideOnMobile":true}
+{"cat":"video","title":"最新电影","desc":"人气高分电影筛选。","url":"https://www.bilibili.com/movie/index/?from_spmid=666.7.index.0#st=2&order=0&area=-1&style_id=-1&release_date=-1&season_status=-1&sort=0&page=1","hideOnMobile":true}
 ]
