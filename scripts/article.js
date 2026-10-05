@@ -1,6 +1,24 @@
 (() => {
   const article = document.querySelector('article');
   if (!article) return;
+  const themeButton = document.querySelector('.theme-toggle');
+  const setTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    if (themeButton) {
+      themeButton.textContent = theme === 'dark' ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+    }
+  };
+  let theme = 'light';
+  try { theme = localStorage.getItem('cpuck-article-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+  setTheme(theme);
+  themeButton?.addEventListener('click', () => {
+    theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try { localStorage.setItem('cpuck-article-theme', theme); } catch {}
+  });
+  const readingTime = document.querySelector('.reading-time');
+  if (readingTime) readingTime.textContent = '约 ' + Math.max(1, Math.ceil(article.textContent.replace(/\s/g, '').length / 500)) + ' 分钟阅读';
   const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
   const toc = document.createElement('details');
   toc.className = 'article-toc';
@@ -23,14 +41,14 @@
     link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
     link.title = link.textContent;
     link.addEventListener('click', () => {
-      if (matchMedia('(max-width: 1250px)').matches) toc.open = false;
+      if (matchMedia('(max-width: 1199px)').matches) toc.open = false;
     });
     nav.append(link);
     links.push(link);
   });
   if (headings.length) {
     toc.append(nav);
-    toc.open = matchMedia('(min-width: 1251px)').matches;
+    toc.open = matchMedia('(min-width: 1200px)').matches;
     document.body.classList.add('has-toc');
     document.body.append(toc);
     if ('IntersectionObserver' in window) {

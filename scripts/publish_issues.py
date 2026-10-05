@@ -1,4 +1,5 @@
 """Publish owner-authored documentation Issues; store articles only in data; Git preserves revisions."""
+from datetime import datetime, timezone, timedelta
 import hashlib
 import base64
 import html
@@ -25,6 +26,8 @@ def render(issue):
     script_hash = base64.b64encode(hashlib.sha256(script.encode()).digest()).decode()
     title = html.escape(issue["title"])
     source = html.escape(issue["html_url"], quote=True)
+    updated = datetime.fromisoformat(issue["updated_at"].replace("Z", "+00:00")).astimezone(timezone(timedelta(hours=8)))
+    display_date = updated.strftime("%Y年%m月%d日 %H:%M")
     # body_html is rendered and sanitized by GitHub, never raw Issue HTML.
     body = issue.get("body_html")
     if body is None:
@@ -34,16 +37,13 @@ def render(issue):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-{script_hash}'; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>{title} · CPuck</title>
-<style>
-body{{margin:0;background:#020617;color:#f8fafc;font:16px/1.8 system-ui,sans-serif}}
-main{{max-width:900px;margin:32px auto;padding:24px;border:1px solid #334155;border-radius:16px;background:#0f172a;overflow-wrap:anywhere}}
-a{{color:#38bdf8}} img,video{{max-width:100%;height:auto}} pre{{overflow:auto;padding:16px;background:#020617}}
-table{{display:block;overflow:auto;border-collapse:collapse}}td,th{{border:1px solid #475569;padding:8px}}
-blockquote{{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}}
-{css}
-</style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
-<a href="{source}">原始 Issue / 编辑</a> · <a href="/data/md/{issue['number']}.md">Markdown</a></nav>
-<h1>{title}</h1><p>更新：{html.escape(issue['updated_at'])}</p><article>{body}</article>
+<style>{css}</style></head><body><main id="article-top">
+<nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
+<div class="nav-actions"><a href="{source}">编辑原文</a><a href="/data/md/{issue['number']}.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
+<header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">{title}</h1>
+<div class="article-meta"><span>更新于 <time datetime="{html.escape(issue['updated_at'], quote=True)}">{display_date}</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article>{body}</article>
+<footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
 </main><script>{script}</script></body></html>
 """
 
