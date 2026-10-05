@@ -1,6 +1,29 @@
 [
   {
     "source": "github-issue",
+    "issue": 8,
+    "isArticle": true,
+    "cat": "log",
+    "title": "vuhk-hu",
+    "desc": "456",
+    "content": "456",
+    "tag": [
+      "documentation"
+    ],
+    "date": "2026-10-05",
+    "updated_at": "2026-10-05T12:29:21Z",
+    "url": "/vuhk-hu.html",
+    "aliases": [
+      "/8",
+      "/8.html",
+      "/blog/8.html",
+      "/blog/posts/issue-8.html"
+    ],
+    "markdown": "/data/md/8.md",
+    "issue_url": "https://github.com/feeday/cpuck.com/issues/8"
+  },
+  {
+    "source": "github-issue",
     "issue": 7,
     "isArticle": true,
     "cat": "log",

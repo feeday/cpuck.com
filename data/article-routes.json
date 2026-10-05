@@ -47,5 +47,16 @@
       "/blog/posts/demo.html"
     ],
     "file": "data/html/demo.html"
+  },
+  "8": {
+    "url": "/vuhk-hu.html",
+    "aliases": [
+      "/8",
+      "/8.html",
+      "/blog/8.html",
+      "/blog/posts/issue-8.html"
+    ],
+    "file": "data/html/8.html",
+    "markdown": "data/md/8.md"
   }
 }
