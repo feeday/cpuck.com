@@ -42,7 +42,7 @@ table{{display:block;overflow:auto;border-collapse:collapse}}td,th{{border:1px s
 blockquote{{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}}
 {css}
 </style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
-<a href="{source}">原始 Issue / 编辑</a> · <a href="/data/{issue['number']}.md">Markdown</a></nav>
+<a href="{source}">原始 Issue / 编辑</a> · <a href="/data/md/{issue['number']}.md">Markdown</a></nav>
 <h1>{title}</h1><p>更新：{html.escape(issue['updated_at'])}</p><article>{body}</article>
 </main><script>{script}</script></body></html>
 """
@@ -118,7 +118,7 @@ def publish(root, issues, owner):
         if old.get("url"):
             aliases.add(old["url"])
         plans[str(number)] = {"url": url, "aliases": sorted(set(aliases) - {url}),
-                              "file": f"data/{number}.html", "markdown": f"data/{number}.md"}
+                              "file": f"data/html/{number}.html", "markdown": f"data/md/{number}.md"}
     validate_routes(root, plans)
     for issue in eligible:
         labels = {label["name"] for label in issue.get("labels", [])}
@@ -138,7 +138,7 @@ def publish(root, issues, owner):
             "content": issue.get("body_text") or issue.get("body") or "",
             "tag": sorted(labels), "date": issue["created_at"][:10],
             "updated_at": issue["updated_at"], "url": url, "aliases": sorted(set(aliases) - {url}),
-            "markdown": f"/data/{number}.md", "issue_url": issue["html_url"]})
+            "markdown": f"/data/md/{number}.md", "issue_url": issue["html_url"]})
     posts.sort(key=lambda p: p.get("updated_at", p.get("date", "")), reverse=True)
     for path in ["data/posts.json", "data/search.json"]:
         write(root / path, json.dumps(posts, ensure_ascii=False, indent=2) + "\n")

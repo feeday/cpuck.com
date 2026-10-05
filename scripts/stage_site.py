@@ -18,8 +18,8 @@ def stage(root, destination):
                     ignore=shutil.ignore_patterns('.git', '.github', 'scripts', 'tests', '__pycache__'))
     for plan in plans.values():
         source = destination / plan['file']
-        if source.parent != destination / 'data' or source.suffix != '.html':
-            raise ValueError('Article source must be an HTML file directly in data')
+        if source.parent != destination / 'data/html' or source.suffix != '.html':
+            raise ValueError('Article source must be an HTML file in data/html')
         page = source.read_text(encoding='utf-8')
         write(destination / output_path(plan['url']), page)
         source.unlink()
@@ -28,10 +28,10 @@ def stage(root, destination):
         # Preserve existing Markdown downloads only in the deployed artifact.
         if plan.get('markdown'):
             md = destination / plan['markdown']
-            if md.parent != destination / 'data' or md.suffix != '.md':
-                raise ValueError('Markdown source must be directly in data')
+            if md.parent != destination / 'data/md' or md.suffix != '.md':
+                raise ValueError('Markdown source must be in data/md')
             number = md.stem
-            for alias in [f'{number}.md', f'blog/md/{number}.md', f'blog/posts/issue-{number}.md']:
+            for alias in [f'data/{number}.md', f'{number}.md', f'blog/md/{number}.md', f'blog/posts/issue-{number}.md']:
                 write(destination / alias, md.read_text(encoding='utf-8'))
 
 

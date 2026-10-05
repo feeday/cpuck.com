@@ -7,8 +7,8 @@
       "/blog/7.html",
       "/blog/posts/issue-7.html"
     ],
-    "file": "data/7.html",
-    "markdown": "data/7.md"
+    "file": "data/html/7.html",
+    "markdown": "data/md/7.md"
   },
   "1": {
     "url": "/1.html",
@@ -17,8 +17,8 @@
       "/blog/1.html",
       "/blog/posts/issue-1.html"
     ],
-    "file": "data/1.html",
-    "markdown": "data/1.md"
+    "file": "data/html/1.html",
+    "markdown": "data/md/1.md"
   },
   "5": {
     "url": "/5.html",
@@ -27,8 +27,8 @@
       "/blog/5.html",
       "/blog/posts/issue-5.html"
     ],
-    "file": "data/5.html",
-    "markdown": "data/5.md"
+    "file": "data/html/5.html",
+    "markdown": "data/md/5.md"
   },
   "6": {
     "url": "/win11-key.html",
@@ -38,14 +38,14 @@
       "/blog/6.html",
       "/blog/posts/issue-6.html"
     ],
-    "file": "data/6.html",
-    "markdown": "data/6.md"
+    "file": "data/html/6.html",
+    "markdown": "data/md/6.md"
   },
   "demo": {
     "url": "/demo.html",
     "aliases": [
       "/blog/posts/demo.html"
     ],
-    "file": "data/demo.html"
+    "file": "data/html/demo.html"
   }
 }

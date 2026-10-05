@@ -19,7 +19,7 @@
       "/blog/7.html",
       "/blog/posts/issue-7.html"
     ],
-    "markdown": "/data/7.md",
+    "markdown": "/data/md/7.md",
     "issue_url": "https://github.com/feeday/cpuck.com/issues/7"
   },
   {
@@ -42,7 +42,7 @@
       "/blog/6.html",
       "/blog/posts/issue-6.html"
     ],
-    "markdown": "/data/6.md",
+    "markdown": "/data/md/6.md",
     "issue_url": "https://github.com/feeday/cpuck.com/issues/6"
   },
   {

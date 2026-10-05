@@ -6,10 +6,10 @@
 
 ## 文件与链接
 
-所有文章文件平铺在 `data` 中，不再向仓库写入 blog、数字目录或根目录文章副本：
+Markdown 存放在 `data/md`，HTML 存放在 `data/html`，不再向仓库写入 blog、数字目录或根目录文章副本：
 
-- `data/6.md`：Markdown 正文。
-- `data/6.html`：文章 HTML。
+- `data/md/6.md`：Markdown 正文。
+- `data/html/6.html`：文章 HTML。
 - `data/article-routes.json`：文章公开地址及旧地址映射。
 - `data/posts.json`、`data/search.json`：搜索索引。
 
@@ -23,7 +23,7 @@
 GitHub Pages 无后缀地址使用目录 index.html，访问 `/6` 会补为 `/6/`。
 `scripts/stage_site.py` 仅在仓库外的临时部署目录生成公开页面和兼容跳转，绝不提交这些页面。
 旧数字链接、旧 blog 链接及以前的标题地址继续跳转到当前地址。
-文章内 Markdown 下载指向 `/data/编号.md`。
+文章内 Markdown 下载指向 `/data/md/编号.md`。
 
 代码块超过 10 行默认折叠，10 行及以内默认展开；均保留复制按钮。
 首页默认隐藏文章，搜索完整文章索引。
