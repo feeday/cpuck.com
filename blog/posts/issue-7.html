@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-25mEIkYk1cMyDLZ83MIjUlpb+QKnQguQw0XB+r6N2Bo='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-e8TGlpR/Pa5oua6Wze51I1SQabOHTDXZz5zGOdeRp5I='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>3G-USB · CPuck</title>
 <style>
 body{margin:0;background:#020617;color:#f8fafc;font:16px/1.8 system-ui,sans-serif}
@@ -381,12 +381,12 @@ Legacy驱动
   article.querySelectorAll('pre').forEach(pre => {
     const details = document.createElement('details');
     details.className = 'code-fold';
-    details.open = false;
     const frame = document.createElement('div');
     frame.className = 'code-frame';
     const toggle = document.createElement('summary');
     const language = pre.getAttribute('lang') || '代码';
-    const lineCount = pre.textContent.replace(/\n$/, '').split('\n').length;
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
     const updateLabel = () => {
       toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
     };
