@@ -1,45 +1,79 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-e8TGlpR/Pa5oua6Wze51I1SQabOHTDXZz5zGOdeRp5I='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s1flQ/huFgy6VuBRpjBeumh+VIkMGvfrjrkRMtTeQo8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>win11-key · CPuck</title>
-<style>
-body{margin:0;background:#020617;color:#f8fafc;font:16px/1.8 system-ui,sans-serif}
-main{max-width:900px;margin:32px auto;padding:24px;border:1px solid #334155;border-radius:16px;background:#0f172a;overflow-wrap:anywhere}
-a{color:#38bdf8} img,video{max-width:100%;height:auto} pre{overflow:auto;padding:16px;background:#020617}
-table{display:block;overflow:auto;border-collapse:collapse}td,th{border:1px solid #475569;padding:8px}
-blockquote{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}
-html { scroll-behavior: smooth; color-scheme: dark; }
-* { box-sizing: border-box; }
-:is(h1,h2,h3,h4,h5,h6) { scroll-margin-top: 24px; }
-button, summary { cursor: pointer; }
-a:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid #38bdf8; outline-offset: 3px; }
-main { width: min(900px, calc(100% - 40px)); }
-main > nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: #64748b; }
-main > nav a { padding: 4px 8px; border-radius: 6px; text-decoration: none; color: #94a3b8; }
-main > nav a:hover { background: #1e293b; color: #38bdf8; }
-.article-toc { position: fixed; right: max(24px, calc((100vw - 1200px) / 2)); top: 32px; width: 244px; z-index: 20; border: 1px solid #263245; border-radius: 12px; background: #0f172af5; box-shadow: 0 8px 24px #0003; font: 13px/1.5 system-ui,sans-serif; }
-.article-toc summary { padding: 12px 16px; font-size: 13px; font-weight: 600; color: #cbd5e1; }
-.article-toc nav { max-height: calc(100vh - 180px); overflow: auto; padding: 0 8px 10px; scrollbar-width: thin; scrollbar-color: #334155 transparent; }
-.article-toc nav a { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; padding: 6px 12px; margin: 2px 0; border-left: 2px solid transparent; border-radius: 4px; color: #94a3b8; text-decoration: none; overflow-wrap: anywhere; }
-.article-toc nav a:hover { color: #e2e8f0; background: #1e293b80; }
-.article-toc nav a[aria-current] { color: #38bdf8; background: #38bdf80c; border-left-color: #38bdf8; }
-.code-frame { position: relative; margin: 12px 0; border: 1px solid #334155; border-radius: 8px; overflow: hidden; background: #020617; }
-.code-fold { margin: 0; }
-.code-fold summary { min-height: 40px; padding: 10px 105px 10px 12px; background: #172235; font: 12px/20px system-ui,sans-serif; color: #94a3b8; }
-.code-fold pre { margin: 0; padding: 8px 14px; white-space: pre; overflow: auto; font: 13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size: 4; }
-.code-fold code { padding: 0; margin: 0; font: inherit; white-space: inherit; background: transparent; }
-.copy-code { position: absolute; top: 6px; right: 8px; margin: 0; padding: 4px 8px; color: #cbd5e1; border: 1px solid #334155; border-radius: 5px; background: #0f172a; font: 12px/18px system-ui,sans-serif; }
-.copy-code:hover { color: #38bdf8; border-color: #38bdf8; }
-.back-top { position: fixed; right: 24px; bottom: 24px; z-index: 21; padding: 8px 12px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; text-decoration: none; font: 13px/1.6 system-ui,sans-serif; }
-@media (min-width: 1251px) { .has-toc main { width: 900px; margin-right: auto; margin-left: calc((100vw - 1200px) / 2); } }
-@media (max-width: 1250px) { .article-toc { top: auto; bottom: 78px; right: 16px; width: min(280px, calc(100vw - 32px)); } .article-toc nav { max-height: 45vh; } }
-@media (max-width: 600px) { main { width: calc(100% - 24px); margin: 12px auto 140px; padding: 16px; } }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-
-</style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
-<a href="https://github.com/feeday/cpuck.com/issues/6">原始 Issue / 编辑</a> · <a href="/data/md/6.md">Markdown</a></nav>
-<h1>win11-key</h1><p>更新：2026-09-13T06:30:53Z</p><article><h1 dir="auto">Windows 11 是否“正版”？普通人判断指南</h1>
+<style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
+:root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-underline-offset:4px; }
+button,summary { cursor:pointer; }
+button { font:inherit; }
+a:focus-visible,button:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+main { width:min(820px,calc(100% - 48px)); margin:40px auto 80px; padding:32px 52px 26px; border:1px solid var(--line); border-radius:16px; background:var(--paper); box-shadow:0 8px 36px #14203305; overflow-wrap:anywhere; }
+.page-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:25px; border-bottom:1px solid var(--line); font-size:13px; }
+.page-nav a { color:var(--muted); text-decoration:none; }
+.page-nav .home-link { color:var(--heading); font-weight:650; letter-spacing:.02em; }
+.nav-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; }
+.page-nav a:hover { color:var(--accent); }
+.theme-toggle { border:1px solid var(--line); border-radius:7px; padding:4px 10px; background:var(--paper); color:var(--muted); font-size:12px; }
+.article-header { padding:32px 0 28px; margin-bottom:28px; border-bottom:1px solid var(--line); }
+.article-label { margin:0 0 12px; color:var(--accent); font-size:11px; letter-spacing:.14em; font-weight:650; }
+.article-title { margin:0 0 16px; color:var(--heading); font-size:clamp(27px,4vw,38px); line-height:1.35; letter-spacing:-.035em; font-weight:750; }
+.article-meta { display:flex; flex-wrap:wrap; gap:8px 20px; color:var(--muted); font-size:12px; }
+article > :first-child { margin-top:0; }
+article > :last-child { margin-bottom:0; }
+article p { margin:0 0 1.25em; }
+article :is(h1,h2,h3,h4,h5,h6) { color:var(--heading); line-height:1.5; scroll-margin-top:28px; font-weight:650; }
+article h1 { font-size:28px; margin:1.7em 0 .8em; }
+article h2 { font-size:23px; margin:2em 0 .85em; padding-bottom:10px; border-bottom:1px solid var(--line); }
+article h3 { font-size:19px; margin:1.7em 0 .7em; }
+article :is(h4,h5,h6) { font-size:16px; margin:1.5em 0 .65em; }
+article :is(ul,ol) { padding-left:1.6em; margin:0 0 1.3em; }
+article li { padding-left:.2em; margin:.3em 0; }
+article li > :is(ul,ol) { margin:.4em 0; }
+article li > p { margin:.4em 0; }
+article strong { color:var(--heading); font-weight:650; }
+article blockquote { margin:1.5em 0; padding:14px 20px; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; background:var(--soft); color:var(--muted); }
+article blockquote > :last-child { margin-bottom:0; }
+article hr { height:1px; border:0; background:var(--line); margin:32px 0; }
+article :is(img,video) { max-width:100%; height:auto; border-radius:8px; }
+article table { display:block; max-width:100%; width:max-content; overflow:auto; border-collapse:collapse; margin:24px 0; font-size:14px; line-height:1.65; }
+article :is(td,th) { border:1px solid var(--line); padding:11px 15px; min-width:80px; }
+article th { background:var(--soft); color:var(--heading); font-weight:650; }
+article tr:nth-child(even) td { background:var(--soft); }
+article code { padding:.15em .38em; border-radius:4px; background:var(--soft); color:var(--heading); font: .87em/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+article pre { overflow:auto; padding:18px; background:var(--code); border-radius:8px; }
+article pre code { padding:0; background:none; font:inherit; overflow-wrap:normal; }
+.code-frame { position:relative; margin:22px 0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--code); }
+.code-fold { margin:0; }
+.code-fold summary { padding:10px 100px 10px 16px; background:var(--soft); color:var(--muted); font-size:12px; line-height:22px; }
+.code-fold[open] summary { border-bottom:1px solid var(--line); }
+.code-fold pre { margin:0; padding:17px 18px; white-space:pre; overflow:auto; font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; border-radius:0; }
+.copy-code { position:absolute; right:9px; top:8px; padding:3px 9px; border:1px solid var(--line); border-radius:5px; color:var(--muted); background:var(--paper); font:12px/20px system-ui,sans-serif; }
+.copy-code:hover { color:var(--accent); border-color:var(--accent); }
+.article-footer { display:flex; justify-content:space-between; gap:16px; padding-top:22px; margin-top:42px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.article-footer a { text-decoration:none; }
+.article-toc { position:fixed; left:calc(50% + 320px); top:62px; width:220px; font-size:12px; line-height:1.65; }
+.article-toc summary { padding:0 10px 14px; color:var(--heading); font-weight:650; }
+.article-toc nav { max-height:calc(100vh - 180px); overflow:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; border-left:1px solid var(--line); }
+.article-toc nav a { display:block; padding:6px 12px; color:var(--muted); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; overflow-wrap:anywhere; }
+.article-toc nav a:hover { color:var(--heading); }
+.article-toc nav a[aria-current] { color:var(--accent); border-left-color:var(--accent); background:var(--soft); }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:7px 12px; text-decoration:none; font-size:12px; box-shadow:0 3px 12px #00000005; }
+@media(min-width:1200px) { .has-toc main { width:820px; margin-left:calc(50% - 540px); margin-right:0; } }
+@media(max-width:1199px) { .article-toc { left:auto; right:20px; top:auto; bottom:74px; width:min(280px,calc(100% - 40px)); padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:10px; z-index:20; box-shadow:0 8px 32px #0000000d; } .article-toc summary { padding:0; } .article-toc[open] summary { padding-bottom:10px; } .article-toc nav { max-height:40vh; } }
+@media(max-width:600px) { body { font-size:15px; } main { width:100%; margin:0 0 90px; padding:22px 22px 28px; border:0; border-radius:0; box-shadow:none; } body { background:var(--paper); } .page-nav { gap:12px; padding-bottom:20px; } .nav-actions { gap:10px; font-size:12px; } .article-header { padding:26px 0 22px; margin-bottom:24px; } .article-title { font-size:28px; } article h1 { font-size:24px; } article h2 { font-size:21px; } article table { font-size:13px; } article :is(td,th) { padding:9px 11px; } .back-top { right:20px; bottom:20px; } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print { body,main { background:white; color:black; } main,.has-toc main { width:100%; margin:0; border:0; padding:0; box-shadow:none; } .page-nav,.article-toc,.back-top,.copy-code,.article-footer { display:none; } }
+</style></head><body><main id="article-top">
+<nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
+<div class="nav-actions"><a href="https://github.com/feeday/cpuck.com/issues/6">编辑原文</a><a href="/data/md/6.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
+<header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">win11-key</h1>
+<div class="article-meta"><span>更新于 <time datetime="2026-09-13T06:30:53Z">2026年09月13日 14:30</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article><h1 dir="auto">Windows 11 是否“正版”？普通人判断指南</h1>
 <blockquote>
 <p dir="auto">目的：用 <strong>Windows 自带命令</strong>判断当前系统是什么版本、是否已激活、使用的是 Retail / OEM / MAK / KMS 哪种授权通道，并理解“已激活”和“授权来源合规”不是一回事。<br>
 不需要安装任何第三方软件。</p>
@@ -559,9 +593,28 @@ KMS 看是不是正规组织内部服务器。
 “已激活”解决的是技术状态，
 “是不是正版授权”还要看许可证来源和使用权。
 </code></pre></div></article>
+<footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
 </main><script>(() => {
   const article = document.querySelector('article');
   if (!article) return;
+  const themeButton = document.querySelector('.theme-toggle');
+  const setTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    if (themeButton) {
+      themeButton.textContent = theme === 'dark' ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+    }
+  };
+  let theme = 'light';
+  try { theme = localStorage.getItem('cpuck-article-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+  setTheme(theme);
+  themeButton?.addEventListener('click', () => {
+    theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try { localStorage.setItem('cpuck-article-theme', theme); } catch {}
+  });
+  const readingTime = document.querySelector('.reading-time');
+  if (readingTime) readingTime.textContent = '约 ' + Math.max(1, Math.ceil(article.textContent.replace(/\s/g, '').length / 500)) + ' 分钟阅读';
   const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
   const toc = document.createElement('details');
   toc.className = 'article-toc';
@@ -584,14 +637,14 @@ KMS 看是不是正规组织内部服务器。
     link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
     link.title = link.textContent;
     link.addEventListener('click', () => {
-      if (matchMedia('(max-width: 1250px)').matches) toc.open = false;
+      if (matchMedia('(max-width: 1199px)').matches) toc.open = false;
     });
     nav.append(link);
     links.push(link);
   });
   if (headings.length) {
     toc.append(nav);
-    toc.open = matchMedia('(min-width: 1251px)').matches;
+    toc.open = matchMedia('(min-width: 1200px)').matches;
     document.body.classList.add('has-toc');
     document.body.append(toc);
     if ('IntersectionObserver' in window) {
