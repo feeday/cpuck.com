@@ -34,3 +34,10 @@ Actions → Publish Issues → Run workflow 可全量重建。
 工作流使用内置 GITHUB_TOKEN；GitHub Pages 的 Source 设为 GitHub Actions。
 文章仅写回 data，之后生成部署产物并使用 deploy-pages 发布。
 图片与附件引用 Issue 原始地址，不下载二进制附件。
+
+## 防止一级文章链接被覆盖
+
+必须在 Settings → Pages → Build and deployment → Source 选择 **GitHub Actions**。
+不要使用 Deploy from a branch：仓库不保存根目录文章，分支构建会覆盖自定义工作流生成的一级链接，导致 404。
+工作流在生成文章前检查该设置，不正确时明确报错。main 的所有推送均触发完整构建，确保首页、资源和文章更新一并部署。
+修改 Source 后，在 Actions → Publish Issues → Run workflow 重新发布。

@@ -5,12 +5,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - scripts/stage_site.py
-      - scripts/publish_issues.py
-      - scripts/article.js
-      - scripts/article.css
-      - .github/workflows/publish-issues.yml
 permissions:
   contents: read
 concurrency:
@@ -22,11 +16,21 @@ jobs:
     permissions:
       contents: write
       issues: read
+      pages: read
     steps:
       - uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
+      - name: Verify Pages uses the custom workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          build_type=$(gh api "repos/$GITHUB_REPOSITORY/pages" --jq '.build_type')
+          if [ "$build_type" != "workflow" ]; then
+            echo "::error::Set Settings > Pages > Build and deployment > Source to GitHub Actions, then rerun this workflow. Branch publishing overwrites the generated article URLs."
+            exit 1
+          fi
       - name: Build articles in data
         env:
           GH_TOKEN: ${{ github.token }}
