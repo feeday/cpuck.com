@@ -16,7 +16,8 @@
     "aliases": [
       "/7",
       "/7.html",
-      "/blog/7.html"
+      "/blog/7.html",
+      "/blog/posts/issue-7.html"
     ],
     "markdown": "/data/7.md",
     "issue_url": "https://github.com/feeday/cpuck.com/issues/7"
@@ -38,7 +39,8 @@
     "aliases": [
       "/6",
       "/6.html",
-      "/blog/6.html"
+      "/blog/6.html",
+      "/blog/posts/issue-6.html"
     ],
     "markdown": "/data/6.md",
     "issue_url": "https://github.com/feeday/cpuck.com/issues/6"
