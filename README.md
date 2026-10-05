@@ -30,3 +30,7 @@ currentDataList = currentDataList.slice(0, 20);
 ```
 
 有搜索词时不会截断结果，会继续对完整 `resources` 数据进行匹配。
+
+## 文章存储与链接
+
+文章统一存放在 `data/编号.md` 和 `data/编号.html`，不再建立 blog 或根目录文章副本。公开地址仍为 `/win11-key.html` 等一级链接，部署时生成。历史版本使用 Git 保存。自定义地址及发布说明见 [ISSUE_PUBLISHING.md](scripts/ISSUE_PUBLISHING.md)。

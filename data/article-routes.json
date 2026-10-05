@@ -1,0 +1,51 @@
+{
+  "7": {
+    "url": "/3g-usb.html",
+    "aliases": [
+      "/7",
+      "/7.html",
+      "/blog/7.html",
+      "/blog/posts/issue-7.html"
+    ],
+    "file": "data/7.html",
+    "markdown": "data/7.md"
+  },
+  "1": {
+    "url": "/1.html",
+    "aliases": [
+      "/1",
+      "/blog/1.html",
+      "/blog/posts/issue-1.html"
+    ],
+    "file": "data/1.html",
+    "markdown": "data/1.md"
+  },
+  "5": {
+    "url": "/5.html",
+    "aliases": [
+      "/5",
+      "/blog/5.html",
+      "/blog/posts/issue-5.html"
+    ],
+    "file": "data/5.html",
+    "markdown": "data/5.md"
+  },
+  "6": {
+    "url": "/win11-key.html",
+    "aliases": [
+      "/6",
+      "/6.html",
+      "/blog/6.html",
+      "/blog/posts/issue-6.html"
+    ],
+    "file": "data/6.html",
+    "markdown": "data/6.md"
+  },
+  "demo": {
+    "url": "/demo.html",
+    "aliases": [
+      "/blog/posts/demo.html"
+    ],
+    "file": "data/demo.html"
+  }
+}

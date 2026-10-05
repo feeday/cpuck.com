@@ -1,4 +1,4 @@
-"""Publish owner-authored documentation Issues; keep immutable MD/HTML revisions."""
+"""Publish owner-authored documentation Issues; store articles only in data; Git preserves revisions."""
 import hashlib
 import base64
 import html
@@ -42,7 +42,7 @@ table{{display:block;overflow:auto;border-collapse:collapse}}td,th{{border:1px s
 blockquote{{border-left:3px solid #38bdf8;margin-left:0;padding-left:16px;color:#94a3b8}}
 {css}
 </style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
-<a href="{source}">原始 Issue / 编辑</a> · <a href="/blog/md/{issue['number']}.md">Markdown</a></nav>
+<a href="{source}">原始 Issue / 编辑</a> · <a href="/data/{issue['number']}.md">Markdown</a></nav>
 <h1>{title}</h1><p>更新：{html.escape(issue['updated_at'])}</p><article>{body}</article>
 </main><script>{script}</script></body></html>
 """
@@ -81,6 +81,23 @@ def alias_page(url):
             f'<body><a href="{target}">阅读文章</a></body></html>\n')
 
 
+def validate_routes(root, plans):
+    claimed = {}
+    for key, plan in plans.items():
+        for route in [plan["url"], *plan.get("aliases", [])]:
+            if not re.fullmatch(r"/(?:blog/(?:posts/)?)?[A-Za-z0-9][A-Za-z0-9_-]*(?:\.html)?", route):
+                raise ValueError(f"Unsafe article route: {route}")
+            file = output_path(route)
+            top = file.split("/")[0].split(".")[0].lower()
+            if top in {"data", "assets", "scripts", "tests", "gpu", "index", "404", "cname", "readme", "favicon"}:
+                raise ValueError(f"Reserved site route: {route}")
+            if file in claimed and claimed[file] != key:
+                raise ValueError(f"Duplicate article route: {route}")
+            if (Path(root) / file).exists():
+                raise ValueError(f"Article route would overwrite site file: {route}")
+            claimed[file] = key
+
+
 def publish(root, issues, owner):
     root = Path(root)
     index = root / "data/posts.json"
@@ -90,31 +107,19 @@ def publish(root, issues, owner):
     eligible = [i for i in issues if not i.get("pull_request")
                 and i["user"]["login"].lower() == owner.lower()
                 and "documentation" in {label["name"] for label in i.get("labels", [])}]
-    # Validate every route before writing, including numeric compatibility aliases.
-    routes = {}
-    previous = {p["issue"]: p for p in existing if p.get("source") == "github-issue"}
-    plans = {}
+    manifest = root / "data/article-routes.json"
+    plans = json.loads(manifest.read_text(encoding="utf-8")) if manifest.exists() else {}
     for issue in eligible:
         number = int(issue["number"])
         url = article_path(issue)
-        aliases = {f"/{number}.html", f"/{number}", f"/blog/{number}.html"}
-        old = previous.get(number, {})
-        aliases.update(old.get("aliases", []))
+        old = plans.get(str(number), {})
+        aliases = set(old.get("aliases", [])) | {f"/{number}.html", f"/{number}",
+                    f"/blog/{number}.html", f"/blog/posts/issue-{number}.html"}
         if old.get("url"):
             aliases.add(old["url"])
-        plans[number] = (url, aliases)
-        for route in aliases | {url}:
-            file = output_path(route)
-            if file in routes and routes[file] != number:
-                raise ValueError(f"Duplicate article route: {route}")
-            routes[file] = number
-            target = root / file
-            # Existing root pages belong to the site unless indexed as articles.
-            known = {output_path(u) for p in previous.values()
-                     for u in [p.get("url", ""), *p.get("aliases", [])] if u}
-            if (target.exists() and not file.startswith("blog/") and file not in known
-                    and file not in {f"{number}.html", f"{number}/index.html"}):
-                raise ValueError(f"Article route would overwrite site file: {route}")
+        plans[str(number)] = {"url": url, "aliases": sorted(set(aliases) - {url}),
+                              "file": f"data/{number}.html", "markdown": f"data/{number}.md"}
+    validate_routes(root, plans)
     for issue in eligible:
         labels = {label["name"] for label in issue.get("labels", [])}
         if (issue.get("pull_request") or issue["user"]["login"].lower() != owner.lower()
@@ -123,30 +128,21 @@ def publish(root, issues, owner):
         number = int(issue["number"])
         issue = {**issue, "number": number}
         md = "# " + issue["title"] + "\n\n" + (issue.get("body") or "") + "\n"
-        url, aliases = plans[number]
-        page = render(issue).replace(f'/blog/md/{number}.md', f'/{number}.md')
-        write(root / output_path(url), page)
-        for alias in aliases - {url}:
-            write(root / output_path(alias), alias_page(url))
-        write(root / f"{number}.md", md)
-        write(root / f"blog/md/{number}.md", md)
-        stem = f"issue-{number}"
-        revision = hashlib.sha256((md + page).encode()).hexdigest()[:16]
-        for extension, content in [("md", md), ("html", page)]:
-            write(root / f"blog/posts/{stem}.{extension}", content)
-            backup = root / f"blog/backups/{stem}/{revision}.{extension}"
-            if not backup.exists():
-                write(backup, content)
+        plan = plans[str(number)]
+        url, aliases = plan["url"], plan["aliases"]
+        write(root / plan["file"], render(issue))
+        write(root / plan["markdown"], md)
         posts.append({
             "source": "github-issue", "issue": number, "isArticle": True, "cat": "log",
             "title": issue["title"], "desc": (issue.get("body_text") or issue.get("body") or "")[:180],
             "content": issue.get("body_text") or issue.get("body") or "",
             "tag": sorted(labels), "date": issue["created_at"][:10],
-            "updated_at": issue["updated_at"], "url": url, "aliases": sorted(aliases - {url}),
-            "markdown": f"/{number}.md", "issue_url": issue["html_url"]})
+            "updated_at": issue["updated_at"], "url": url, "aliases": sorted(set(aliases) - {url}),
+            "markdown": f"/data/{number}.md", "issue_url": issue["html_url"]})
     posts.sort(key=lambda p: p.get("updated_at", p.get("date", "")), reverse=True)
     for path in ["data/posts.json", "data/search.json"]:
         write(root / path, json.dumps(posts, ensure_ascii=False, indent=2) + "\n")
+    write(manifest, json.dumps(plans, ensure_ascii=False, indent=2) + "\n")
     return posts
 
 

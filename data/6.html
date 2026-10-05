@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-25mEIkYk1cMyDLZ83MIjUlpb+QKnQguQw0XB+r6N2Bo='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-e8TGlpR/Pa5oua6Wze51I1SQabOHTDXZz5zGOdeRp5I='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>win11-key · CPuck</title>
 <style>
 body{margin:0;background:#020617;color:#f8fafc;font:16px/1.8 system-ui,sans-serif}
@@ -27,7 +27,7 @@ main > nav a:hover { background: #1e293b; color: #38bdf8; }
 .code-frame { position: relative; margin: 12px 0; border: 1px solid #334155; border-radius: 8px; overflow: hidden; background: #020617; }
 .code-fold { margin: 0; }
 .code-fold summary { min-height: 40px; padding: 10px 105px 10px 12px; background: #172235; font: 12px/20px system-ui,sans-serif; color: #94a3b8; }
-.code-fold pre { margin: 0; padding: 12px 14px; white-space: pre; overflow: auto; font: 13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size: 4; }
+.code-fold pre { margin: 0; padding: 8px 14px; white-space: pre; overflow: auto; font: 13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size: 4; }
 .code-fold code { padding: 0; margin: 0; font: inherit; white-space: inherit; background: transparent; }
 .copy-code { position: absolute; top: 6px; right: 8px; margin: 0; padding: 4px 8px; color: #cbd5e1; border: 1px solid #334155; border-radius: 5px; background: #0f172a; font: 12px/18px system-ui,sans-serif; }
 .copy-code:hover { color: #38bdf8; border-color: #38bdf8; }
@@ -38,7 +38,7 @@ main > nav a:hover { background: #1e293b; color: #38bdf8; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 </style></head><body><main id="article-top"><nav><a href="/">← 资源导航</a> ·
-<a href="https://github.com/feeday/cpuck.com/issues/6">原始 Issue / 编辑</a> · <a href="/blog/md/6.md">Markdown</a></nav>
+<a href="https://github.com/feeday/cpuck.com/issues/6">原始 Issue / 编辑</a> · <a href="/data/6.md">Markdown</a></nav>
 <h1>win11-key</h1><p>更新：2026-09-13T06:30:53Z</p><article><h1 dir="auto">Windows 11 是否“正版”？普通人判断指南</h1>
 <blockquote>
 <p dir="auto">目的：用 <strong>Windows 自带命令</strong>判断当前系统是什么版本、是否已激活、使用的是 Retail / OEM / MAK / KMS 哪种授权通道，并理解“已激活”和“授权来源合规”不是一回事。<br>
@@ -610,12 +610,12 @@ KMS 看是不是正规组织内部服务器。
   article.querySelectorAll('pre').forEach(pre => {
     const details = document.createElement('details');
     details.className = 'code-fold';
-    details.open = false;
     const frame = document.createElement('div');
     frame.className = 'code-frame';
     const toggle = document.createElement('summary');
     const language = pre.getAttribute('lang') || '代码';
-    const lineCount = pre.textContent.replace(/\n$/, '').split('\n').length;
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
     const updateLabel = () => {
       toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
     };
