@@ -49,12 +49,12 @@
   article.querySelectorAll('pre').forEach(pre => {
     const details = document.createElement('details');
     details.className = 'code-fold';
-    details.open = false;
     const frame = document.createElement('div');
     frame.className = 'code-frame';
     const toggle = document.createElement('summary');
     const language = pre.getAttribute('lang') || '代码';
-    const lineCount = pre.textContent.replace(/\n$/, '').split('\n').length;
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
     const updateLabel = () => {
       toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
     };
