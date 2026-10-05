@@ -1,6 +1,29 @@
 [
   {
     "source": "github-issue",
+    "issue": 9,
+    "isArticle": true,
+    "cat": "log",
+    "title": "cbg",
+    "desc": "456",
+    "content": "456",
+    "tag": [
+      "documentation"
+    ],
+    "date": "2026-10-05",
+    "updated_at": "2026-10-05T13:07:28Z",
+    "url": "/cbg.html",
+    "aliases": [
+      "/9",
+      "/9.html",
+      "/blog/9.html",
+      "/blog/posts/issue-9.html"
+    ],
+    "markdown": "/data/md/9.md",
+    "issue_url": "https://github.com/feeday/cpuck.com/issues/9"
+  },
+  {
+    "source": "github-issue",
     "issue": 8,
     "isArticle": true,
     "cat": "log",
