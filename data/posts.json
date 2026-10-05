@@ -12,8 +12,13 @@
     ],
     "date": "2026-09-26",
     "updated_at": "2026-09-26T16:12:58Z",
-    "url": "/blog/7.html",
-    "markdown": "/blog/md/7.md",
+    "url": "/3g-usb.html",
+    "aliases": [
+      "/7",
+      "/7.html",
+      "/blog/7.html"
+    ],
+    "markdown": "/7.md",
     "issue_url": "https://github.com/feeday/cpuck.com/issues/7"
   },
   {
@@ -29,8 +34,13 @@
     ],
     "date": "2026-09-13",
     "updated_at": "2026-09-13T06:30:53Z",
-    "url": "/blog/6.html",
-    "markdown": "/blog/md/6.md",
+    "url": "/win11-key.html",
+    "aliases": [
+      "/6",
+      "/6.html",
+      "/blog/6.html"
+    ],
+    "markdown": "/6.md",
     "issue_url": "https://github.com/feeday/cpuck.com/issues/6"
   },
   {
