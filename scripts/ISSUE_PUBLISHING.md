@@ -5,10 +5,13 @@
 已有符合条件的 Issue 会在首次运行时补发。编辑标题、正文或标签会自动重建。
 关闭 Issue 不会下架文章；移除 documentation 标签后从搜索索引隐藏，文件及历史备份保留。
 
-- 最新正文：blog/md/编号.md
-- 文章地址：/blog/编号.html（例如 Issue #1 → https://datxy.com/blog/1.html），对应 blog/编号.html
-- 不再生成根目录数字文件夹；旧 /1/、/5/ 地址停止使用。
-- 兼容旧链接及 HTML 副本：blog/posts/issue-编号.html
+- 最新正文：/编号.md（旧 blog/md/编号.md 仍保留）。
+- 文章地址位于根目录：中文标题默认 /编号.html；英文标题自动转为小写短横线地址，例如 win11-key → /win11-key.html。
+- /编号.html、/编号 和旧 /blog/编号.html 均保留，自动跳转到当前文章地址。
+- 自定义地址：在 Issue 正文最顶部填写 `<!-- permalink: /6 -->` 或 `<!-- permalink: /my-article.html -->`。仅允许一级路径，字符为英文字母、数字、短横线、下划线，可选 .html 后缀。
+- GitHub Pages 的无后缀地址使用目录 index.html，因此访问 /6 会补为 /6/；.html 地址不会补斜杠。
+- 自定义路径优先于英文标题；修改标题或路径后旧地址仍可访问。重名或覆盖现有网站页面会停止发布并在 Actions 报错。
+- 兼容 HTML 副本：blog/posts/issue-编号.html。
 - 历史备份：blog/backups/issue-编号/内容哈希.md 和 .html
 - 搜索索引：data/posts.json、data/search.json（自动更新，无需手工维护）
 

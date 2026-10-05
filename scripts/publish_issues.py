@@ -4,6 +4,7 @@ import base64
 import html
 import json
 import os
+import re
 from pathlib import Path
 import urllib.request
 
@@ -53,13 +54,68 @@ def write(path, value):
     path.write_text(value, encoding="utf-8")
 
 
+def article_path(issue):
+    """An explicit permalink wins; ASCII English titles otherwise become slugs."""
+    match = re.match(r"\s*<!--\s*permalink:\s*(.*?)\s*-->", issue.get("body") or "", re.I)
+    if match:
+        value = match.group(1).strip().lstrip("/")
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_-]*(?:\.html)?", value):
+            raise ValueError(f"Issue #{issue['number']}: permalink must be a single root path")
+        return "/" + value
+    title = issue["title"].strip()
+    if title.isascii() and re.search(r"[A-Za-z]", title):
+        slug = re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+        return "/" + slug + ".html"
+    return f"/{issue['number']}.html"
+
+
+def output_path(url):
+    return url.lstrip("/") if url.endswith(".html") else url.lstrip("/") + "/index.html"
+
+
+def alias_page(url):
+    target = html.escape(url, quote=True)
+    return (f'<!doctype html><html><head><meta charset="utf-8">'
+            f'<meta http-equiv="refresh" content="0;url={target}">'
+            f'<link rel="canonical" href="{target}"><title>文章跳转</title></head>'
+            f'<body><a href="{target}">阅读文章</a></body></html>\n')
+
+
 def publish(root, issues, owner):
     root = Path(root)
     index = root / "data/posts.json"
     existing = json.loads(index.read_text(encoding="utf-8")) if index.exists() else []
     # Preserve manually maintained entries, rebuild only our Issue entries.
     posts = [p for p in existing if p.get("source") != "github-issue"]
-    for issue in issues:
+    eligible = [i for i in issues if not i.get("pull_request")
+                and i["user"]["login"].lower() == owner.lower()
+                and "documentation" in {label["name"] for label in i.get("labels", [])}]
+    # Validate every route before writing, including numeric compatibility aliases.
+    routes = {}
+    previous = {p["issue"]: p for p in existing if p.get("source") == "github-issue"}
+    plans = {}
+    for issue in eligible:
+        number = int(issue["number"])
+        url = article_path(issue)
+        aliases = {f"/{number}.html", f"/{number}", f"/blog/{number}.html"}
+        old = previous.get(number, {})
+        aliases.update(old.get("aliases", []))
+        if old.get("url"):
+            aliases.add(old["url"])
+        plans[number] = (url, aliases)
+        for route in aliases | {url}:
+            file = output_path(route)
+            if file in routes and routes[file] != number:
+                raise ValueError(f"Duplicate article route: {route}")
+            routes[file] = number
+            target = root / file
+            # Existing root pages belong to the site unless indexed as articles.
+            known = {output_path(u) for p in previous.values()
+                     for u in [p.get("url", ""), *p.get("aliases", [])] if u}
+            if (target.exists() and not file.startswith("blog/") and file not in known
+                    and file not in {f"{number}.html", f"{number}/index.html"}):
+                raise ValueError(f"Article route would overwrite site file: {route}")
+    for issue in eligible:
         labels = {label["name"] for label in issue.get("labels", [])}
         if (issue.get("pull_request") or issue["user"]["login"].lower() != owner.lower()
                 or "documentation" not in labels):
@@ -67,8 +123,12 @@ def publish(root, issues, owner):
         number = int(issue["number"])
         issue = {**issue, "number": number}
         md = "# " + issue["title"] + "\n\n" + (issue.get("body") or "") + "\n"
-        page = render(issue)
-        write(root / f"blog/{number}.html", page)
+        url, aliases = plans[number]
+        page = render(issue).replace(f'/blog/md/{number}.md', f'/{number}.md')
+        write(root / output_path(url), page)
+        for alias in aliases - {url}:
+            write(root / output_path(alias), alias_page(url))
+        write(root / f"{number}.md", md)
         write(root / f"blog/md/{number}.md", md)
         stem = f"issue-{number}"
         revision = hashlib.sha256((md + page).encode()).hexdigest()[:16]
@@ -82,8 +142,8 @@ def publish(root, issues, owner):
             "title": issue["title"], "desc": (issue.get("body_text") or issue.get("body") or "")[:180],
             "content": issue.get("body_text") or issue.get("body") or "",
             "tag": sorted(labels), "date": issue["created_at"][:10],
-            "updated_at": issue["updated_at"], "url": f"/blog/{number}.html",
-            "markdown": f"/blog/md/{number}.md", "issue_url": issue["html_url"]})
+            "updated_at": issue["updated_at"], "url": url, "aliases": sorted(aliases - {url}),
+            "markdown": f"/{number}.md", "issue_url": issue["html_url"]})
     posts.sort(key=lambda p: p.get("updated_at", p.get("date", "")), reverse=True)
     for path in ["data/posts.json", "data/search.json"]:
         write(root / path, json.dumps(posts, ensure_ascii=False, indent=2) + "\n")
