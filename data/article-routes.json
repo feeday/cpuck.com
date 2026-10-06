@@ -69,5 +69,16 @@
     ],
     "file": "data/html/9.html",
     "markdown": "data/md/9.md"
+  },
+  "10": {
+    "url": "/qwen3-asr-demo.html",
+    "aliases": [
+      "/10",
+      "/10.html",
+      "/blog/10.html",
+      "/blog/posts/issue-10.html"
+    ],
+    "file": "data/html/10.html",
+    "markdown": "data/md/10.md"
   }
 }

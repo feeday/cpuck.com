@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s1flQ/huFgy6VuBRpjBeumh+VIkMGvfrjrkRMtTeQo8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Qwen3-ASR-Demo · CPuck</title>
+<style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
+:root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-underline-offset:4px; }
+button,summary { cursor:pointer; }
+button { font:inherit; }
+a:focus-visible,button:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+main { width:min(820px,calc(100% - 48px)); margin:40px auto 80px; padding:32px 52px 26px; border:1px solid var(--line); border-radius:16px; background:var(--paper); box-shadow:0 8px 36px #14203305; overflow-wrap:anywhere; }
+.page-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:25px; border-bottom:1px solid var(--line); font-size:13px; }
+.page-nav a { color:var(--muted); text-decoration:none; }
+.page-nav .home-link { color:var(--heading); font-weight:650; letter-spacing:.02em; }
+.nav-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; }
+.page-nav a:hover { color:var(--accent); }
+.theme-toggle { border:1px solid var(--line); border-radius:7px; padding:4px 10px; background:var(--paper); color:var(--muted); font-size:12px; }
+.article-header { padding:32px 0 28px; margin-bottom:28px; border-bottom:1px solid var(--line); }
+.article-label { margin:0 0 12px; color:var(--accent); font-size:11px; letter-spacing:.14em; font-weight:650; }
+.article-title { margin:0 0 16px; color:var(--heading); font-size:clamp(27px,4vw,38px); line-height:1.35; letter-spacing:-.035em; font-weight:750; }
+.article-meta { display:flex; flex-wrap:wrap; gap:8px 20px; color:var(--muted); font-size:12px; }
+article > :first-child { margin-top:0; }
+article > :last-child { margin-bottom:0; }
+article p { margin:0 0 1.25em; }
+article :is(h1,h2,h3,h4,h5,h6) { color:var(--heading); line-height:1.5; scroll-margin-top:28px; font-weight:650; }
+article h1 { font-size:28px; margin:1.7em 0 .8em; }
+article h2 { font-size:23px; margin:2em 0 .85em; padding-bottom:10px; border-bottom:1px solid var(--line); }
+article h3 { font-size:19px; margin:1.7em 0 .7em; }
+article :is(h4,h5,h6) { font-size:16px; margin:1.5em 0 .65em; }
+article :is(ul,ol) { padding-left:1.6em; margin:0 0 1.3em; }
+article li { padding-left:.2em; margin:.3em 0; }
+article li > :is(ul,ol) { margin:.4em 0; }
+article li > p { margin:.4em 0; }
+article strong { color:var(--heading); font-weight:650; }
+article blockquote { margin:1.5em 0; padding:14px 20px; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; background:var(--soft); color:var(--muted); }
+article blockquote > :last-child { margin-bottom:0; }
+article hr { height:1px; border:0; background:var(--line); margin:32px 0; }
+article :is(img,video) { max-width:100%; height:auto; border-radius:8px; }
+article table { display:block; max-width:100%; width:max-content; overflow:auto; border-collapse:collapse; margin:24px 0; font-size:14px; line-height:1.65; }
+article :is(td,th) { border:1px solid var(--line); padding:11px 15px; min-width:80px; }
+article th { background:var(--soft); color:var(--heading); font-weight:650; }
+article tr:nth-child(even) td { background:var(--soft); }
+article code { padding:.15em .38em; border-radius:4px; background:var(--soft); color:var(--heading); font: .87em/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+article pre { overflow:auto; padding:18px; background:var(--code); border-radius:8px; }
+article pre code { padding:0; background:none; font:inherit; overflow-wrap:normal; }
+.code-frame { position:relative; margin:22px 0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--code); }
+.code-fold { margin:0; }
+.code-fold summary { padding:10px 100px 10px 16px; background:var(--soft); color:var(--muted); font-size:12px; line-height:22px; }
+.code-fold[open] summary { border-bottom:1px solid var(--line); }
+.code-fold pre { margin:0; padding:17px 18px; white-space:pre; overflow:auto; font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; border-radius:0; }
+.copy-code { position:absolute; right:9px; top:8px; padding:3px 9px; border:1px solid var(--line); border-radius:5px; color:var(--muted); background:var(--paper); font:12px/20px system-ui,sans-serif; }
+.copy-code:hover { color:var(--accent); border-color:var(--accent); }
+.article-footer { display:flex; justify-content:space-between; gap:16px; padding-top:22px; margin-top:42px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.article-footer a { text-decoration:none; }
+.article-toc { position:fixed; left:calc(50% + 320px); top:62px; width:220px; font-size:12px; line-height:1.65; }
+.article-toc summary { padding:0 10px 14px; color:var(--heading); font-weight:650; }
+.article-toc nav { max-height:calc(100vh - 180px); overflow:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; border-left:1px solid var(--line); }
+.article-toc nav a { display:block; padding:6px 12px; color:var(--muted); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; overflow-wrap:anywhere; }
+.article-toc nav a:hover { color:var(--heading); }
+.article-toc nav a[aria-current] { color:var(--accent); border-left-color:var(--accent); background:var(--soft); }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:7px 12px; text-decoration:none; font-size:12px; box-shadow:0 3px 12px #00000005; }
+@media(min-width:1200px) { .has-toc main { width:820px; margin-left:calc(50% - 540px); margin-right:0; } }
+@media(max-width:1199px) { .article-toc { left:auto; right:20px; top:auto; bottom:74px; width:min(280px,calc(100% - 40px)); padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:10px; z-index:20; box-shadow:0 8px 32px #0000000d; } .article-toc summary { padding:0; } .article-toc[open] summary { padding-bottom:10px; } .article-toc nav { max-height:40vh; } }
+@media(max-width:600px) { body { font-size:15px; } main { width:100%; margin:0 0 90px; padding:22px 22px 28px; border:0; border-radius:0; box-shadow:none; } body { background:var(--paper); } .page-nav { gap:12px; padding-bottom:20px; } .nav-actions { gap:10px; font-size:12px; } .article-header { padding:26px 0 22px; margin-bottom:24px; } .article-title { font-size:28px; } article h1 { font-size:24px; } article h2 { font-size:21px; } article table { font-size:13px; } article :is(td,th) { padding:9px 11px; } .back-top { right:20px; bottom:20px; } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print { body,main { background:white; color:black; } main,.has-toc main { width:100%; margin:0; border:0; padding:0; box-shadow:none; } .page-nav,.article-toc,.back-top,.copy-code,.article-footer { display:none; } }
+</style></head><body><main id="article-top">
+<nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
+<div class="nav-actions"><a href="https://github.com/feeday/cpuck.com/issues/10">编辑原文</a><a href="/data/md/10.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
+<header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">Qwen3-ASR-Demo</h1>
+<div class="article-meta"><span>更新于 <time datetime="2026-10-06T02:24:10Z">2026年10月06日 10:24</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article><p dir="auto">通过阿里语音识别调用抱脸空间填写密钥音频转文字</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="import os
+import re
+import tempfile
+from pathlib import Path
+
+import gradio as gr
+from gradio_client import Client, handle_file
+# pip install gradio gradio_client
+# https://huggingface.co/settings/tokens
+
+SPACE_ID = &quot;Qwen/Qwen3-ASR&quot;
+
+
+LANGUAGES = [
+    &quot;Auto&quot;,
+    &quot;Chinese&quot;,
+    &quot;Cantonese&quot;,
+    &quot;English&quot;,
+    &quot;Japanese&quot;,
+    &quot;Korean&quot;,
+    &quot;Arabic&quot;,
+    &quot;German&quot;,
+    &quot;French&quot;,
+    &quot;Spanish&quot;,
+    &quot;Portuguese&quot;,
+    &quot;Indonesian&quot;,
+    &quot;Italian&quot;,
+    &quot;Russian&quot;,
+    &quot;Thai&quot;,
+    &quot;Vietnamese&quot;,
+    &quot;Turkish&quot;,
+    &quot;Hindi&quot;,
+    &quot;Malay&quot;,
+    &quot;Dutch&quot;,
+    &quot;Swedish&quot;,
+    &quot;Danish&quot;,
+    &quot;Finnish&quot;,
+    &quot;Polish&quot;,
+    &quot;Czech&quot;,
+    &quot;Filipino&quot;,
+    &quot;Persian&quot;,
+    &quot;Greek&quot;,
+    &quot;Romanian&quot;,
+    &quot;Hungarian&quot;,
+    &quot;Macedonian&quot;,
+]
+
+
+def srt_time(seconds):
+    seconds = max(0, float(seconds))
+
+    ms = int(round(seconds * 1000))
+
+    h = ms // 3600000
+    ms %= 3600000
+
+    m = ms // 60000
+    ms %= 60000
+
+    s = ms // 1000
+    ms %= 1000
+
+    return f&quot;{h:02}:{m:02}:{s:02},{ms:03}&quot;
+
+
+def is_cjk(text):
+    return bool(
+        re.search(
+            r&quot;[\u3400-\u9fff&quot;
+            r&quot;\u3040-\u30ff&quot;
+            r&quot;\uac00-\ud7af]&quot;,
+            text,
+        )
+    )
+
+
+def merge_text(old, new):
+    old = old or &quot;&quot;
+    new = new or &quot;&quot;
+
+    if not old:
+        return new
+
+    if not new:
+        return old
+
+    # 中文、日文、韩文通常不插入空格
+    if is_cjk(old[-1:]) or is_cjk(new[:1]):
+        return old + new
+
+    # 标点前不加空格
+    if re.match(r&quot;^[,.;:!?，。！？；：、…]&quot;, new):
+        return old + new
+
+    # 撇号等英文情况
+    if new.startswith((&quot;'&quot;, &quot;’&quot;)):
+        return old + new
+
+    return old + &quot; &quot; + new
+
+
+def timestamps_to_segments(
+    timestamps,
+    max_chars=28,
+    max_duration=6.0,
+):
+    &quot;&quot;&quot;
+    将词/字级时间戳合并成适合 SRT 的字幕段。
+    &quot;&quot;&quot;
+
+    if not timestamps:
+        return []
+
+    segments = []
+
+    current_text = &quot;&quot;
+    start = None
+    end = None
+
+    punctuation = (
+        &quot;。！？!?&quot;
+        &quot;；;&quot;
+        &quot;\n&quot;
+    )
+
+    for item in timestamps:
+        text = str(item.get(&quot;text&quot;, &quot;&quot;)).strip()
+
+        if not text:
+            continue
+
+        ts_start = float(item.get(&quot;start_time&quot;, 0) or 0)
+        ts_end = float(item.get(&quot;end_time&quot;, ts_start) or ts_start)
+
+        if start is None:
+            start = ts_start
+
+        end = ts_end
+        current_text = merge_text(current_text, text)
+
+        duration = end - start
+
+        should_split = False
+
+        if len(current_text) &gt;= max_chars:
+            should_split = True
+
+        if duration &gt;= max_duration:
+            should_split = True
+
+        if current_text.endswith(punctuation):
+            should_split = True
+
+        if should_split:
+            segments.append(
+                {
+                    &quot;start&quot;: start,
+                    &quot;end&quot;: end,
+                    &quot;text&quot;: current_text.strip(),
+                }
+            )
+
+            current_text = &quot;&quot;
+            start = None
+            end = None
+
+    if current_text and start is not None:
+        segments.append(
+            {
+                &quot;start&quot;: start,
+                &quot;end&quot;: end,
+                &quot;text&quot;: current_text.strip(),
+            }
+        )
+
+    return segments
+
+
+def segments_to_srt(segments):
+    result = []
+
+    for i, seg in enumerate(segments, 1):
+        result.append(str(i))
+
+        result.append(
+            f&quot;{srt_time(seg['start'])} --&gt; &quot;
+            f&quot;{srt_time(seg['end'])}&quot;
+        )
+
+        result.append(seg[&quot;text&quot;])
+        result.append(&quot;&quot;)
+
+    return &quot;\n&quot;.join(result)
+
+
+def recognize(
+    audio_file,
+    hf_token,
+    language,
+    max_chars,
+    max_duration,
+):
+    if not audio_file:
+        raise gr.Error(&quot;请先上传音频。&quot;)
+
+    token = (hf_token or &quot;&quot;).strip()
+
+    try:
+        if token:
+            client = Client(
+                SPACE_ID,
+                token=token,
+            )
+        else:
+            client = Client(SPACE_ID)
+
+        result = client.predict(
+            audio_upload=handle_file(audio_file),
+            lang_disp=language,
+            return_ts=True,
+            api_name=&quot;/transcribe&quot;,
+        )
+
+    except Exception as e:
+        raise gr.Error(
+            f&quot;调用 Qwen3-ASR 失败：\n{e}&quot;
+        )
+
+    if not isinstance(result, (list, tuple)):
+        raise gr.Error(
+            f&quot;接口返回格式异常：{type(result)}&quot;
+        )
+
+    detected_language = &quot;&quot;
+    text = &quot;&quot;
+    timestamps = None
+
+    if len(result) &gt;= 1:
+        detected_language = result[0] or &quot;&quot;
+
+    if len(result) &gt;= 2:
+        text = result[1] or &quot;&quot;
+
+    if len(result) &gt;= 3:
+        timestamps = result[2]
+
+    if not timestamps:
+        raise gr.Error(
+            &quot;识别成功，但接口没有返回时间戳，&quot;
+            &quot;因此暂时无法生成准确 SRT。&quot;
+        )
+
+    segments = timestamps_to_segments(
+        timestamps,
+        max_chars=int(max_chars),
+        max_duration=float(max_duration),
+    )
+
+    srt_content = segments_to_srt(segments)
+
+    # 输出文件
+    audio_path = Path(audio_file)
+
+    out_dir = Path(tempfile.gettempdir()) / &quot;qwen3_asr_srt&quot;
+    out_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    srt_path = out_dir / f&quot;{audio_path.stem}.srt&quot;
+
+    srt_path.write_text(
+        srt_content,
+        encoding=&quot;utf-8-sig&quot;,
+    )
+
+    return (
+        detected_language,
+        text,
+        srt_content,
+        str(srt_path),
+    )
+
+
+with gr.Blocks(
+    title=&quot;Qwen3-ASR SRT 字幕工具&quot;
+) as demo:
+
+    gr.Markdown(
+        &quot;&quot;&quot;
+# 🎤 Qwen3-ASR 字幕生成器
+
+上传音频，调用 Qwen3-ASR 自动识别并生成 **SRT 字幕**。
+
+- 支持自动语言检测
+- 支持中文 / 英文 / 日文等
+- 自动生成时间轴
+- 可填写 Hugging Face Token
+- 本地不运行 ASR 模型，只调用远程 Space
+&quot;&quot;&quot;
+    )
+
+    with gr.Row():
+
+        with gr.Column():
+
+            audio = gr.Audio(
+                label=&quot;🎤 上传音频&quot;,
+                type=&quot;filepath&quot;,
+                sources=[&quot;upload&quot;, &quot;microphone&quot;],
+            )
+
+            token = gr.Textbox(
+                label=&quot;🔑 Hugging Face API Key / Token（可选）&quot;,
+                placeholder=&quot;hf_xxxxxxxxxxxxxxxxx&quot;,
+                type=&quot;password&quot;,
+            )
+
+            language = gr.Dropdown(
+                LANGUAGES,
+                value=&quot;Auto&quot;,
+                label=&quot;🌍 语言&quot;,
+            )
+
+            with gr.Row():
+
+                max_chars = gr.Slider(
+                    10,
+                    80,
+                    value=28,
+                    step=1,
+                    label=&quot;每条字幕最大字符数&quot;,
+                )
+
+                max_duration = gr.Slider(
+                    1,
+                    15,
+                    value=6,
+                    step=0.5,
+                    label=&quot;每条字幕最长秒数&quot;,
+                )
+
+            submit = gr.Button(
+                &quot;🚀 开始识别并生成 SRT&quot;,
+                variant=&quot;primary&quot;,
+            )
+
+        with gr.Column():
+
+            detected = gr.Textbox(
+                label=&quot;🌍 检测语言&quot;
+            )
+
+            text_result = gr.Textbox(
+                label=&quot;📝 完整识别文本&quot;,
+                lines=10,
+            )
+
+            srt_result = gr.Textbox(
+                label=&quot;🎬 SRT 字幕&quot;,
+                lines=18,
+            )
+
+            srt_file = gr.File(
+                label=&quot;⬇️ 下载 SRT&quot;
+            )
+
+    submit.click(
+        recognize,
+        inputs=[
+            audio,
+            token,
+            language,
+            max_chars,
+            max_duration,
+        ],
+        outputs=[
+            detected,
+            text_result,
+            srt_result,
+            srt_file,
+        ],
+    )
+
+
+if __name__ == &quot;__main__&quot;:
+    demo.launch(
+        server_name=&quot;127.0.0.1&quot;,
+        server_port=7860,
+        inbrowser=True,
+    )"><pre class="notranslate"><code class="notranslate">import os
+import re
+import tempfile
+from pathlib import Path
+
+import gradio as gr
+from gradio_client import Client, handle_file
+# pip install gradio gradio_client
+# https://huggingface.co/settings/tokens
+
+SPACE_ID = "Qwen/Qwen3-ASR"
+
+
+LANGUAGES = [
+    "Auto",
+    "Chinese",
+    "Cantonese",
+    "English",
+    "Japanese",
+    "Korean",
+    "Arabic",
+    "German",
+    "French",
+    "Spanish",
+    "Portuguese",
+    "Indonesian",
+    "Italian",
+    "Russian",
+    "Thai",
+    "Vietnamese",
+    "Turkish",
+    "Hindi",
+    "Malay",
+    "Dutch",
+    "Swedish",
+    "Danish",
+    "Finnish",
+    "Polish",
+    "Czech",
+    "Filipino",
+    "Persian",
+    "Greek",
+    "Romanian",
+    "Hungarian",
+    "Macedonian",
+]
+
+
+def srt_time(seconds):
+    seconds = max(0, float(seconds))
+
+    ms = int(round(seconds * 1000))
+
+    h = ms // 3600000
+    ms %= 3600000
+
+    m = ms // 60000
+    ms %= 60000
+
+    s = ms // 1000
+    ms %= 1000
+
+    return f"{h:02}:{m:02}:{s:02},{ms:03}"
+
+
+def is_cjk(text):
+    return bool(
+        re.search(
+            r"[\u3400-\u9fff"
+            r"\u3040-\u30ff"
+            r"\uac00-\ud7af]",
+            text,
+        )
+    )
+
+
+def merge_text(old, new):
+    old = old or ""
+    new = new or ""
+
+    if not old:
+        return new
+
+    if not new:
+        return old
+
+    # 中文、日文、韩文通常不插入空格
+    if is_cjk(old[-1:]) or is_cjk(new[:1]):
+        return old + new
+
+    # 标点前不加空格
+    if re.match(r"^[,.;:!?，。！？；：、…]", new):
+        return old + new
+
+    # 撇号等英文情况
+    if new.startswith(("'", "’")):
+        return old + new
+
+    return old + " " + new
+
+
+def timestamps_to_segments(
+    timestamps,
+    max_chars=28,
+    max_duration=6.0,
+):
+    """
+    将词/字级时间戳合并成适合 SRT 的字幕段。
+    """
+
+    if not timestamps:
+        return []
+
+    segments = []
+
+    current_text = ""
+    start = None
+    end = None
+
+    punctuation = (
+        "。！？!?"
+        "；;"
+        "\n"
+    )
+
+    for item in timestamps:
+        text = str(item.get("text", "")).strip()
+
+        if not text:
+            continue
+
+        ts_start = float(item.get("start_time", 0) or 0)
+        ts_end = float(item.get("end_time", ts_start) or ts_start)
+
+        if start is None:
+            start = ts_start
+
+        end = ts_end
+        current_text = merge_text(current_text, text)
+
+        duration = end - start
+
+        should_split = False
+
+        if len(current_text) &gt;= max_chars:
+            should_split = True
+
+        if duration &gt;= max_duration:
+            should_split = True
+
+        if current_text.endswith(punctuation):
+            should_split = True
+
+        if should_split:
+            segments.append(
+                {
+                    "start": start,
+                    "end": end,
+                    "text": current_text.strip(),
+                }
+            )
+
+            current_text = ""
+            start = None
+            end = None
+
+    if current_text and start is not None:
+        segments.append(
+            {
+                "start": start,
+                "end": end,
+                "text": current_text.strip(),
+            }
+        )
+
+    return segments
+
+
+def segments_to_srt(segments):
+    result = []
+
+    for i, seg in enumerate(segments, 1):
+        result.append(str(i))
+
+        result.append(
+            f"{srt_time(seg['start'])} --&gt; "
+            f"{srt_time(seg['end'])}"
+        )
+
+        result.append(seg["text"])
+        result.append("")
+
+    return "\n".join(result)
+
+
+def recognize(
+    audio_file,
+    hf_token,
+    language,
+    max_chars,
+    max_duration,
+):
+    if not audio_file:
+        raise gr.Error("请先上传音频。")
+
+    token = (hf_token or "").strip()
+
+    try:
+        if token:
+            client = Client(
+                SPACE_ID,
+                token=token,
+            )
+        else:
+            client = Client(SPACE_ID)
+
+        result = client.predict(
+            audio_upload=handle_file(audio_file),
+            lang_disp=language,
+            return_ts=True,
+            api_name="/transcribe",
+        )
+
+    except Exception as e:
+        raise gr.Error(
+            f"调用 Qwen3-ASR 失败：\n{e}"
+        )
+
+    if not isinstance(result, (list, tuple)):
+        raise gr.Error(
+            f"接口返回格式异常：{type(result)}"
+        )
+
+    detected_language = ""
+    text = ""
+    timestamps = None
+
+    if len(result) &gt;= 1:
+        detected_language = result[0] or ""
+
+    if len(result) &gt;= 2:
+        text = result[1] or ""
+
+    if len(result) &gt;= 3:
+        timestamps = result[2]
+
+    if not timestamps:
+        raise gr.Error(
+            "识别成功，但接口没有返回时间戳，"
+            "因此暂时无法生成准确 SRT。"
+        )
+
+    segments = timestamps_to_segments(
+        timestamps,
+        max_chars=int(max_chars),
+        max_duration=float(max_duration),
+    )
+
+    srt_content = segments_to_srt(segments)
+
+    # 输出文件
+    audio_path = Path(audio_file)
+
+    out_dir = Path(tempfile.gettempdir()) / "qwen3_asr_srt"
+    out_dir.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    srt_path = out_dir / f"{audio_path.stem}.srt"
+
+    srt_path.write_text(
+        srt_content,
+        encoding="utf-8-sig",
+    )
+
+    return (
+        detected_language,
+        text,
+        srt_content,
+        str(srt_path),
+    )
+
+
+with gr.Blocks(
+    title="Qwen3-ASR SRT 字幕工具"
+) as demo:
+
+    gr.Markdown(
+        """
+# 🎤 Qwen3-ASR 字幕生成器
+
+上传音频，调用 Qwen3-ASR 自动识别并生成 **SRT 字幕**。
+
+- 支持自动语言检测
+- 支持中文 / 英文 / 日文等
+- 自动生成时间轴
+- 可填写 Hugging Face Token
+- 本地不运行 ASR 模型，只调用远程 Space
+"""
+    )
+
+    with gr.Row():
+
+        with gr.Column():
+
+            audio = gr.Audio(
+                label="🎤 上传音频",
+                type="filepath",
+                sources=["upload", "microphone"],
+            )
+
+            token = gr.Textbox(
+                label="🔑 Hugging Face API Key / Token（可选）",
+                placeholder="hf_xxxxxxxxxxxxxxxxx",
+                type="password",
+            )
+
+            language = gr.Dropdown(
+                LANGUAGES,
+                value="Auto",
+                label="🌍 语言",
+            )
+
+            with gr.Row():
+
+                max_chars = gr.Slider(
+                    10,
+                    80,
+                    value=28,
+                    step=1,
+                    label="每条字幕最大字符数",
+                )
+
+                max_duration = gr.Slider(
+                    1,
+                    15,
+                    value=6,
+                    step=0.5,
+                    label="每条字幕最长秒数",
+                )
+
+            submit = gr.Button(
+                "🚀 开始识别并生成 SRT",
+                variant="primary",
+            )
+
+        with gr.Column():
+
+            detected = gr.Textbox(
+                label="🌍 检测语言"
+            )
+
+            text_result = gr.Textbox(
+                label="📝 完整识别文本",
+                lines=10,
+            )
+
+            srt_result = gr.Textbox(
+                label="🎬 SRT 字幕",
+                lines=18,
+            )
+
+            srt_file = gr.File(
+                label="⬇️ 下载 SRT"
+            )
+
+    submit.click(
+        recognize,
+        inputs=[
+            audio,
+            token,
+            language,
+            max_chars,
+            max_duration,
+        ],
+        outputs=[
+            detected,
+            text_result,
+            srt_result,
+            srt_file,
+        ],
+    )
+
+
+if __name__ == "__main__":
+    demo.launch(
+        server_name="127.0.0.1",
+        server_port=7860,
+        inbrowser=True,
+    )
+</code></pre></div></article>
+<footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
+</main><script>(() => {
+  const article = document.querySelector('article');
+  if (!article) return;
+  const themeButton = document.querySelector('.theme-toggle');
+  const setTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    if (themeButton) {
+      themeButton.textContent = theme === 'dark' ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+    }
+  };
+  let theme = 'light';
+  try { theme = localStorage.getItem('cpuck-article-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+  setTheme(theme);
+  themeButton?.addEventListener('click', () => {
+    theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try { localStorage.setItem('cpuck-article-theme', theme); } catch {}
+  });
+  const readingTime = document.querySelector('.reading-time');
+  if (readingTime) readingTime.textContent = '约 ' + Math.max(1, Math.ceil(article.textContent.replace(/\s/g, '').length / 500)) + ' 分钟阅读';
+  const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const toc = document.createElement('details');
+  toc.className = 'article-toc';
+  const summary = document.createElement('summary');
+  summary.textContent = '文章目录';
+  toc.append(summary);
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', '文章目录');
+  const links = [];
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      let id = 'article-section-' + (index + 1);
+      while (document.getElementById(id)) id += '-';
+      heading.id = id;
+    }
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(heading.id);
+    link.textContent = heading.textContent.trim();
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
+    link.addEventListener('click', () => {
+      if (matchMedia('(max-width: 1199px)').matches) toc.open = false;
+    });
+    nav.append(link);
+    links.push(link);
+  });
+  if (headings.length) {
+    toc.append(nav);
+    toc.open = matchMedia('(min-width: 1200px)').matches;
+    document.body.classList.add('has-toc');
+    document.body.append(toc);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const current = entries.find(entry => entry.isIntersecting);
+        if (!current) return;
+        const index = headings.indexOf(current.target);
+        links.forEach((link, i) => {
+          if (i === index) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, {rootMargin: '0px 0px -65% 0px'});
+      headings.forEach(heading => observer.observe(heading));
+    }
+  }
+  article.querySelectorAll('pre').forEach(pre => {
+    const details = document.createElement('details');
+    details.className = 'code-fold';
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
+    const toggle = document.createElement('summary');
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = '复制代码';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent);
+        button.textContent = '已复制';
+      } catch {
+        details.open = true;
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = '已选中，请手动复制';
+      }
+      setTimeout(() => { button.textContent = '复制代码'; }, 2200);
+    });
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
+  });
+  const top = document.createElement('a');
+  top.href = '#article-top';
+  top.className = 'back-top';
+  top.textContent = '↑ 顶部';
+  top.setAttribute('aria-label', '返回顶部');
+  document.body.append(top);
+})();
+</script></body></html>
