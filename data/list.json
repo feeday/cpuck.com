@@ -35,7 +35,7 @@
   "desc": "在线文档表格",
   "links": {
     "http": "https://docs.qq.com/desktop/",
-    "hfCn": "https://github.com/feeday/cpuck.com/issues",
+    "hfCn": "/dB.html",
     "hf": "/xlsx.html"
   },
   "isTop": true,
