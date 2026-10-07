@@ -94,7 +94,7 @@
 {"cat":"text","title":"Translate","desc":"谷歌文档文字在线翻译。","url":"https://translate.google.com/"},
 {"cat":"audio","title":"云听","desc":"中央广播电台。","url":"https://www.radio.cn/pc-portal/erji/radioStation.html","hideOnMobile":true},
 {"cat":"audio","title":"Suno","desc":"合成音乐。","url":"https://www.suno.com","hideOnMobile":true},
- {"cat":"audio","title":"Spotify","desc":"音乐收藏。","url":"https://open.spotify.com/playlist/2VmPK9zHiT09je0OtZco9J","hideOnMobile":true},
+ {"cat":"image","title":"文生图","desc":"qwen-image-2-1-studio","url":"https://cpuck.com/qwen-image-2-1-studio/","hideOnMobile":true},
 {"cat":"audio","title":"有声书","desc":"喜马拉雅有声故事。","url":"https://www.ximalaya.com/youshengshu/updates/","hideOnMobile":true},
 {"cat":"video","title":"LTX-2.3","desc":"在线图生视频带音效。","url":"https://huggingface.co/spaces/Lightricks/LTX-2-3"},
 {"cat":"audio","title":"Qwen-ASR","desc":"在线语音识别转换。","url":"https://huggingface.co/spaces/Qwen/Qwen3-ASR-Demo"},
