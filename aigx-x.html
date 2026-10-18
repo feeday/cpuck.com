@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<script>
+(function(){function mem(){const map=new Map();return {getItem(k){return map.has(k)?map.get(k):null},setItem(k,v){map.set(String(k),String(v))},removeItem(k){map.delete(String(k))},clear(){map.clear()}};}for(const n of ['localStorage','sessionStorage'])try{const v=window[n];v.setItem('_probe_aigx','1');v.removeItem('_probe_aigx');}catch{try{Object.defineProperty(window,n,{configurable:true,value:mem()});}catch{}}})();
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="AIGC 工作台：完整内置 API 对话测试与 Markdown 智能编辑器，适配 PC 与移动端。">
-    <link rel="icon" type="image/png" href="/favicon.png">
-    <title>AIGX 工作台</title>
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
+    <title>MDE 工作台</title>
     <style>
         :root {
             --bg-body: #020617;
@@ -150,32 +153,44 @@
             .stage { border-radius: 18px; }
         }
     </style>
-</head>
+<style>.shell{grid-template-rows:auto minmax(0,1fr) auto}.shell>.site-footer{padding:5px 8px 0;border-top:1px solid rgba(255,255,255,.08)}.shell .footer-content{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.shell .footer-links{display:flex;align-items:center;gap:16px;flex-wrap:wrap}.shell .footer-link-item{display:inline-flex;align-items:center;gap:6px;color:#94a3b8;text-decoration:none;font-size:11px}.shell .footer-link-item:hover{color:#fff}.shell .footer-icon{width:14px;height:14px;fill:currentColor}.shell .copyright-bar{display:flex;gap:12px;align-items:center;font-size:10px;color:#64748b}.shell .copyright-divider{width:1px;height:10px;background:#334155}.shell #performance-result{font-family:monospace}@media(max-width:720px){.shell .footer-content{justify-content:center;gap:7px}.shell .footer-links{justify-content:center}.shell .copyright-bar{font-size:9px}}</style><link rel="canonical" href="https://ai.cpuck.com/mde"></head>
 <body>
     <main class="shell">
         <header class="hero">
             <div class="brand">
                 <div class="brand-mark">AI</div>
                 <div>
-                    <h1>AIGX 图像工作台</h1>
+                    <h1>MDE Markdown 工作台</h1>
                 </div>
             </div>
             <nav class="mode-tabs" aria-label="切换工具" role="tablist">
-                <button class="tab-btn active" type="button" data-target="apiPanel" role="tab" aria-selected="true">图像对话</button>
-                <button class="tab-btn" type="button" data-target="mdPanel" role="tab" aria-selected="false">MD 编辑</button>
+                <button class="tab-btn" type="button" data-target="apiPanel" role="tab" aria-selected="false">图像对话</button>
+                <button class="tab-btn active" type="button" data-target="mdPanel" role="tab" aria-selected="true">MD 编辑</button>
             </nav>
         </header>
 
         <section class="stage" aria-label="AIGC 工具区">
-            <article class="tool-card active" id="apiPanel">
+            <article class="tool-card" id="apiPanel">
                 <div class="frame-wrap"><iframe id="apiFrame" title="LLM AI API Test" loading="eager"></iframe></div>
             </article>
 
-            <article class="tool-card" id="mdPanel">
+            <article class="tool-card active" id="mdPanel">
                 <div class="frame-wrap"><iframe id="mdFrame" title="MD-Edit" loading="eager"></iframe></div>
             </article>
         </section>
-    </main>
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-links"><a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" class="footer-link-item"><img class="footer-icon" src="/assets/chatgpt.ico" alt="" width="16" height="16" style="object-fit:contain;filter:invert(1)">ChatGPT</a><a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer" class="footer-link-item">
+                    <svg class="footer-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.998 8.014L5.358 13.91h3.918l-1.057 5.766 8.649-11.338H11.23l1.823-5.326L9.998 8.014zm-4.39 1.764L1.76 14.54a3.868 3.868 0 0 0 3.863 3.87h1.01c.21 1.58 1.56 2.8 3.19 2.8h7.957a4.67 4.67 0 0 0 1.516-9.088c-.015-.173-.023-.35-.023-.527a6.62 6.62 0 0 0-6.619-6.619c-2.923 0-5.412 1.89-6.289 4.526a3.882 3.882 0 0 0-.765-.077z"/></svg> Cloudflare
+                </a><a href="/rss.xml" class="footer-link-item"><svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="19" r="2"/><path d="M3 10v3a8 8 0 0 1 8 8h3A11 11 0 0 0 3 10zm0-7v3c8.28 0 15 6.72 15 15h3C21 11.06 12.94 3 3 3z"/></svg>RSS</a><a href="https://github.com/" target="_blank" rel="noopener noreferrer" class="footer-link-item"><svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.23c-3.34.73-4.04-1.42-4.04-1.42-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.21.08 1.85 1.24 1.85 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.31-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23A11.5 11.5 0 0 1 12 6.8c1.02 0 2.05.14 3.01.41 2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.6-2.81 5.62-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.22.69.83.58A12 12 0 0 0 24 12C24 5.37 18.63 0 12 0z"/></svg>GitHub</a><a href="https://huggingface.co/spaces" target="_blank" rel="noopener noreferrer" class="footer-link-item"><svg class="footer-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.37.5 0 5.87 0 12.5c0 3.2 1.25 6.13 3.32 8.35l.04.05c.82.88 2.06 1.2 2.97.77.92-.42 1.2-1.65.8-2.57l-.05-.12c-.52-.86-.82-1.85-.82-2.91 0-3.17 2.58-5.75 5.75-5.75s5.75 2.58 5.75 5.75c0 1.05-.29 2.03-.8 2.89l-.04.1c-.42.94-.15 2.18.78 2.6.93.43 2.18.1 3.01-.79l.05-.05A12.43 12.43 0 0 0 24 12.5C24 5.87 18.63.5 12 .5zM7.75 11.25a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5zM12 17.6c-2.04 0-3.8-1.24-4.52-3.01h9.04A4.88 4.88 0 0 1 12 17.6zm4.25-6.35a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5z"/></svg>HuggingFace</a></div>
+
+            <div class="copyright-bar">
+                <span>&copy; 2026 Web Gemini 3 Pro Design</span>
+                <div class="copyright-divider"></div>
+                <span id="performance-result">Load: -- ms</span>
+            </div>
+        </div>
+    </footer></main>
 
     <script>
         window.addEventListener('DOMContentLoaded', () => {
@@ -288,19 +303,35 @@
             }
 
             tabs.forEach(tab => tab.addEventListener('click', () => setActivePanel(tab.dataset.target)));
-            setActivePanel('apiPanel');
+            setActivePanel('mdPanel');
         });
     </script>
 
-    <script type="text/plain" id="apiSource" class="embedded-source">
+
+<script type="text/plain" id="apiSource" class="embedded-source">
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<script>
+(function () {
+  function memStore() {
+    const data=new Map();
+    return {get length(){return data.size;},key(i){return Array.from(data.keys())[i]??null;},
+      getItem(k){return data.has(String(k))?data.get(String(k)):null;},
+      setItem(k,v){data.set(String(k),String(v));},removeItem(k){data.delete(String(k));},clear(){data.clear();}};
+  }
+  for(const name of ['localStorage','sessionStorage']) {
+    try { const st=window[name]; const key='__aigx_probe_';st.setItem(key,'1');st.removeItem(key); }
+    catch { try {Object.defineProperty(window,name,{configurable:true,value:memStore()});}catch{} }
+  }
+})();
+<\/script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LLM AI API Test</title>
     <meta name="description" content="API Test with Custom BaseURL and Models">
-    <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="icon" type="image/png" href="/assets/favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* ================== 1. 全局与变量 ================== */
@@ -592,7 +623,30 @@
             .chat-input-area { padding: 10px 15px 15px 15px; }
             .btn-action { padding: 0 12px; font-size: 0.85rem; }
         }
-    </style>
+    
+/* AIGX 嵌入工具：保留原有布局，仅扩展左侧表单及右侧工作区 */
+.sidebar-details{border:1px solid var(--border-light);background:rgba(2,6,23,.36);border-radius:10px;padding:11px;}
+.sidebar-details summary{cursor:pointer;font-size:.84rem;font-weight:700;color:#cbd5e1;}
+.sidebar-settings{display:grid;gap:7px;padding-top:12px;}
+.sidebar-settings label,.sidebar-tool-controls label{margin:8px 0 3px;font-size:.75rem;color:var(--text-secondary);}
+.sidebar-note{font-size:.75rem;color:var(--text-secondary);line-height:1.65;overflow-wrap:anywhere;}
+.sidebar-tool-controls{display:flex;flex-direction:column;gap:10px;border:1px solid var(--border-light);border-radius:13px;padding:12px;background:rgba(2,6,23,.3);}
+.sidebar-tool-controls[hidden],.sidebar-tool-controls [hidden],.sidebar-tool-view[hidden]{display:none!important;}
+.sidebar-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.sidebar-two>div{min-width:0;}.sidebar-two .glass-input{width:100%;}
+.sidebar-buttons{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.sidebar-buttons>.btn-api{flex:1 1 95px;font-size:.8rem;padding:9px 4px;}
+.sidebar-check{display:flex;align-items:center;gap:7px;}
+.sidebar-check input{accent-color:var(--theme-blue);}
+.sidebar-run{margin-top:6px;background:rgba(56,189,248,.14);border-color:rgba(56,189,248,.3);color:#e0f2fe;}
+.sidebar-tool-view{display:none;position:absolute;inset:0;min-width:0;min-height:0;background:#020617;overflow:hidden;}
+.sidebar-tool-view>iframe{display:block;width:100%;height:100%;border:0;background:#020617;}
+.right-panel.task-active .chat-history,.right-panel.task-active .typing-indicator,.right-panel.task-active .chat-input-area{display:none!important;}
+.right-panel.task-active .sidebar-tool-view{display:block;}
+.sidebar-tool-controls .glass-input{min-height:36px;}
+#toolStatus{max-height:120px;overflow:auto;}
+@media(max-width:900px){.sidebar-two{grid-template-columns:repeat(2,minmax(0,1fr));}}
+</style>
 </head>
 <body>
 
@@ -618,9 +672,27 @@
                 <label for="apiKey">🔑 API Key</label>
                 <input type="password" id="apiKey" class="glass-input" placeholder="请输入你的 API Key">
             </div>
+            <div class="form-group" id="allApiSettings">
+                <details class="sidebar-details" id="providerKeys">
+                    <summary>🔐 API 配置 · 按服务填写</summary>
+                    <div class="sidebar-settings">
+                        <label for="apiBaseUrl">Poixe / 兼容 API Base URL</label>
+                        <input type="url" id="apiBaseUrl" class="glass-input" value="https://api.poixe.com/v1/" placeholder="https://api.poixe.com/v1/">
+                        <label for="toolApimartKey">APIMart Key · GPT Image</label>
+                        <input type="password" id="toolApimartKey" class="glass-input" placeholder="sk-…（仅生图/改图）" autocomplete="off">
+                        <label for="toolDeepseekKey">DeepSeek Key · 独立通道（可选）</label>
+                        <input type="password" id="toolDeepseekKey" class="glass-input" placeholder="sk-…（可留空使用 Poixe）" autocomplete="off">
+                        <label for="toolHfToken">Hugging Face Token · ASR/Qwen</label>
+                        <input type="password" id="toolHfToken" class="glass-input" placeholder="hf_…（公共 Space 可留空）" autocomplete="off">
+                        <label for="toolImgurClientId">Imgur Client ID · 图片分享</label>
+                        <input type="text" id="toolImgurClientId" class="glass-input" placeholder="Client ID" autocomplete="off">
+                        <div class="sidebar-note">密钥在浏览器侧使用；直接访问远程 API 需要服务方开放 CORS。公开网页不要嵌入私人 Key。</div>
+                    </div>
+                </details>
+            </div>
 
             <div class="form-group">
-                <label for="unifiedModel">🤖 AI 引擎模型</label>
+                <label for="unifiedModel">🤖 AI 引擎 / 功能选择</label>
                 <select id="unifiedModel" class="glass-input" onchange="onModelChange()">
                     <optgroup label="图像反推">
                         <option value="reverse:gpt-4o" selected>GPT-4o · 图像反推</option>
@@ -642,7 +714,35 @@
                         <option value="claude-opus-4-8">Claude-opus-4-8</option>
                         <option value="deepseek-v4-flash">DeepSeek-V4-flash</option>
                     </optgroup>
-                </select>
+                
+                    <optgroup label="🎨 生图 / 改图">
+                        <option value="tool:gen-gpt">GPT Image 2 · AI 生图</option>
+                        <option value="tool:edit-gpt">GPT Image 2 · AI 改图</option>
+                        <option value="tool:gen-gemini">Gemini Flash Image · 生图</option>
+                        <option value="tool:edit-gemini">Gemini Flash Image · 改图</option>
+                        <option value="tool:gen-hf">Qwen Image (HF) · 生图</option>
+                        <option value="tool:edit-hf">Qwen Image (HF) · 改图</option>
+                    </optgroup>
+                    <optgroup label="🎬 视频 / 音频">
+                        <option value="tool:audio-edit">音频编辑 · 波形裁剪 / 导出</option>
+                        <option value="tool:asr">Qwen ASR · 音频转文字</option>
+                        <option value="tool:audio-extract">视频提取音频</option>
+                        <option value="tool:frames">视频抽帧</option>
+                    </optgroup>
+                    <optgroup label="🛠️ 图文工具">
+                        <option value="tool:share">图像分享 · Imgur</option>
+                        <option value="tool:qr">生成二维码</option>
+                        <option value="tool:decode-qr">识别二维码</option>
+                        <option value="tool:html-preview">HTML 预览</option>
+                        <option value="tool:points">AI 提炼要点</option>
+                        <option value="tool:links">提链去重</option>
+                        <option value="tool:format">文本自然排版</option>
+                        <option value="tool:tts">文字朗读</option>
+                        <option value="tool:invert">图像反色</option>
+                        <option value="tool:gray">图像灰度</option>
+                        <option value="tool:restore">图像还原</option>
+                    </optgroup>
+</select>
                 <input type="text" id="customModel" class="glass-input" placeholder="输入自定义模型名以覆盖上方选择（图像模式会沿用当前任务类型）" style="margin-top: 8px;">
             </div>
 
@@ -659,6 +759,45 @@
                 </div>
             </div>
 
+
+            <section id="sidebarToolControls" class="sidebar-tool-controls" hidden aria-label="任务设置">
+                <label id="toolTaskLabel">🛠️ 任务参数</label>
+                <p class="sidebar-note" id="toolTaskHint">左侧选择任务并在此配置，结果显示在右侧。</p>
+                <div id="toolFileGroup" class="form-group" hidden>
+                    <label for="toolFile">📁 输入图片 / 音频 / 视频</label>
+                    <input class="glass-input" type="file" id="toolFile" accept="image/*,audio/*,video/*,.mp4,.mov,.webm,.wav,.mp3,.ogg,.flac,.m4a,.aac">
+                </div>
+                <div id="toolPromptGroup" class="form-group" hidden>
+                    <label for="toolPrompt">✍️ 提示词 / 文字输入</label>
+                    <textarea class="glass-input" id="toolPrompt" rows="4" placeholder="请输入生成指令或需要处理的文本" style="resize:vertical;min-height:86px"></textarea>
+                </div>
+                <div id="toolImageSettings" hidden>
+                    <label for="toolResolution">输出分辨率</label>
+                    <select id="toolResolution" class="glass-input"><option value="1k">1K</option><option value="2k">2K</option><option value="4k">4K</option></select>
+                    <label for="toolAspect">画面比例</label>
+                    <select id="toolAspect" class="glass-input"><option value="1:1">1:1</option><option value="16:9">16:9 横屏</option><option value="9:16">9:16 竖屏</option><option value="4:3">4:3</option><option value="3:4">3:4</option><option value="2:3">2:3</option><option value="3:2">3:2</option></select>
+                </div>
+                <div id="toolAudioSettings" hidden>
+                    <div class="sidebar-two"><div><label for="toolAudioStart">开始 / 秒</label><input type="number" step="0.001" min="0" id="toolAudioStart" class="glass-input" value="0"></div><div><label for="toolAudioEnd">结束 / 秒</label><input type="number" step="0.001" min="0" id="toolAudioEnd" class="glass-input" value="0"></div></div>
+                    <div class="sidebar-buttons"><button type="button" id="toolTrim" class="btn-api">✂ 保留选段</button><button type="button" id="toolUndo" class="btn-api">撤销裁剪</button></div>
+                    <div class="sidebar-two"><div><label for="toolAudioGain">增益 / dB</label><input type="number" id="toolAudioGain" min="-60" max="24" step="1" value="0" class="glass-input"></div><div><label for="toolAudioFormat">导出格式</label><select id="toolAudioFormat" class="glass-input"><option value="mp3">MP3</option><option value="wav">WAV</option><option value="flac">FLAC</option><option value="m4a">M4A</option><option value="aac">AAC</option><option value="ogg">OGG</option><option value="opus">OPUS</option><option value="webm">WebM</option></select></div></div>
+                    <div class="sidebar-two"><div><label for="toolFadeIn">淡入 / 秒</label><input type="number" id="toolFadeIn" min="0" step=".1" class="glass-input" value="0"></div><div><label for="toolFadeOut">淡出 / 秒</label><input type="number" id="toolFadeOut" min="0" step=".1" class="glass-input" value="0"></div></div>
+                    <label class="sidebar-check"><input id="toolNormalize" type="checkbox"> 峰值归一化</label>
+                    <label for="toolAudioScope">导出范围</label><select id="toolAudioScope" class="glass-input"><option value="selection">选中音频</option><option value="full">完整音频</option></select>
+                    <div class="sidebar-buttons"><button type="button" class="btn-api" id="toolPreview">▶ 试听</button><button type="button" class="btn-api" id="toolExport">⬇ 导出音频</button></div>
+                </div>
+                <div id="toolAsrSettings" hidden>
+                    <label for="toolAsrLanguage">ASR 语言</label>
+                    <select class="glass-input" id="toolAsrLanguage"><option value="auto">自动识别</option><option value="zh">中文</option><option value="en">English</option><option value="ja">日本語</option><option value="ko">한국어</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option><option value="ru">Русский</option><option value="ar">العربية</option></select>
+                    <label for="toolAsrChunk">分段时长 / 秒</label><input class="glass-input" type="number" id="toolAsrChunk" value="8" min="2" max="30" step="1">
+                    <label for="toolAsrContext">识别上下文（可选）</label><textarea class="glass-input" id="toolAsrContext" rows="2" placeholder="专有名词、背景" style="resize:vertical"></textarea>
+                    <label class="sidebar-check"><input type="checkbox" id="toolAsrItn"> 数字规范化 ITN</label>
+                    <div class="sidebar-buttons"><button type="button" class="btn-api" id="toolAsrCancel">取消识别</button><button type="button" class="btn-api" id="toolAsrTxt">TXT</button><button type="button" class="btn-api" id="toolAsrSrt">SRT</button><button type="button" class="btn-api" id="toolAsrVtt">VTT</button></div>
+                </div>
+                <div id="toolFrameSettings" hidden><label for="toolFps">抽帧率 / FPS</label><input type="number" id="toolFps" class="glass-input" value="1" min="0.2" max="30" step="0.2"></div>
+                <button type="button" class="btn-api sidebar-run" id="toolRun">▶ 开始执行</button>
+                <div class="sidebar-note" id="toolStatus" role="status" aria-live="polite">就绪</div>
+            </section>
             <div class="divider"></div>
 
             <div class="form-group">
@@ -688,6 +827,9 @@
     </div>
 
     <div class="right-panel" id="rightPanel">
+        <div class="sidebar-tool-view" id="sidebarToolView" hidden>
+            <iframe id="sidebarToolFrame" title="集成工具运行区" loading="lazy"></iframe>
+        </div>
 
         <div class="chat-history" id="chatHistory">
             <div class="sys-hint" id="emptyPlaceholder">
@@ -724,11 +866,6 @@
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                     </button>
                 </div>
-            </div>
-
-            <div class="api-url-bar">
-                <label for="apiBaseUrl" style="margin: 0; font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; text-transform: uppercase;">🌐 API URL:</label>
-                <input type="text" id="apiBaseUrl" value="https://api.poixe.com/v1/" placeholder="https://api.poixe.com/v1/" style="background: transparent; border: none; color: var(--text-primary); font-family: inherit; font-size: 0.85rem; width: 100%; outline: none;">
             </div>
         </div>
     </div>
@@ -1682,18 +1819,185 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
         }
     }
 <\/script>
+
+<script id="aigxSidebarIntegration">
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const baseChange=onModelChange;
+let toolReady=false, toolLoad=null, activeTask='', taskRefreshTimer=0, processing=false;
+const supported=['gen-gpt','edit-gpt','gen-gemini','edit-gemini','gen-hf','edit-hf','audio-edit','asr','audio-extract','frames','share','qr','decode-qr','html-preview','points','links','format','tts','invert','gray','restore'];
+const isAudio=mode=>['audio-edit','asr','audio-extract'].includes(mode);
+let syncingAudio=false;
+const needsFile=mode=>['edit-gpt','edit-gemini','edit-hf','audio-edit','asr','audio-extract','frames','share','decode-qr','invert','gray','restore'].includes(mode);
+const needsPrompt=mode=>['gen-gpt','edit-gpt','gen-gemini','edit-gemini','gen-hf','edit-hf','qr','html-preview','points','links','format','tts'].includes(mode);
+const photo=mode=>/^(gen|edit)-(gpt|gemini|hf)$/.test(mode);
+const messages={
+'gen-gpt':'APIMart GPT Image · 生图，填入提示词','edit-gpt':'APIMart GPT Image · 改图，先上传图片','gen-gemini':'Poixe Gemini · 生图，填入提示词','edit-gemini':'Poixe Gemini · 改图，先上传图片','gen-hf':'Hugging Face Qwen Image · 生图','edit-hf':'Hugging Face Qwen Image · 改图','audio-edit':'浏览器本地音频裁剪、试听与导出','asr':'音频在浏览器分段后上传 Hugging Face Qwen ASR','audio-extract':'提取本地视频中的音轨，支持 MP3 导出','frames':'按指定 FPS 抽取视频画面','share':'需 Imgur Client ID；将图像发送至 Imgur','qr':'将文本转换为二维码图片','decode-qr':'识别已上传图片中的二维码','html-preview':'本地预览输入的 HTML','points':'使用 Poixe AI 提炼文本要点','links':'提取、去重文本中的链接','format':'本地整理文字排版','tts':'使用浏览器系统声音朗读文字','invert':'本地图像反色','gray':'本地图像灰度','restore':'还原本地图像'};
+function mark(s){$('toolStatus').textContent=String(s||'');}
+function doc(){try{return $('sidebarToolFrame').contentDocument;}catch{return null;}}
+function item(id){return doc()?.getElementById(id);}
+function assign(id,value){const el=item(id);if(el){el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));return true;}return false;}
+function press(id){const el=item(id);if(!el){mark('功能尚未初始化：'+id);return false;}el.click();return true;}
+function syncKeys(){
+ const map=[['apiKey','directPoixeKey'],['apiKey','apiKey'],['toolApimartKey','directApimartKey'],['toolApimartKey','imageApiKey'],['toolDeepseekKey','directDeepseekKey'],['toolHfToken','directHfKey'],['toolHfToken','hfApiKey'],['toolHfToken','audioAsrToken'],['toolImgurClientId','directImgurClientId'],['apiBaseUrl','directPoixeBase']];
+ for(const [from,to] of map) {const a=$(from),b=item(to);if(a&&b)b.value=a.value;}
+}
+function syncAudio(fromHost=true){
+ if(syncingAudio)return;syncingAudio=true;
+ try {
+ const pairs={toolAudioStart:'audioLabStart',toolAudioEnd:'audioLabEnd',toolAudioGain:'audioLabGain',toolFadeIn:'audioLabFadeIn',toolFadeOut:'audioLabFadeOut',toolAudioFormat:'audioLabFormat',toolAudioScope:'audioLabScope',toolAsrLanguage:'audioAsrLanguage',toolAsrChunk:'audioAsrChunk',toolAsrContext:'audioAsrContext'};
+ for(const [a,b] of Object.entries(pairs)){const src=fromHost?$(a):item(b),dst=fromHost?item(b):$(a);if(src&&dst){if(!fromHost&&document.activeElement===dst)continue;dst.value=src.value; if(fromHost)dst.dispatchEvent(new Event('change',{bubbles:true}));}}
+ for(const [a,b] of [['toolNormalize','audioLabNormalize'],['toolAsrItn','audioAsrITN']]){const src=fromHost?$(a):item(b),dst=fromHost?item(b):$(a);if(src&&dst)dst.checked=src.checked;}
+ } finally {syncingAudio=false;}
+}
+function configureFrame(){const d=doc();if(!d)return;
+ // Move status into the results panel, as the original button grid is hidden.
+ const output=d.getElementById('viewportCard'),log=d.getElementById('responseWrap');if(output&&log)output.appendChild(log);
+ const fileInput=d.getElementById('universalFile');if(fileInput)fileInput.style.display='none';
+ syncKeys();syncAudio(true);toolReady=true;
+ d.getElementById('audioLabStart')?.addEventListener('change',()=>syncAudio(false));
+ d.getElementById('audioLabEnd')?.addEventListener('change',()=>syncAudio(false));
+ d.getElementById('audioLabWave')?.addEventListener('pointerup',()=>setTimeout(()=>syncAudio(false),50));
+ refreshView();
+ clearInterval(taskRefreshTimer);taskRefreshTimer=setInterval(()=>{
+   if(!activeTask)return;
+   const status=item('audioLabStatus')?.textContent||item('respStatus')?.textContent||'';
+   if(status&&!processing)mark(status.slice(0,320));
+   if(isAudio(activeTask))syncAudio(false);
+ },900);
+}
+async function setupFrame(){if(toolReady&&doc())return;
+ if(toolLoad)return toolLoad;
+ toolLoad=new Promise((resolve,reject)=>{
+   const frame=$('sidebarToolFrame');
+   const source=parent.document.getElementById('toolSource');
+   if(!source){reject(new Error('嵌入工具源码不存在'));return;}
+   frame.addEventListener('load',()=>{try{configureFrame();resolve();}catch(e){reject(e);}}, {once:true});
+   frame.srcdoc=source.textContent.replaceAll('<'+String.fromCharCode(92)+'/script>', '<'+'/script>');
+ });
+ try{await toolLoad;}catch(e){toolLoad=null;throw e;}
+}
+function switchUI(){
+ const mode=$('unifiedModel').value;
+ const id=mode.startsWith('tool:')?mode.slice(5):'';
+ activeTask=supported.includes(id)?id:'';
+ const enabled=!!activeTask;
+ $('sidebarToolControls').hidden=!enabled;
+ $('rightPanel').classList.toggle('task-active',enabled);
+ $('sidebarToolView').hidden=!enabled;
+ $('uploadGroup').style.display=enabled?'none':$('uploadGroup').style.display;
+ $('customModel').style.display=enabled?'none':'';
+ $('toolTaskHint').textContent=messages[activeTask]||'';
+ $('toolFileGroup').hidden=!needsFile(activeTask);
+ $('toolPromptGroup').hidden=!needsPrompt(activeTask);
+ $('toolImageSettings').hidden=!photo(activeTask);
+ $('toolAudioSettings').hidden=!isAudio(activeTask);
+ $('toolAsrSettings').hidden=activeTask!=='asr';
+ $('toolFrameSettings').hidden=activeTask!=='frames';
+ $('toolRun').hidden=activeTask==='audio-edit';
+ if(activeTask==='audio-extract')$('toolRun').textContent='▶ 提取视频音轨';
+ else if(activeTask==='asr')$('toolRun').textContent='▶ 开始语音识别';
+ else if(photo(activeTask))$('toolRun').textContent='🎨 开始'+(activeTask.startsWith('edit-')?'改图':'生图');
+ else $('toolRun').textContent='▶ 开始执行';
+ const a=$('toolFile');if(activeTask==='audio-extract'||activeTask==='frames')a.accept='video/*,.mp4,.mov,.webm,.mkv';else if(activeTask==='audio-edit'||activeTask==='asr')a.accept='audio/*,video/*,.wav,.mp3,.flac,.m4a,.aac,.ogg,.webm,.mp4,.mov';else a.accept='image/*,.png,.jpg,.jpeg,.webp';
+ if(!enabled){mark('就绪');return;}
+ mark(messages[activeTask]);
+ if(photo(activeTask)||activeTask==='asr'||activeTask==='share')$('providerKeys').open=true;
+ setupFrame().then(()=>refreshView()).catch(e=>mark('加载工具失败：'+e.message));
+}
+function refreshView(){
+ if(!toolReady||!activeTask)return;
+ const audio=isAudio(activeTask),card=item('audioLabCard'),viewport=item('viewportCard');
+ if(card)card.hidden=!audio;
+ if(viewport)viewport.style.display=audio?'none':'block';
+ if(audio){syncAudio(true);}
+ else if(photo(activeTask)){
+  const models={'gen-gpt':'gpt-image-2','edit-gpt':'gpt-image-2','gen-gemini':'gemini-2.5-flash-image','edit-gemini':'gemini-2.5-flash-image','gen-hf':'hf-qwen-image','edit-hf':'hf-qwen-image'};
+  assign('unifiedModel',models[activeTask]);const select=item('unifiedModel');if(select)select.dispatchEvent(new Event('change'));
+  assign('imageResolution',$('toolResolution').value);assign('imgSize',$('toolAspect').value);
+  if(activeTask.endsWith('-hf'))assign('hfGenerationMode',activeTask.startsWith('edit-')?'Edit an image':'Create an image');
+ }
+}
+function transferFile(f){const d=doc();if(!d||!f)return;
+ const transfer=(id)=>{const node=d.getElementById(id);if(!node)return;const dt=new DataTransfer();dt.items.add(f);node.files=dt.files;node.dispatchEvent(new Event('change',{bubbles:true}));};
+ if(isAudio(activeTask)){
+   transfer('universalFile');
+   if(activeTask!=='audio-extract')transfer('audioLabFile');
+ } else transfer('universalFile');
+ mark('正在载入文件：'+f.name+'（'+(f.size/1048576).toFixed(2)+' MB）');
+}
+async function runTask(){
+ if(!activeTask)return;
+ if(processing)return;
+ processing=true;$('toolRun').disabled=true;
+ try{
+   await setupFrame();syncKeys();syncAudio(true);
+   const code=activeTask, text=$('toolPrompt').value;
+   const file=$('toolFile').files?.[0];
+   if(needsFile(code)&&!file&&!item('universalFile')?.files?.length&&!item('audioLabPlayer')?.src)throw Error('请先上传对应文件');
+   if(needsPrompt(code)&&!text.trim())throw Error('请先填写提示词或需要处理的文字');
+   if(photo(code)){
+     if(code.endsWith('-gpt')&&!$('toolApimartKey').value.trim())throw Error('请在左侧 API 配置填写 APIMart Key');
+     if(code.endsWith('-gemini')&&!$('apiKey').value.trim())throw Error('请在左侧填写 Poixe API Key');
+     assign('universalText',text);assign('imageResolution',$('toolResolution').value);assign('imgSize',$('toolAspect').value);
+     if(!press('btnCombinedAction'))throw Error('生成按钮未加载');
+   } else if(code==='audio-extract'){press('btnExtractAudio');}
+   else if(code==='frames'){assign('universalText',String($('toolFps').value||1));press('btnFrames');}
+   else if(code==='asr'){press('audioAsrRun');}
+   else {
+    const handlers={'share':'btnShareImage','qr':'btnGenerateQR','decode-qr':'btnDecodeQR','html-preview':'btnHtmlPreview','points':'btnExtractPoints','links':'btnExtractLinks','format':'optimize-btn','tts':'btnTts','invert':'btnInvert','gray':'btnGray','restore':'btnRestore'};
+    assign('universalText',text);
+    if(!press(handlers[code]))throw Error('功能按钮未加载');
+   }
+   mark('操作已提交，处理进度及结果请查看右侧面板。');
+   if(window.innerWidth<=900&&typeof closeMobilePanel==='function')closeMobilePanel();
+ }catch(e){mark('❌ '+e.message);}finally{processing=false;$('toolRun').disabled=false;}
+}
+// override original change handler only for tool values; native AIGX AI model logic unchanged.
+onModelChange=function(){
+ const mode=$('unifiedModel').value;
+ if(!mode.startsWith('tool:')){baseChange();switchUI();}
+ else switchUI();
+};
+// setup settings; never add key to URL or hardcode it in HTML.
+['apiKey','apiBaseUrl','toolApimartKey','toolDeepseekKey','toolHfToken','toolImgurClientId'].forEach(id=>$(id)?.addEventListener('input',syncKeys));
+['toolAudioStart','toolAudioEnd','toolAudioGain','toolFadeIn','toolFadeOut','toolAudioFormat','toolAudioScope','toolNormalize','toolAsrLanguage','toolAsrChunk','toolAsrContext','toolAsrItn'].forEach(id=>$(id)?.addEventListener('input',()=>syncAudio(true)));
+['toolResolution','toolAspect'].forEach(id=>$(id)?.addEventListener('change',refreshView));
+$('toolFile').addEventListener('change',e=>{const f=e.target.files?.[0];if(f)setupFrame().then(()=>transferFile(f)).catch(err=>mark(err.message));});
+$('toolRun').addEventListener('click',runTask);
+[['toolTrim','audioLabKeep'],['toolUndo','audioLabUndo'],['toolPreview','audioLabPreview'],['toolExport','audioLabExport'],['toolAsrCancel','audioAsrCancel'],['toolAsrTxt','audioAsrTxt'],['toolAsrSrt','audioAsrSrt'],['toolAsrVtt','audioAsrVtt']].forEach(([a,b])=>$(a).addEventListener('click',()=>{syncAudio(true);press(b);}));
+// Responsive waveform remains interactive even though transport controls have moved left.
+onModelChange();
+})();
+<\/script>
 </body>
 </html>
 
-    </script>
+    
+</script>
+<script type="text/plain" id="mdSource" class="embedded-source">
 
-    <script type="text/plain" id="mdSource" class="embedded-source">
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<script>
+(function () {
+  function memStore() {
+    const data=new Map();
+    return {get length(){return data.size;},key(i){return Array.from(data.keys())[i]??null;},
+      getItem(k){return data.has(String(k))?data.get(String(k)):null;},
+      setItem(k,v){data.set(String(k),String(v));},removeItem(k){data.delete(String(k));},clear(){data.clear();}};
+  }
+  for(const name of ['localStorage','sessionStorage']) {
+    try { const st=window[name]; const key='__aigx_probe_';st.setItem(key,'1');st.removeItem(key); }
+    catch { try {Object.defineProperty(window,name,{configurable:true,value:memStore()});}catch{} }
+  }
+})();
+<\/script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-     <link rel="icon" type="image/png" href="/favicon.png">
+     <link rel="icon" type="image/png" href="/assets/favicon.png">
     <title>MD-Edit</title>
     <style>
         :root {
@@ -2358,7 +2662,7 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
         // --- AI API 调用逻辑 ---
         async function runAiEdit(mode) {
             const apiKey = document.getElementById('apiKey').value.trim();
-            const baseUrl = document.getElementById('apiBaseUrl').value.trim().replace(/\/+$/, '/') || '[https://api.poixe.com/v1/](https://api.poixe.com/v1/)';
+            const baseUrl = document.getElementById('apiBaseUrl').value.trim().replace(/\/+$/, '/') || 'https://api.poixe.com/v1/';
             const model = document.getElementById('modelName').value.trim() || 'deepseek-v4-flash';
             const doc = getTextarea().value.trim();
             const instruction = document.getElementById('aiInstruction').value;
@@ -2421,6 +2725,2882 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
 </body>
 </html>
 
-    </script>
+    
+</script>
+<script type="text/plain" id="toolSource" class="embedded-source">
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script>
+(function () {
+  function memStore() {
+    const data=new Map();
+    return {get length(){return data.size;},key(i){return Array.from(data.keys())[i]??null;},
+      getItem(k){return data.has(String(k))?data.get(String(k)):null;},
+      setItem(k,v){data.set(String(k),String(v));},removeItem(k){data.delete(String(k));},clear(){data.clear();}};
+  }
+  for(const name of ['localStorage','sessionStorage']) {
+    try { const st=window[name]; const key='__aigx_probe_';st.setItem(key,'1');st.removeItem(key); }
+    catch { try {Object.defineProperty(window,name,{configurable:true,value:memStore()});}catch{} }
+  }
+})();
+<\/script>
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+const nativeFetch = window.fetch.bind(window);
+function safeBase(val, fallback) { let url = String(val || '').trim(); if(!url)url=fallback; if(!/^https:\/\//i.test(url) && !/^http:\/\/localhost(?::\d+)?\//i.test(url)) throw Error('请使用 HTTPS API 地址（本机 localhost 可使用 HTTP）'); return url.replace(/\/+$/, '')+'/'; }
+function authHeaders(key, other={}){if(!key)throw Error('当前服务尚未填写对应 API Key，请展开 DIRECT API CONFIG');return {...other,Authorization:'Bearer '+key};}
+function providerBase(){return safeBase($('directPoixeBase')?.value||$('apiProxy')?.value,'https://api.poixe.com/v1/');}
+function getTextKey(){return $('directPoixeKey')?.value.trim()||$('apiKey')?.value.trim()||'';}
+function getImageKey(){return $('directApimartKey')?.value.trim()||$('imageApiKey')?.value.trim()||'';}
+function getDeepseekKey(){return $('directDeepseekKey')?.value.trim()||getTextKey();}
+function getImgurId(){return $('directImgurClientId')?.value.trim()||'';}
+function jsonResult(obj,status=200){return new Response(JSON.stringify(obj),{status,headers:{'content-type':'application/json;charset=utf-8'}});}
+function cleanOpts(options={}){return {method:options.method||'GET',body:options.body,signal:options.signal,cache:options.cache||'no-store',credentials:'omit'};}
+async function checkedFetch(url,options){try{return await nativeFetch(url,options);}catch(err){throw Error('直连接口失败：'+String(err?.message||err)+'。可能是浏览器 CORS 跨域限制、DNS 或目标服务不可访问。请给 API 提供允许跨域的 HTTPS 代理，或检查 Key。');}}
+window.fetch = async function(input,options={}) {
+  const path=typeof input==='string'?input:(input?.url||'');
+  if(typeof path!=='string'||!path.startsWith('?api='))return nativeFetch(input,options);
+  const params=new URLSearchParams(path.slice(1)), route=params.get('api');
+  const opts=cleanOpts(options);
+  if(route==='share_limits')return jsonResult({max_bytes:15*1024*1024,post_max_size:'browser',upload_max_filesize:'browser',file_uploads:true});
+  if(route==='qr_image'){
+    const url=params.get('url');if(!url||!/^https?:\/\//i.test(url))return jsonResult({error:{message:'图片 URL 不合法'}},400);
+    return checkedFetch(url,{...opts,mode:'cors'});
+  }
+  if(route==='share_image'){
+    const id=getImgurId();if(!id)return jsonResult({error:{message:'请先填写 Imgur Client ID。纯 HTML 没有服务端隐藏的上传凭据。'}},400);
+    const upstream=await checkedFetch('https://api.imgur.com/3/image',{...opts,method:'POST',headers:{Authorization:'Client-ID '+id},body:options.body});
+    const reply=await upstream.json().catch(()=>({}));
+    if(!upstream.ok||!reply.success||!reply.data?.link)return jsonResult({error:{message:reply?.data?.error?.message||reply?.data?.error||reply?.error||'Imgur 拒绝上传'}},upstream.status||502);
+    return jsonResult({url:reply.data.link});
+  }
+  if(route==='chat'||route==='deepseek'){
+    const key=route==='deepseek'?getDeepseekKey():getTextKey();
+    if(!key)return jsonResult({error:{message:'请填写 '+(route==='deepseek'?'DeepSeek':'Poixe')+' API Key'}},401);
+    const target=providerBase()+'chat/completions';
+    return checkedFetch(target,{...opts,method:'POST',headers:authHeaders(key,{'Content-Type':'application/json'}),body:options.body});
+  }
+  if(route==='gpt_image_create'||route==='gpt_image_query'){
+    const key=getImageKey();if(!key)return jsonResult({error:{message:'请填写 APIMart API Key'}},401);
+    const target=route==='gpt_image_create'?'https://api.apimart.ai/v1/images/generations':'https://api.apimart.ai/v1/tasks/'+encodeURIComponent(params.get('task_id')||'');
+    return checkedFetch(target,{...opts,headers:authHeaders(key,route==='gpt_image_create'?{'Content-Type':'application/json'}:{}),method:route==='gpt_image_create'?'POST':'GET'});
+  }
+  if(route==='image'){
+    const key=getTextKey();if(!key)return jsonResult({error:{message:'请填写 Poixe Gemini API Key'}},401);
+    const model=params.get('model')||'gemini-2.5-flash-image';
+    if(!/^[a-zA-Z0-9_.-]+$/.test(model))return jsonResult({error:{message:'模型名称无效'}},400);
+    const base=providerBase().replace(/v1\/?$/,'');
+    return checkedFetch(base+'v1beta/models/'+encodeURIComponent(model)+':generateContent',{...opts,method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key}});
+  }
+  if(route==='qwen_asr'){
+    const op=params.get('op');const id=params.get('id');const token=options.headers?.['X-ASR-Token']||$('audioAsrToken')?.value.trim()||$('directHfKey')?.value.trim()||'';
+    if(token&&!/^hf_[A-Za-z0-9_-]+$/.test(token))return jsonResult({error:{message:'Hugging Face Token 格式错误'}},400);
+    const headers=token?{'Authorization':'Bearer '+token}:{};
+    const root='https://qwen-qwen3-asr-demo.hf.space/gradio_api';
+    if(op==='upload'){
+      const f=new FormData();f.append('files',new Blob([options.body],{type:'audio/wav'}),'tcq233_chunk.wav');
+      return checkedFetch(root+'/upload',{...opts,method:'POST',headers,body:f});
+    }
+    if(op==='call')return checkedFetch(root+'/call/asr_inference',{...opts,method:'POST',headers:{...headers,'Content-Type':'application/json'},body:options.body});
+    if(op==='result'&&/^[A-Za-z0-9_-]{1,128}$/.test(id||''))return checkedFetch(root+'/call/asr_inference/'+id,{...opts,method:'GET',headers});
+    return jsonResult({error:{message:'不支持的 Qwen ASR 请求'}},400);
+  }
+  return jsonResult({error:{message:'浏览器模式不支持的 API：'+route}},404);
+};
+window.addEventListener('DOMContentLoaded',()=>{
+  const mapping=[['directPoixeKey','apiKey'],['directApimartKey','imageApiKey'],['directHfKey','hfApiKey'],['directHfKey','audioAsrToken'],['directPoixeBase','apiProxy']];
+  for(const [from,to] of mapping){const source=$(from),target=$(to);if(!source||!target)continue;
+    source.addEventListener('input',()=>{target.value=source.value;target.dispatchEvent(new Event('change',{bubbles:true}));});
+  }
+  // Previously user-provided browser settings only; no built-in old PHP API Keys are included.
+  for(const [from,to] of [['directPoixeKey','apiKey'],['directApimartKey','imageApiKey'],['directHfKey','hfApiKey']]){
+    const src=$(from),dst=$(to);if(src&&dst&&dst.value&&!src.value)src.value=dst.value;
+  }
+  // Keep direct credentials only in current page memory (not persistent storage).
+  const status=$('directEndpointStatus');if(status)status.textContent='STATUS: 静态 HTML · 浏览器直接请求第三方 API；跨域是否开放由 API 服务方决定';
+});
+})();
+<\/script>
+
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<title>─=≡Σ((( つ•̀ω•́)つ</title>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"><\/script>
+<script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"><\/script>
+<script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"><\/script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"><\/script>
+<script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"><\/script>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<!-- Google AdSense 1015 - 在页面全生命周期只加载一次 -->
+
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { 
+    font-family: 'Share Tech Mono', -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif; 
+    margin: 0; padding: 15px 10px; 
+    background-color: #030303;
+    background-image: 
+        linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    color: #d4d4d4; 
+    min-height: 100vh; 
+}
+.app-container { max-width: 600px; margin: 0 auto; padding-bottom: 20px; position: relative; z-index: 10; }
+
+.card { 
+    background: rgba(10, 10, 10, 0.8); 
+    backdrop-filter: blur(10px);
+    border-radius: 8px; 
+    border: 1px solid #333;
+    padding: 20px; 
+    margin-bottom: 15px; 
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8); 
+    position: relative;
+}
+.card::before { content: ''; position: absolute; top: -1px; left: -1px; width: 8px; height: 8px; border-top: 2px solid #00ff41; border-left: 2px solid #00ff41; border-top-left-radius: 4px; }
+.card::after { content: ''; position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; border-bottom: 2px solid #00ff41; border-right: 2px solid #00ff41; border-bottom-right-radius: 4px; }
+
+.input-style { 
+    width: 100%; padding: 12px 14px; margin-bottom: 12px; border-radius: 6px; 
+    border: 1px solid #333; background: #000; font-size: 14px; outline: none; 
+    transition: all 0.3s ease; color: #00f0ff; font-family: 'Share Tech Mono', monospace; 
+}
+.input-style:focus { border-color: #00f0ff; background: #050505; box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+textarea.input-style { min-height: 90px; resize: vertical; line-height: 1.8; white-space: pre-wrap; overflow-x: hidden; }
+textarea.input-style.is-empty { white-space: pre; overflow-x: auto; }
+textarea.input-style.is-empty::placeholder { white-space: pre; }
+textarea.input-style::placeholder { color: #555; font-family: 'Share Tech Mono', monospace; font-size: 12px; line-height: 1.4; }
+
+/* Search bar: keep the same dark terminal treatment as the form controls below. */
+.search-wrapper {
+    position: relative; display: flex; align-items: center; width: 100%; min-height: 44px;
+    margin-bottom: 12px; background: #000; border: 1px solid #333; border-radius: 6px;
+    transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+.search-wrapper:focus-within { border-color: #00f0ff; background: #050505; box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+.custom-select { position: relative; flex: 0 0 auto; align-self: stretch; }
+.select-trigger {
+    height: 100%; min-width: 92px; padding: 0 10px 0 13px; display: flex; align-items: center;
+    justify-content: space-between; gap: 6px; color: #00ff41; font-size: 13px; cursor: pointer;
+    user-select: none;
+}
+.arrow-icon { width: 15px; height: 15px; fill: currentColor; transition: transform 0.2s ease; }
+.custom-select.open .arrow-icon { transform: rotate(180deg); }
+.select-options {
+    display: none; position: absolute; z-index: 100; top: calc(100% + 7px); left: 0; min-width: 130px;
+    padding: 5px; background: #080808; border: 1px solid #333; border-radius: 6px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85);
+}
+.custom-select.open .select-options { display: block; }
+.option-item { padding: 8px 10px; border-radius: 4px; color: #888; font-size: 13px; cursor: pointer; }
+.option-item:hover { background: rgba(255, 255, 255, 0.07); color: #d4d4d4; }
+.option-item.selected { background: rgba(0, 255, 65, 0.08); color: #00ff41; }
+.search-inner-divider { width: 1px; height: 22px; flex: 0 0 1px; background: #333; }
+.search-input {
+    min-width: 0; flex: 1; height: 42px; padding: 0 36px 0 12px; border: 0; outline: 0;
+    background: transparent; color: #00f0ff; font: 14px 'Share Tech Mono', monospace;
+}
+.search-input::placeholder { color: #555; }
+.search-clear {
+    display: none; position: absolute; right: 45px; padding: 7px; color: #666; font-size: 12px;
+    line-height: 1; cursor: pointer;
+}
+.search-clear:hover { color: #d4d4d4; }
+.search-input:not(:placeholder-shown) + .search-clear { display: block; }
+.external-search-btn {
+    width: 43px; height: 42px; flex: 0 0 43px; display: grid; place-items: center; color: #00f0ff;
+    border-left: 1px solid #333; cursor: pointer; transition: background 0.2s ease, color 0.2s ease;
+}
+.external-search-btn:hover { background: rgba(0, 240, 255, 0.1); color: #00ff41; }
+.external-search-btn:active { background: rgba(0, 240, 255, 0.18); }
+.external-search-btn svg { width: 18px; height: 18px; }
+
+.button-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); gap: 10px; margin-bottom: 5px; }
+.btn { 
+    background: rgba(255, 255, 255, 0.05); color: #888; border: 1px solid #333; 
+    padding: 10px 0; border-radius: 4px; font-size: 13px; font-weight: 500; 
+    cursor: pointer; transition: 0.2s; text-align: center; display: inline-flex; 
+    justify-content: center; align-items: center; user-select: none; font-family: 'Share Tech Mono', sans-serif; letter-spacing: 1px;
+}
+.btn:hover { background: rgba(255, 255, 255, 0.1); border-color: #555; color: #ccc; }
+.btn:active { background: rgba(0, 240, 255, 0.1); transform: scale(0.98); border-color: #00f0ff; color: #00f0ff; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-ai { border-color: #00ff41; color: #00ff41; background: rgba(0, 255, 65, 0.05); font-weight: bold; }
+.btn-ai:hover, .btn-ai:active { background: rgba(0, 255, 65, 0.2); box-shadow: 0 0 10px rgba(0, 255, 65, 0.4); text-shadow: 0 0 5px #00ff41; }
+
+.btn-tucao { border-color: #00f0ff; color: #00f0ff; background: rgba(0, 240, 255, 0.05); font-weight: bold; }
+.btn-tucao:hover, .btn-tucao:active { background: rgba(0, 240, 255, 0.2); box-shadow: 0 0 10px rgba(0, 240, 255, 0.4); text-shadow: 0 0 5px #00f0ff; }
+
+.btn-danger { border-color: #ff2a2a; color: #ff2a2a; background: rgba(255, 42, 42, 0.05); }
+.btn-danger:hover, .btn-danger:active { background: rgba(255, 42, 42, 0.2); box-shadow: 0 0 10px rgba(255, 42, 42, 0.4); text-shadow: 0 0 5px #ff2a2a; }
+
+#response { 
+    white-space: pre-wrap; word-break: break-all; font-family: 'Share Tech Mono', ui-monospace, monospace; 
+    background: #050505; color: #00ff41; border: 1px solid #00ff41; border-radius: 6px; 
+    padding: 12px; font-size: 12px; max-height: 400px; overflow-y: auto; margin-top: 10px; 
+    text-align: left; text-shadow: 0 0 2px rgba(0, 255, 65, 0.5);
+}
+#responseWrap { display: none; margin-top: 15px; }
+
+#stats { 
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px 5px; font-size: 11px; 
+    color: #666; margin: 10px 0; padding: 10px 5px; background: #000; border-radius: 6px; 
+    border: 1px dashed #333; text-align: center; 
+}
+
+.ping-container { padding: 15px; background: #0a0a0a; border: 1px dashed #333; border-radius: 8px; margin-top: 15px; }
+.ping-header { font-size: 13px; font-weight: 600; color: #d4d4d4; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+.ping-box { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #000; border: 1px solid #333; border-radius: 6px; font-size: 14px; cursor: pointer; transition: background 0.2s; color: #d4d4d4; }
+.ping-box:active { background: #111; border-color: #00f0ff; }
+.ping-site { font-weight: bold; color: #00f0ff; }
+.ping-ms { color: #00ff41; font-family: 'Share Tech Mono', monospace; font-weight: bold; text-shadow: 0 0 5px rgba(0, 255, 65, 0.5); }
+.ping-desc { font-size: 11px; color: #888; margin-top: 12px; }
+.ping-desc span span { color: #d4d4d4 !important; }
+#performance-result { background: #000 !important; border: 1px solid #333; color: #00ff41 !important; text-shadow: 0 0 3px rgba(0, 255, 65, 0.4); }
+
+.ping-chart-wrap { width: 100%; height: 125px; margin-top: 15px; position: relative; background: #050505; border: 1px solid #333; border-radius: 6px; padding: 10px 0; }
+canvas#chart { width: 100%; height: 100%; display: block; }
+
+.ping-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: flex-end; opacity: 0; transition: opacity 0.3s ease; }
+.ping-modal.show { opacity: 1; display: flex; }
+.ping-sheet { width: 100%; max-width: 600px; background: #0a0a0a; border: 1px solid #00ff41; border-bottom: none; border-radius: 12px 12px 0 0; overflow: hidden; transform: translateY(100%); transition: transform 0.3s ease; box-shadow: 0 -5px 20px rgba(0, 255, 65, 0.2); }
+.ping-modal.show .ping-sheet { transform: translateY(0); }
+.ping-sheet .item { padding: 16px; text-align: center; background: #0a0a0a; border-bottom: 1px solid #333; font-size: 15px; color: #00f0ff; cursor: pointer; font-family: 'Share Tech Mono'; letter-spacing: 2px;}
+.ping-sheet .item:active { background: #111; color: #00ff41; }
+.ping-sheet .item.cancel { margin-top: 8px; color: #ff2a2a; font-weight: bold; border-bottom: none; }
+
+.footer-banner { margin-top: 20px; text-align: center; border-radius: 8px; overflow: hidden; }
+audio { outline: none; filter: invert(0.8) hue-rotate(180deg); }
+.sub-text { color: #888 !important; }
+
+/* Google 广告位置：参考随手记录原版，位于首张卡片顶部，搜索栏上方。 */
+.adsense-reference-top {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 0 12px;
+    text-align: center;
+}
+.adsense-reference-top > ins.adsbygoogle {
+    display: inline-block;
+    width: 300px;
+    height: 50px;
+    margin: 0 auto;
+}
+/* 320px 竖屏下，广告独立向卡片边缘延伸，避免 300px 广告被卡片 20px 内边距裁切。 */
+@media (max-width: 359px) {
+    .adsense-reference-top {
+        width: calc(100% + 40px);
+        max-width: none;
+        margin-left: -20px;
+        margin-right: -20px;
+    }
+}
+@media (max-width: 319px) {
+    .adsense-reference-top > ins.adsbygoogle {
+        width: calc(100vw - 20px) !important;
+        max-width: 100%;
+    }
+}
+/* 管理员排查功能，正常访客完全不显示。 */
+.adsense-diagnostics-1015 { font: 12px/1.6 ui-monospace, Consolas, monospace; border: 1px dashed #555; background: #050505; color: #b8eac4; border-radius: 6px; margin-top: 8px; padding: 8px 12px; word-break: break-all; }
+.adsense-diagnostics-1015 summary { cursor: pointer; color: #00f0ff; }
+.adsense-diagnostics-1015 pre { white-space: pre-wrap; margin-bottom: 0; font: inherit; }
+
+
+
+
+/* IP 信息图：让图片与链接一同填满卡片可用宽度，兼容手机窄屏和嵌套引用。 */
+.ip-info-wrapper { display:flex; justify-content:center; align-items:center; width:100%; max-width:100%; min-width:0; margin:0 auto; overflow:hidden; text-align:center; }
+.ip-info-link { display:block; width:100%; max-width:100%; min-width:0; line-height:0; }
+.ip-info-image { display:block; width:100%; max-width:100%; min-width:0; height:auto; object-fit:contain; border:0; }
+
+/* 仅新增音频工作台局部样式；原有主页面所有 CSS 保持不变。 */
+#audioLabCard[hidden] { display: none !important; }
+#audioLabCard .audio-row { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;align-items:end; }
+#audioLabCard .audio-row.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
+#audioLabCard .audio-row > label { font-size:12px;color:#888;min-width:0;display:block; }
+#audioLabCard .audio-row .input-style { margin:6px 0 12px;padding:10px 8px; }
+#audioLabCard .audio-toggle { font-size:12px;color:#a1a1a1;display:inline-flex;align-items:center;gap:5px;padding:6px 0 12px; }
+#audioLabCard .audio-toggle input { accent-color:#00ff41; }
+#audioLabCard .audio-wave { width:100%;height:105px;display:block;border:1px solid #333;border-radius:6px;background:#050505;touch-action:none;cursor:crosshair; }
+#audioLabCard .audio-status { color:#00ff41;font:12px/1.7 'Share Tech Mono',monospace;white-space:pre-wrap;word-break:break-word; }
+#audioLabCard .audio-subtitle-row { border-top:1px dashed #333;padding:9px 0; }
+#audioLabCard .audio-subtitle-row textarea { min-height:52px;margin:7px 0 0; }
+#audioLabCard .audio-subtitle-row .btn { padding:5px 9px;font-size:11px; }
+#audioLabCard audio { width:100%;margin:10px 0; }
+#audioLabCard .audio-title { font-size:14px;color:#00f0ff;margin:0 0 12px; }
+#audioLabCard .audio-inline-buttons { display:flex;flex-wrap:wrap;gap:8px; margin:10px 0; }
+#audioLabCard .audio-inline-buttons .btn { flex:1 1 100px; padding:9px;letter-spacing:0; }
+#audioLabCard .audio-hint {font-size:11px;color:#888;line-height:1.75;margin:10px 0;}
+#audioLabCard .audio-file-name {font-size:12px;color:#00ff41;overflow-wrap:anywhere;margin:10px 0;}
+@media(max-width:390px){#audioLabCard .audio-row.three{grid-template-columns:repeat(2,minmax(0,1fr));}}
+
+
+/* HTML 迁移：只对第三工作台的新配置区和 IP 图生效 */
+.direct-config-card { padding:14px 18px; }
+.direct-config-title { color:#00ff41;font-weight:700;letter-spacing:1px;font-size:13px;margin-bottom:10px; }
+.direct-config-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 11px; }
+.direct-config-grid label { color:#999;font-size:11px;display:block;min-width:0; }
+.direct-config-grid label .input-style { margin:6px 0 6px;min-width:0; }
+.direct-config-help { font-size:11px;color:#888;line-height:1.65;margin:8px 0 0; }
+.ip-auto-fit { display:flex;justify-content:center;width:100%;min-width:0;overflow:hidden; }
+.ip-auto-fit > a { display:block;width:100%;min-width:0; }
+.ip-auto-fit > a > img { width:100%!important;max-width:100%!important;height:auto!important;object-fit:contain;display:block;margin:auto; }
+@media(max-width:400px) { .direct-config-grid {grid-template-columns:1fr;} }
+</style>
+
+<style id="aigxFrameSkin">
+body{background:#020617!important;background-image:none!important;padding:12px!important;color:#e2e8f0!important;}
+.app-container{max-width:100%!important; padding:0!important;}
+.app-container > *:not(#viewportCard):not(#audioLabCard){display:none!important;}
+#viewportCard{background:rgba(15,23,42,.45)!important;border-color:rgba(148,163,184,.16)!important;box-shadow:none!important;}
+#viewportCard>.ping-box,#viewportCard>.ping-desc,#viewportCard>.ping-chart-wrap{display:none!important;}
+#viewportCard #mediaPreview{max-width:100%!important;}
+#viewportCard img{max-width:100%!important;height:auto!important;}
+#responseWrap{display:block;}
+#response{max-height:350px;}
+#audioLabCard{background:rgba(15,23,42,.45)!important;border-color:rgba(148,163,184,.16)!important;box-shadow:none!important;}
+#audioLabCard > *:not(#audioLabName):not(#audioLabWave):not(#audioLabPlayer):not(#audioLabStatus):not(#audioAsrResults){display:none!important;}
+#audioLabCard #audioAsrResults .audio-inline-buttons{display:none!important;}
+#audioLabCard #audioAsrCues{max-height:none!important;}
+#audioLabCard .audio-wave{height:175px!important;}
+</style></head>
+<body>
+<div class="app-container">
+
+  <!-- ========================================== -->
+  <!-- 📢 GOOGLE ADSENSE MATRIX                   -->
+  <!-- ========================================== -->
+
+  <!-- ========================================== -->
+
+  <div class="card">
+    <!-- 参考版 Google 广告：原有位置/尺寸，深色赛博风格保持不变 -->
+    <div class="adsense-reference-top" id="googleAdTop2282084339" aria-label="广告">
+      <script id="adsenseSdk1015" async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964437526797765"
+        crossorigin="anonymous"
+        onload="window.__adsenseSdkLoaded1015=true"
+        onerror="window.__adsenseSdkFailed1015=true"><\/script>
+      <!-- wxm95：来自参考页面的 300 × 50 广告位 -->
+      <ins class="adsbygoogle"
+           style="display:inline-block;width:300px;height:50px"
+           data-ad-client="ca-pub-1964437526797765"
+           data-ad-slot="2282084339"></ins>
+    </div>
+    <script>
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        window.__adsensePushOK1015 = true;
+      } catch (e) {
+        window.__adsensePushError1015 = String(e && e.message ? e.message : e);
+      }
+    <\/script>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <!-- 仅用于定位广告未显示的原因。URL 添加 ?ad_debug=1 才会展示 -->
+    <details class="adsense-diagnostics-1015" id="adsenseDiagnostics1015" hidden>
+      <summary>AdSense 1015 广告诊断（仅管理员自检）</summary>
+      <pre id="adsenseDiagnosticText1015">正在检测…</pre>
+    </details>
+    
+    
+<div class="ip-info-wrapper">
+    <a class="ip-info-link"
+       href="https://tcq233.com"
+       target="_blank"
+       rel="noopener noreferrer">
+        <img class="ip-info-image"
+             src="https://cpuck.com/ip/"
+             alt="IP 信息"
+             referrerpolicy="no-referrer"
+             loading="lazy" />
+    </a>
+</div>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    <div id="stats">
+      <span id="total">总数: 0</span>
+      <span id="chinese">汉字: 0</span>
+      <span id="punctuation">标点: 0</span>
+      <span id="alphabet">字母: 0</span>
+      <span id="numbers">数字: 0</span>
+      <span id="duplicate">重复: 0</span>
+    </div>
+    <textarea id="universalText" class="input-style is-empty" placeholder="🚀 系统就绪，等待输入指令或粘贴数据源..."></textarea>
+  </div>
+ <div class="search-wrapper">
+                <div class="custom-select" id="customSelect">
+                    <div class="select-trigger" onclick="toggleSelect(event)">
+                        <span id="currentEngineText">Bilibili</span>
+                        <svg class="arrow-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </div>
+                    <input type="hidden" id="searchEngineValue" value="https://search.bilibili.com/all?keyword=">
+
+                    <div class="select-options" id="selectOptions">
+              
+                        <div class="option-item" onclick="selectEngine('https://www.google.com/search?q=', 'Google', this)">Google</div>
+                        <div class="option-item" onclick="selectEngine('https://github.com/search?q=', 'Github', this)">Github</div>
+                        <div class="option-item" onclick="selectEngine('https://yandex.by/images/search?text=', 'Yandex', this)">Yandex</div>
+                        <div class="option-item" onclick="selectEngine('https://www.douyin.com/search/', '抖音', this)">Douyin</div>
+                        <div class="option-item" onclick="selectEngine('https://search.bilibili.com/all?keyword=', 'B站', this)">Bilibili</div>
+                        <div class="option-item" onclick="selectEngine('https://www.baidu.com/s?q2=', '百度', this)">Baidu</div>          
+                    </div>
+                </div>
+                
+                <div class="search-inner-divider"></div>
+
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索标题或简介..." autocomplete="off">
+                <span class="search-clear" id="searchClear" onmousedown="event.preventDefault()" onclick="clearSearch()">✕</span>
+                
+                <div class="external-search-btn" id="externalSearchBtn" title="搜索">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </div>
+            </div>
+  
+<!-- HTML 直接调用服务：API Key 与后端 API 均由访问者本人配置。 -->
+<div class="card direct-config-card" id="directConfigCard">
+  <div class="direct-config-title">🔐 HTML DIRECT API CONFIG / 各服务独立授权</div>
+  <div class="direct-config-grid">
+    <label>Poixe API Key（对话 / Gemini 图像）<input class="input-style" id="directPoixeKey" type="password" placeholder="sk-...（必填）" autocomplete="off"></label>
+    <label>APIMart API Key（GPT Image 2）<input class="input-style" id="directApimartKey" type="password" placeholder="sk-...（生图必填）" autocomplete="off"></label>
+    <label>DeepSeek / Poixe API Key<input class="input-style" id="directDeepseekKey" type="password" placeholder="sk-...（独立对话可填写）" autocomplete="off"></label>
+    <label>Hugging Face Token（Qwen ASR / HF 图像）<input class="input-style" id="directHfKey" type="password" placeholder="hf_...（公共 Space 可留空）" autocomplete="off"></label>
+    <label>Imgur Client ID（图像分享）<input class="input-style" id="directImgurClientId" type="text" placeholder="Imgur Client ID（上传时必填）" autocomplete="off"></label>
+    <label>Poixe API Base URL（可选自定义网关）<input class="input-style" id="directPoixeBase" type="url" placeholder="https://api.poixe.com/v1/"></label>
+  </div>
+  <p class="direct-config-help">🔒 HTML 不附带旧版 PHP 私有密钥；工具箱独立 Key 不预置；原有“图像对话 / MD 编辑”仍按原代码可能使用浏览器本地存储。请勿在公共设备输入私密 Key。第三方 API 必须允许浏览器跨域（CORS），否则须自行配置允许 CORS 的服务端代理。ASR 的音频分段会发送至 Hugging Face；其他本地音频剪辑不会上传。</p>
+  <p class="direct-config-help" id="directEndpointStatus" role="status">STATUS: 本地工具已就绪 · API 需自行填写密钥</p>
+</div>
+
+  <div class="card">
+   <div class="button-grid" style="margin-top: 15px; grid-template-columns: 1fr 1fr 1fr;">
+     <button class="btn " id="btnClearOutput" title="复制文本并彻底重置所有控制状态">复制重置</button>
+     <button class="btn btn-tucao" id="btnShareImage">图像分享</button>
+      <button class="btn" id="btnTts">语音朗读</button>
+     <button class="btn " id="btnCombinedAction">模型测速</button>   
+      <button class="btn" id="btnExtractPoints">提炼要点</button>
+      <button class="btn" id="btnExtractLinks">提链去重</button>
+      <button class="btn" id="btnHtmlPreview">HTML预览</button>
+      <button class="btn" id="btnFrames">视频分离</button>
+      <button class="btn" id="btnExtractAudio">视频提音频</button>
+      <button class="btn" id="btnAudioEdit">音频剪辑</button>
+      <button class="btn btn-ai" id="btnAudioAsr">Qwen ASR</button>
+      <button class="btn" id="optimize-btn">自然排版</button>
+      <button class="btn" id="btnDecodeQR">识别二维码</button>
+      <button class="btn" id="btnImportMemory">导入记忆</button>
+      <button class="btn" id="btnExportMemory">导出记忆</button>
+      <button class="btn btn-danger" id="btnClearMemory">清空记忆</button>
+      <a class="btn" href="https://pan.quark.cn/s/7d5d8cd6f065" target="_blank" rel="noopener noreferrer">网盘资源</a>
+      <a class="btn" href="http://cpu.jy6d.com/" target="_blank" rel="noopener noreferrer">测处理器</a>
+      <a class="btn" href="https://hf-mirror.com/datasets/feeday/datxy/tree/main/apk" target="_blank" rel="noopener noreferrer">安卓应用</a>
+      <input id="memoryFileInput" type="file" accept="application/json,.json" style="display:none" />
+    </div>
+
+    <div id="responseWrap">
+      <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:5px;">
+        <span class="sub-text" id="respStatus" style="font-size:12px; color:#888;">等待执行指令...</span>
+        <button class="btn" id="btnHideResp" style="padding: 2px 8px; font-size:11px;">隐藏日志</button>
+      </div>
+      <div id="response"></div>
+    </div>
+  </div>
+
+  <!-- 音频编辑与 Qwen ASR：默认折叠显示，不改变原有页面排版和卡片样式 -->
+  <div class="card" id="audioLabCard" hidden>
+    <div class="audio-title">🎛️ AUDIO WORKBENCH / QWEN ASR <button type="button" class="btn" id="audioLabClose" style="float:right;padding:5px 12px;">收起</button></div>
+    <input id="audioLabFile" type="file" accept="audio/*,video/*,.wav,.mp3,.flac,.m4a,.aac,.ogg,.opus,.mp4,.mov,.webm,.mkv" hidden />
+    <div class="audio-inline-buttons"><button class="btn" id="audioLabChoose">导入音视频</button><button class="btn" id="audioLabKeep" disabled>✂ 保留选段</button><button class="btn" id="audioLabUndo" disabled>撤销裁剪</button></div>
+    <div id="audioLabName" class="audio-file-name">暂无音频。可以使用页面底部上传的音视频，或在此导入。</div>
+    <canvas class="audio-wave" id="audioLabWave" height="105" aria-label="音频波形：拖动可选择时间段"></canvas>
+    <audio id="audioLabPlayer" controls preload="none"></audio>
+    <div class="audio-row"><label>开始时间（秒）<input type="number" min="0" step="0.001" value="0" id="audioLabStart" class="input-style"></label><label>结束时间（秒）<input type="number" min="0" step="0.001" value="0" id="audioLabEnd" class="input-style"></label></div>
+    <div class="audio-row three"><label>增益 dB<input type="number" min="-60" max="24" step="1" value="0" id="audioLabGain" class="input-style"></label><label>淡入（秒）<input type="number" min="0" step="0.1" value="0" id="audioLabFadeIn" class="input-style"></label><label>淡出（秒）<input type="number" min="0" step="0.1" value="0" id="audioLabFadeOut" class="input-style"></label></div>
+    <label class="audio-toggle"><input type="checkbox" id="audioLabNormalize">峰值归一化（98%）</label>
+    <div class="audio-row"><label>导出范围<select id="audioLabScope" class="input-style"><option value="selection">当前选段</option><option value="full">全部音频</option></select></label><label>导出格式<select id="audioLabFormat" class="input-style"><option value="mp3">MP3（192 kbps）</option><option value="wav">WAV（PCM 无压缩）</option><option value="flac">FLAC（无损）</option><option value="m4a">M4A（AAC）</option><option value="aac">AAC</option><option value="ogg">OGG</option><option value="opus">OPUS</option><option value="webm">WebM 音频</option></select></label></div>
+    <div class="audio-inline-buttons"><button type="button" class="btn" id="audioLabPreview" disabled>▶ 试听选段</button><button type="button" class="btn btn-tucao" id="audioLabExport" disabled>↓ 导出音频</button></div>
+    <p class="audio-hint">拖动波形设定范围；编辑、剪辑及转码在本地浏览器完成。WAV 不需下载转码器；复杂视频与 FLAC/M4A/OGG 等首次使用会加载 FFmpeg WebAssembly。</p>
+    <hr style="border:0;border-top:1px solid #333;margin:18px 0;" />
+    <div class="audio-title">🎙️ QWEN3-ASR / 音频转文字</div>
+    <div class="audio-row"><label>语言<select id="audioAsrLanguage" class="input-style"><option value="auto">自动识别</option><option value="zh">中文</option><option value="en">英语</option><option value="ja">日语</option><option value="ko">韩语</option><option value="fr">法语</option><option value="de">德语</option><option value="es">西班牙语</option><option value="ru">俄语</option><option value="ar">阿拉伯语</option></select></label><label>每段时长（秒）<input type="number" class="input-style" id="audioAsrChunk" min="2" max="30" step="1" value="8"></label></div>
+    <input id="audioAsrToken" type="password" class="input-style" placeholder="HF Token：hf_...（可留空使用公共 Space）" autocomplete="off" />
+    <textarea id="audioAsrContext" class="input-style" rows="2" placeholder="识别上下文或专有名词（可选）"></textarea>
+    <div class="audio-row"><label>识别范围<select id="audioAsrScope" class="input-style"><option value="full">完整当前音频</option><option value="selection">选中区间</option></select></label><label class="audio-toggle"><input type="checkbox" id="audioAsrITN">数字、日期规范化（ITN）</label></div>
+    <div class="audio-inline-buttons"><button class="btn btn-ai" id="audioAsrRun">开始识别</button><button class="btn" id="audioAsrCancel" disabled>取消识别</button></div>
+    <p class="audio-hint">只在点击“开始识别”后上传所选音频分段到 Qwen3-ASR-Demo；转写时间轴按分段估算，不是精确字词对齐，请校对后发布。</p>
+    <div class="audio-status" id="audioLabStatus" role="status" aria-live="polite">准备就绪。可从音频文件或视频开始。</div>
+    <div id="audioAsrResults" style="display:none;">
+      <div class="audio-inline-buttons"><button class="btn" id="audioAsrToText">填入主文本框</button><button class="btn" id="audioAsrTxt">导出 TXT</button><button class="btn" id="audioAsrSrt">导出 SRT</button><button class="btn" id="audioAsrVtt">导出 VTT</button></div>
+      <div id="audioAsrCues"></div>
+    </div>
+  </div>
+
+  <div class="card output-area" id="viewportCard">
+    <div class="ping-box" onclick="openPingModal()">
+            <div class="ping-site" id="siteName">百度</div>
+            <div class="ping-ms" id="pingText">检测中...</div>
+            <div style="color: #00f0ff; font-size: 12px;">切换节点 ⌄</div>
+        </div>
+        <div class="ping-desc" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>LINK LATENCY <span id="descSite" style="color:#d4d4d4; font-weight:bold;">百度</span>:</span>
+            <span id="performance-result" style="background: #000; padding: 2px 6px; border-radius: 4px; font-family: ui-monospace, Consolas, monospace; font-size: 10px; color: #00ff41;">LOADING...</span>
+        </div>
+        <div class="ping-chart-wrap">
+            <canvas id="chart"></canvas>
+        </div>
+
+    <div id="imageDisplayContainer" style="display:none; flex-direction:column; align-items:center; margin-top:15px; width: 100%;">
+      <div id="originalImgWrapper" style="width: 100%; text-align: center; margin-bottom: 15px;">
+        <img id="displayedImage" src="" style="max-width:100%; border-radius:6px; border: 1px solid #333;" />
+      </div>
+
+      <div id="modifiedImgWrapper" style="width: 100%; text-align: center; display: none; margin-bottom: 15px;">
+        <img id="modifiedImage" src="" style="max-width:100%; border-radius:6px; border: 1px solid #00f0ff;" />
+      </div>
+
+      <div id="imageMetadataPreview" class="sub-text" style="display:none;width:100%;max-height:250px;overflow:auto;white-space:pre-wrap;word-break:break-word;text-align:left;background:#050505;border:1px dashed #333;padding:12px;border-radius:6px;font-size:11px;color:#888;margin-bottom:10px;"></div>
+      <a id="generatedImageLink" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-tucao" style="display:none;width:100%;margin-bottom:10px;text-decoration:none;">↗ OPEN GENERATED IMAGE</a>
+      <div id="imageTimeLabel" class="sub-text"></div>
+      <div id="framePager" class="sub-text" style="display:none; font-family: 'Share Tech Mono', monospace; margin-top: 5px; color: #888;"></div>
+      <div class="button-grid" id="frameControls" style="display:none; margin-top: 15px; width:100%;">
+        <button class="btn" id="prevButton">← 上一帧</button>
+        <button class="btn" id="nextButton">下一帧 →</button>
+      </div>
+
+      <div class="button-grid" id="editButtons" style="display:none; margin-top:15px; width:100%;">
+        <button class="btn" id="btnInvert">反色处理</button>
+        <button class="btn" id="btnGray">灰度去除</button>
+        <button class="btn" id="btnRestore">源图还原</button>
+      </div>
+    </div>
+    
+    <div id="mediaPreview" style="margin-top:15px; display:flex; flex-direction:column; align-items:center; width:100%;"></div>
+
+  </div>
+
+  <div class="footer-banner">
+    <input type="text" id="apiProxy" class="input-style" placeholder="🌐 PROXY_URL (留空则默认官方通道)" />
+    <input type="password" id="apiKey" class="input-style" placeholder="🔑 SECURE_KEY (Text/Gemini)" />
+    <input type="password" id="imageApiKey" class="input-style" placeholder="🎨 SECURE_KEY (GPT Image，可留空使用后端配置)" style="display:none;" />
+    <input type="text" id="customApiUrl" class="input-style" style="display:none" placeholder="🌐 API_BASE 例如 http://192.168.31.111:5001/v1/" />
+    <input type="text" id="customModelName" class="input-style" style="display:none" placeholder="🤖 MODEL_NAME 例如 Qwen3.5-9B" />
+    <input type="password" id="customApiKey" class="input-style" style="display:none" placeholder="🔑 CUSTOM_KEY 无鉴权可留空" />
+    <input type="password" id="hfApiKey" class="input-style" style="display:none" placeholder="🤗 Hugging Face Token（可留空）" />
+    <select id="hfGenerationMode" class="input-style" style="display:none">
+      <option value="auto">MODE: 自动判断生图 / 改图</option>
+      <option value="Create an image">MODE: 生图</option>
+      <option value="Edit an image">MODE: 改图</option>
+      <option value="Transparent PNG">MODE: 透明 PNG</option>
+    </select>
+    
+    <div id="imageOptionsWrapper" style="display:none;">
+      <select id="imageResolution" class="input-style" style="display:none;">
+          <option value="1k" selected>RES: 1K STANDARD</option>
+          <option value="2k">RES: 2K HIGH-DEF</option>
+          <option value="4k">RES: 4K ULTRA-HD</option>
+      </select>
+      <select id="imgSize" class="input-style" style="display:none;">
+          <option value="1:1">SIZE: 1:1 正方形</option>
+          <option value="3:2">SIZE: 3:2 横图</option>
+          <option value="2:3">SIZE: 2:3 竖图</option>
+          <option value="4:3">SIZE: 4:3 横图</option>
+          <option value="3:4">SIZE: 3:4 竖图</option>
+          <option value="16:9">SIZE: 16:9 横图</option>
+          <option value="9:16">SIZE: 9:16 竖图</option>
+          <option value="21:9">SIZE: 21:9 宽屏</option>
+      </select>
+    </div>
+
+    <select id="unifiedModel" class="input-style" onchange="onModelChange()">
+        <optgroup label="🧠 新增对话与自定义端点">
+            <option value="deepseek">DeepSeek (PHP KEY / MEMORY)</option>
+            <option value="custom-chat">自定义模型 (API URL / MODEL / KEY)</option>
+        </optgroup>
+        <optgroup label="💬 文本对话与多模态提问">
+            <option value="deepseek-v4-flash" selected>DeepSeek-V4 (Default)</option>
+            <option value="gpt-5.5-2026-04-23">GPT-5.5 Core</option>
+            <option value="gemini-3.1-pro-preview">Gemini-3.1 Pro</option>
+        </optgroup>
+        <optgroup label="🎨 图像生成与修改">
+            <option value="gpt-image-2">GPT Image 2 Engine</option>
+            <option value="gemini-2.5-flash-image">Gemini-2.5-Flash Vision</option>
+            <option value="hf-qwen-image">HF Qwen Image 2.1 (ZeroGPU)</option>
+        </optgroup>
+    </select>
+  </div>
+  
+    <input type="file" id="universalFile" class="input-style" accept="image/*,audio/*,video/*" />
+</div>
+ 
+<div class="ping-modal" id="pingModal" onclick="closePingModal(event)">
+    <div class="ping-sheet" id="pingSheet">
+        <div class="item" onclick="changeSite('https://www.baidu.com','baidu.com')">BAIDU_UPLINK</div>
+        <div class="item" onclick="changeSite('https://weibo.com','weibo.com')">WEIBO_UPLINK</div>
+        <div class="item" onclick="changeSite('https://www.douyin.com','douyin.com')">DOUYIN_UPLINK</div>
+        <div class="item cancel" onclick="closePingModal()">ABORT</div>
+    </div>
+</div>
+
+<script>
+const customSelect = document.getElementById('customSelect');
+const searchInput = document.getElementById('searchInput');
+
+function toggleSelect(event) {
+    event.stopPropagation();
+    customSelect.classList.toggle('open');
+}
+
+function selectEngine(url, label, option) {
+    document.getElementById('searchEngineValue').value = url;
+    document.getElementById('currentEngineText').textContent = label;
+    document.querySelectorAll('.option-item').forEach(item => item.classList.toggle('selected', item === option));
+    customSelect.classList.remove('open');
+    searchInput.focus();
+}
+
+function clearSearch() {
+    searchInput.value = '';
+    searchInput.focus();
+}
+
+function runExternalSearch() {
+    const query = searchInput.value.trim();
+    if (query) window.open(document.getElementById('searchEngineValue').value + encodeURIComponent(query), '_blank', 'noopener,noreferrer');
+}
+
+document.addEventListener('click', () => customSelect.classList.remove('open'));
+document.getElementById('externalSearchBtn').addEventListener('click', runExternalSearch);
+searchInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') runExternalSearch();
+    if (event.key === 'Escape') clearSearch();
+});
+
+const universalText = document.getElementById("universalText");
+const universalFile = document.getElementById("universalFile");
+const response = document.getElementById("response");
+const responseWrap = document.getElementById("responseWrap");
+const respStatus = document.getElementById("respStatus");
+const displayedImage = document.getElementById("displayedImage");
+const imageDisplayContainer = document.getElementById("imageDisplayContainer");
+const editButtons = document.getElementById("editButtons");
+const mediaPreview = document.getElementById("mediaPreview");
+const btnCombinedAction = document.getElementById("btnCombinedAction"); 
+const btnAiAction = document.getElementById("btnAiAction");
+const modifiedImgWrapper = document.getElementById("modifiedImgWrapper");
+const modifiedImage = document.getElementById("modifiedImage");
+const frameControls = document.getElementById("frameControls");
+const framePager = document.getElementById("framePager");
+const prevButton = document.getElementById("prevButton");
+const nextButton = document.getElementById("nextButton");
+
+const TEXT_MODELS = ['deepseek-v4-flash', 'gpt-5.5-2026-04-23', 'gemini-3.1-pro-preview'];
+const IMAGE_MODELS = ['gpt-image-2', 'gemini-2.5-flash-image'];
+const DEEPSEEK_MODE = 'deepseek';
+const CUSTOM_MODE = 'custom-chat';
+const HF_IMAGE_MODE = 'hf-qwen-image';
+const HF_SPACE_ID = 'assembledchaos/qwen-image-2-1-studio';
+const HF_SPACE_URL = 'https://assembledchaos-qwen-image-2-1-studio.hf.space';
+const HF_IMAGE_API_NAME = '/generate';
+const HF_ASPECT_MAP = { '1:1':'Square · 1:1', '16:9':'Landscape · 16:9', '9:16':'Portrait · 9:16', '4:3':'Landscape · 4:3', '3:4':'Portrait · 3:4' };
+const DEFAULT_SIZE_OPTIONS = [['1:1','正方形'],['3:2','横图'],['2:3','竖图'],['4:3','横图'],['3:4','竖图'],['16:9','横图'],['9:16','竖图'],['21:9','宽屏']];
+const HF_SIZE_OPTIONS = [['1:1','正方形'],['16:9','横图'],['9:16','竖图'],['4:3','横图'],['3:4','竖图']];
+let chatContext = []; // 会话临时记忆，页面刷新不保存；可手动导入/导出。
+let hfClientLibPromise = null;
+let hfAppPromise = null;
+let hfAppCacheKey = '';
+
+
+window.addEventListener('load', () => {
+    const savedKey = sessionStorage.getItem('toolbox_poixe_key');
+    if (savedKey) document.getElementById('apiKey').value = savedKey;
+
+    const savedImageKey = sessionStorage.getItem('toolbox_apimart_key');
+    if (savedImageKey) document.getElementById('imageApiKey').value = savedImageKey;
+
+    const savedRes = localStorage.getItem('suishouji_image_res');
+    if (savedRes) document.getElementById('imageResolution').value = savedRes;
+
+    const savedProxy = localStorage.getItem('suishouji_api_proxy') || localStorage.getItem('pixel_api_proxy');
+    if (savedProxy) document.getElementById('apiProxy').value = savedProxy;
+
+    const loadTime = performance.now();
+    const perfElem = document.getElementById('performance-result');
+    if(perfElem) {
+        perfElem.innerHTML = "SYS_BOOT: <span style=\"color:#00ff41; font-weight:bold;\">" + Math.round(loadTime) + "ms</span>";
+    }
+
+    for (const [id, key] of [
+        ['customApiUrl', 'suishouji_custom_url'],
+        ['customModelName', 'suishouji_custom_model'],
+        ['customApiKey', 'suishouji_custom_api_key'],
+        ['hfApiKey', 'suishouji_hf_api_key']
+    ]) {
+        const el = document.getElementById(id);
+        if (el) el.value = localStorage.getItem(key) || '';
+    }
+    checkEmptyState();
+    onModelChange(); 
+});
+  
+function bindEvent(id, type, handler) {
+    const el = document.getElementById(id); 
+    if(el) el.addEventListener(type, handler);
+}
+
+function checkEmptyState() {
+    if (universalText.value.length === 0) {
+        universalText.classList.add('is-empty');
+    } else {
+        universalText.classList.remove('is-empty');
+    }
+}
+
+function getCurrentTimeStr() {
+    const now = new Date();
+    return now.toTimeString().split(' ')[0];
+}
+
+let images = [];
+let currentImageIndex = -1;
+let currentFilter = "";
+let originalImgSrc = "";    
+let modifiedImgSrc = "";    
+let isShowingModified = false; 
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+function getApiKey() { return document.getElementById('apiKey').value.trim(); }
+
+function getImageApiKey() { return document.getElementById('imageApiKey').value.trim(); }
+
+function getApiProxy() {
+    const proxy = document.getElementById('apiProxy').value.trim();
+    if (proxy) localStorage.setItem('suishouji_api_proxy', proxy);
+    else localStorage.removeItem('suishouji_api_proxy');
+    return proxy;
+}
+
+document.getElementById('imageResolution').addEventListener('change', (e) => {
+    localStorage.setItem('suishouji_image_res', e.target.value);
+});
+
+function checkKeyRequirement(model, isForcedGpt = false) {
+    if (model === 'gpt-image-2') {
+        getImageApiKey(); 
+        if (!getImageApiKey()) { alert('请先在工具箱 API 配置中填写 APIMart Key'); return false; }
+        return true; 
+    } else {
+        const key = getApiKey();
+        
+        if (!key) {
+            alert("请先在工具箱的对应 API 配置中填写 Poixe API Key");
+            const keyInput = document.getElementById('apiKey');
+            if (keyInput) {
+                keyInput.focus();
+                keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
+function onModelChange() {
+    const model = document.getElementById('unifiedModel').value;
+    const hasImage = originalImgSrc !== '' && imageDisplayContainer.style.display !== 'none';
+    const isCustom = model === CUSTOM_MODE;
+    const isDeepseek = model === DEEPSEEK_MODE;
+    const isHf = model === HF_IMAGE_MODE;
+    const isGpt = model === 'gpt-image-2';
+    const isLegacy = TEXT_MODELS.includes(model) || (IMAGE_MODELS.includes(model) && !isHf);
+    const options = document.getElementById('imageOptionsWrapper');
+    options.style.display = (isGpt || isHf) ? 'block' : 'none';
+    const resolution = document.getElementById('imageResolution');
+    resolution.style.display = isGpt ? 'block' : 'none';
+    const aspect = document.getElementById('imgSize');
+    aspect.style.display = (isGpt || isHf) ? 'block' : 'none';
+    const ratios = isHf ? HF_SIZE_OPTIONS : DEFAULT_SIZE_OPTIONS;
+    const preferred = aspect.value || '1:1';
+    if (aspect.options.length !== ratios.length || Array.from(aspect.options).some((x,i) => x.value !== ratios[i][0])) {
+        aspect.innerHTML = '';
+        for (const [value, label] of ratios) {
+            const o = document.createElement('option'); o.value = value; o.textContent = 'SIZE: ' + value + ' ' + label;
+            aspect.appendChild(o);
+        }
+        aspect.value = ratios.some(([value]) => value === preferred) ? preferred : '1:1';
+    }
+    document.getElementById('apiKey').style.display = (TEXT_MODELS.includes(model) || model === 'gemini-2.5-flash-image') ? 'block' : 'none';
+    document.getElementById('imageApiKey').style.display = isGpt ? 'block' : 'none';
+    // 自定义地址只属于自定义模型，绝不会传给 DeepSeek / GPT / 旧接口。
+    document.getElementById('apiProxy').style.display = isLegacy ? 'block' : 'none';
+    document.getElementById('customApiUrl').style.display = isCustom ? 'block' : 'none';
+    document.getElementById('customModelName').style.display = isCustom ? 'block' : 'none';
+    document.getElementById('customApiKey').style.display = isCustom ? 'block' : 'none';
+    document.getElementById('hfApiKey').style.display = isHf ? 'block' : 'none';
+    document.getElementById('hfGenerationMode').style.display = isHf ? 'block' : 'none';
+    if (!btnCombinedAction) return;
+    let title = '💬 AI 发送';
+    let type = 'btn btn-tucao';
+    if (isGpt) { title = hasImage ? '🎨 AI 改图' : '🎨 AI 生图'; type = 'btn btn-ai'; }
+    else if (isHf) { title = hasImage ? '🎨 HF 改图' : '🎨 HF 生图'; type = 'btn btn-ai'; }
+    else if (model === 'gemini-2.5-flash-image') { title = hasImage ? '🎨 AI 改图' : '🎨 AI 生图'; type = 'btn btn-ai'; }
+    else if (isCustom) title = hasImage ? '🖼️ 自定义看图' : '💬 自定义对话';
+    else if (isDeepseek) title = '💬 DeepSeek 对话';
+    else if (hasImage) title = '🖼️ 图像问答';
+    btnCombinedAction.innerHTML = title;
+    btnCombinedAction.className = type;
+}
+
+function setupGeneratedImage(imageUrl, successMsg, isEdit = false) {
+    const link = document.getElementById('generatedImageLink');
+    if (link) {
+        link.href = imageUrl;
+        link.style.display = /^https?:\/\//i.test(imageUrl) ? 'inline-flex' : 'none';
+    }
+    const meta = document.getElementById('imageMetadataPreview');
+    if (meta) { meta.style.display = 'none'; meta.textContent = ''; }
+    if (isEdit) {
+        modifiedImgSrc = imageUrl;
+        modifiedImage.src = imageUrl;
+        modifiedImgWrapper.style.display = "block";
+        respStatus.textContent = "✨ " + successMsg + " (已显示在下方)";
+    } else {
+        originalImgSrc = imageUrl; 
+        modifiedImgSrc = "";  
+        displayedImage.src = imageUrl;
+        modifiedImgWrapper.style.display = "none";
+        respStatus.textContent = "✨ " + successMsg;
+    }
+    imageDisplayContainer.style.display = "flex";
+    editButtons.style.display = "grid";
+    onModelChange(); 
+    respStatus.style.color = "#00ff41";
+    responseWrap.style.display = "block";
+    response.textContent = "✅ 操作执行成功。";
+}
+
+function copyToClipboard(text, btnElement) {
+    function copySuccess() {
+        if(!btnElement) return;
+        const old = btnElement.innerHTML;
+        const oldBg = btnElement.style.background;
+        const oldColor = btnElement.style.color;
+        btnElement.innerHTML = "✓ 复制成功";
+        btnElement.style.background = "rgba(0, 255, 65, 0.2)"; 
+        btnElement.style.color = "#00ff41";
+        setTimeout(() => {
+            btnElement.innerHTML = old;
+            btnElement.style.background = oldBg;
+            btnElement.style.color = oldColor;
+        }, 2000);
+    }
+    function copyFallback() {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try { document.execCommand('copy'); copySuccess(); } catch (err) {}
+        textArea.remove();
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(copySuccess).catch(copyFallback);
+    } else { copyFallback(); }
+}
+
+universalFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const link = document.getElementById('generatedImageLink');
+    if (link) link.style.display = 'none';
+
+    if (file.type.startsWith("video/") && file.size > 100 * 1024 * 1024) {
+        alert("⚠️ SYS_WARNING: 视频文件过大！最大仅支持操作 100MB 以内的视频。");
+        e.target.value = ""; return;
+    }
+
+    const url = URL.createObjectURL(file);
+    const mime = file.type;
+
+    imageDisplayContainer.style.display = "none";
+    mediaPreview.innerHTML = "";
+    currentFilter = ""; displayedImage.style.filter = "";
+    displayedImage.removeAttribute("title");
+
+    images = []; currentImageIndex = -1;
+    if(frameControls) frameControls.style.display = "none";
+    if(framePager) framePager.style.display = "none";
+
+    if (mime.startsWith("image/")) {
+        originalImgSrc = url; 
+        modifiedImgSrc = "";  
+        isShowingModified = false; 
+        
+        modifiedImgWrapper.style.display = "none";
+        modifiedImage.src = "";
+
+        displayedImage.src = url;
+        displayedImage.style.display = "block";
+        displayedImage.style.cursor = "default";
+        imageDisplayContainer.style.display = "flex";
+        editButtons.style.display = "grid";
+        
+        if(btnAiAction) btnAiAction.innerHTML = "🎨 AI 改图";
+        onModelChange();
+    } else {
+        originalImgSrc = "";
+        if(btnAiAction) btnAiAction.innerHTML = "✨ 智能润色";
+        onModelChange();
+        
+        if (mime.startsWith("audio/")) {
+            const el = document.createElement('audio'); el.controls = true; el.src = url;
+            mediaPreview.appendChild(el);
+        } else if (mime.startsWith("video/")) {
+            const logBox = document.createElement('div'); logBox.className = "sub-text";
+            logBox.innerHTML = "VIDEO_LOADED: 请在上方输入帧率(FPS)并点击抽帧";
+            mediaPreview.appendChild(logBox);
+        }
+    }
+});
+
+async function getOptimizedBase64(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let w = img.width, h = img.height;
+            const max = 1536; 
+            if (w > max || h > max) {
+                if (w > h) { h = Math.round((h * max) / w); w = max; } 
+                else { w = Math.round((w * max) / h); h = max; }
+            }
+            canvas.width = w; canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            const base64 = dataUrl.split(',')[1];
+            resolve({ mimeType: 'image/jpeg', base64Data: base64, fullUrl: dataUrl });
+        };
+        img.onerror = () => reject(new Error("图片加载失败"));
+        img.crossOrigin = "Anonymous";
+        img.src = src;
+    });
+}
+
+async function pollGptTask(taskId) {
+    respStatus.textContent = 'TASK QUEUED...';
+    response.textContent = 'TASK_ID: ' + String(taskId).slice(0,16) + '\n正在查询生成进度...';
+    await sleep(5000);
+    let lastData=null;
+    for(let attempt=1;attempt<=45;attempt++) {
+        const imageApiKey=getImageApiKey();
+        const apiProxy=getApiProxy();
+        const data=await fetchApiJson('?api=gpt_image_query&task_id='+encodeURIComponent(taskId),{
+            headers:{'X-Image-Key':imageApiKey,'X-Proxy-Url':apiProxy}
+        });
+        lastData=data;
+        const task=Array.isArray(data?.data)?data.data[0]:(data?.data||data);
+        const state=String(task?.status||data?.status||'').toLowerCase();
+        const url=extractImageResultUrl(data);
+        if(['completed','succeeded','success','finished'].includes(state) || (!state&&url)) {
+            if(!url) throw new Error('任务完成但没有返回图像链接：'+JSON.stringify(data).slice(0,500));
+            return {finalImageUrl:url,queryData:data};
+        }
+        if(['failed','error','cancelled','canceled'].includes(state)) {
+            const reason=task?.error?.message||task?.error||data?.error?.message||'云端图像任务失败';
+            throw new Error(typeof reason==='string'?reason:JSON.stringify(reason));
+        }
+        respStatus.textContent='RENDER: '+(state||'QUEUED')+' ['+attempt+'/45]';
+        await sleep(4000);
+    }
+    throw new Error('任务查询超时，请保留任务号：'+taskId+'。最后状态：'+JSON.stringify(lastData).slice(0,500));
+}
+
+if(btnCombinedAction) {
+    btnCombinedAction.onclick = async () => {
+        const content = universalText.value.trim();
+        const model = document.getElementById('unifiedModel').value;
+        const isImageMode = originalImgSrc && imageDisplayContainer.style.display !== "none";
+        
+        if (!checkKeyRequirement(model)) return;
+
+        const apiKey = getApiKey();
+        const imageApiKey = getImageApiKey(); 
+        const apiProxy = getApiProxy();
+
+        if (TEXT_MODELS.includes(model)) {
+            if (!content && !isImageMode) return alert("SYS_PROMPT: 请输入对话内容！");
+            
+            const oldText = btnCombinedAction.innerHTML;
+            btnCombinedAction.disabled = true;
+            responseWrap.style.display = "block";
+
+            btnCombinedAction.innerHTML = "⏳ 运算中...";
+            respStatus.textContent = "ESTABLISHING UPLINK...";
+            respStatus.style.color = "#00f0ff";
+            response.textContent = "⏳ 等待核心算力响应...\n";
+
+            try {
+                let apiMessages = [];
+                if (isImageMode) {
+                    btnCombinedAction.innerHTML = "⏳ 提取特征...";
+                    let targetImgSrc = modifiedImgSrc ? modifiedImgSrc : originalImgSrc;
+                    let optimized = await getOptimizedBase64(targetImgSrc);
+                    let fullBase64Url = optimized.fullUrl;
+
+                    apiMessages = [{
+                        role: "user",
+                        content: [
+                            { type: "text", text: content || "请详细描述这张图片的内容。" },
+                            { type: "image_url", image_url: { url: fullBase64Url } }
+                        ]
+                    }];
+                } else {
+                    apiMessages = [{ role: "user", content: content }];
+                }
+
+                btnCombinedAction.innerHTML = "⏳ 运算中...";
+                const requestPayload = { model: model, messages: apiMessages, stream: false, max_completion_tokens: 4096 };
+
+                const startTime = Date.now();
+                const createRes = await fetch("?api=chat", {
+                    method: 'POST',
+                    headers: { 'X-User-Key': apiKey, 'X-Proxy-Url': apiProxy, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestPayload)
+                });
+
+                if (!createRes.ok) {
+                    const err = await createRes.json().catch(()=>({}));
+                    throw new Error(err.error?.message || "HTTP " + createRes.status);
+                }
+
+                const data = await createRes.json();
+                const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                const tokens = data.usage?.total_tokens || "未知";
+                const aiReply = data.choices?.[0]?.message?.content || "无有效返回内容";
+
+                respStatus.textContent = "✅ UPLINK SECURED"; respStatus.style.color = "#00ff41";
+                
+                if (isImageMode) requestPayload.messages[0].content[1].image_url.url = "[Base64 Data Truncated]";
+                
+                const logHeader = "| ⏱️ " + duration + "s | 🪙 " + tokens + " Tokens |\n";
+                const logBody = "[" + getCurrentTimeStr() + "] RESPONSE_LOG:\n📦 Payload:\n" + JSON.stringify(requestPayload) + "\n✅ Result:\n" + JSON.stringify(data);
+                response.textContent = logHeader + logBody;
+                
+                universalText.value = aiReply;
+                updateStats(); checkEmptyState();
+            } catch (e) {
+                respStatus.textContent = "❌ LINK FAILED"; respStatus.style.color = "#ff2a2a";
+                response.textContent = "SYS_ERR: " + e.message;
+            }
+            btnCombinedAction.innerHTML = oldText; btnCombinedAction.disabled = false;
+            return;
+        }
+
+        if (IMAGE_MODELS.includes(model)) {
+            if (!content && !isImageMode) return alert("SYS_PROMPT: 请在文本框输入您的生图要求！");
+
+            const oldText = btnCombinedAction.innerHTML;
+            btnCombinedAction.disabled = true;
+            responseWrap.style.display = "block";
+
+            btnCombinedAction.innerHTML = "⏳ 构建任务..."; respStatus.textContent = "INITIALIZING RENDER...";
+            response.textContent = "⏳ 构建渲染请求矩阵...\n指令: " + (content || "[处理当前底图]");
+
+            try {
+                let base64Data = "", mimeType = "image/png", fullBase64Url = "";
+                if (isImageMode) {
+                    btnCombinedAction.innerHTML = "⏳ 解析底图...";
+                    let targetImgSrc = modifiedImgSrc ? modifiedImgSrc : originalImgSrc;
+                    let optimized = await getOptimizedBase64(targetImgSrc);
+                    mimeType = optimized.mimeType; base64Data = optimized.base64Data; fullBase64Url = optimized.fullUrl;
+                }
+
+                btnCombinedAction.innerHTML = "⏳ 渲染中...";
+                const startTime = Date.now();
+
+                if (model === 'gpt-image-2') {
+                    const selectedResolution = document.getElementById('imageResolution').value || '1k';
+                    const gptPayload = { model: "gpt-image-2", prompt: content || "请以提供的图片为基础生成", n: 1, resolution: selectedResolution, size: document.getElementById('imgSize').value, official_fallback: true };
+                    if (isImageMode) gptPayload.image_urls = [ fullBase64Url ];
+
+                    const createRes = await fetch("?api=gpt_image_create", { 
+                        method: 'POST', 
+                        headers: { 'X-Image-Key': imageApiKey, 'X-Proxy-Url': apiProxy, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(gptPayload) 
+                    });
+                    const createData = await createRes.json();
+                    if (!createRes.ok) throw new Error(createData.error?.message || JSON.stringify(createData));
+                    const directUrl = extractImageResultUrl(createData);
+                    const entry = Array.isArray(createData.data) ? createData.data[0] : (createData.data || createData);
+                    const taskId = entry?.task_id || entry?.id || createData.task_id || createData.id;
+                    let finalImageUrl = directUrl;
+                    let queryData = createData;
+                    if (!finalImageUrl) {
+                        if (!taskId) throw new Error('未返回图像链接或任务编号：' + JSON.stringify(createData));
+                        const polled = await pollGptTask(taskId, content, 'RENDER_COMPLETE', isImageMode);
+                        finalImageUrl = polled.finalImageUrl;
+                        queryData = polled.queryData;
+                    }
+                    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                    setupGeneratedImage(finalImageUrl, "RENDER_COMPLETE", isImageMode);
+                    response.textContent = "| ⏱️ " + duration + "s |\n[" + getCurrentTimeStr() + "] APIMart_LOG:\n" + JSON.stringify(queryData);
+                } else {
+                    const requestParts = [];
+                    if (isImageMode) requestParts.push({ inlineData: { mimeType: mimeType, data: base64Data } });
+                    if (content) requestParts.push({ text: content });
+
+                    const requestBody = { contents: [{ parts: requestParts }], generationConfig: { responseModalities: ["Text", "Image"] } };
+                    const createRes = await fetch("?api=image&model=" + model, {
+                        method: 'POST',
+                        headers: { 'X-User-Key': apiKey, 'X-Proxy-Url': apiProxy, 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    if (!createRes.ok) {
+                        const err = await createRes.json().catch(()=>({}));
+                        throw new Error(err.error?.message || "HTTP " + createRes.status);
+                    }
+
+                    const data = await createRes.json();
+                    let imageUrl = "";
+                    data.candidates[0].content.parts.forEach(p => {
+                        if (p.inlineData) imageUrl = "data:" + p.inlineData.mimeType + ";base64," + p.inlineData.data;
+                    });
+                    if (!imageUrl) throw new Error("SYS_ERR: API未返回图片数据");
+
+                    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                    setupGeneratedImage(imageUrl, "RENDER_COMPLETE", isImageMode);
+                    
+                    if(isImageMode) requestBody.contents[0].parts[0].inlineData.data = "[Base64 Data Truncated]";
+                    response.textContent = "| ⏱️ " + duration + "s |\n📦 Payload:\n" + JSON.stringify(requestBody) + "\n-- SYS_SUCCESS";
+                }
+            } catch (e) {
+                respStatus.textContent = "❌ ERROR"; respStatus.style.color = "#ff2a2a";
+                response.textContent = "SYS_ERR: " + e.message;
+            }
+            btnCombinedAction.innerHTML = oldText; btnCombinedAction.disabled = false;
+        }
+    };
+}
+
+
+// ==========================================
+// 新模块：多轮对话、私有模型和 HF 图像生成
+// 全部复用原有赛博风控件；原来的 5 个模型和 Imgur 按钮保持原逻辑。
+// ==========================================
+function extractImageResultUrl(payload) {
+    const d = Array.isArray(payload?.data) ? payload.data[0] : (payload?.data || payload);
+    const candidates = [d?.url, d?.image_url, d?.result?.url,
+        d?.result?.image_url, d?.result?.images?.[0]?.url, d?.images?.[0]?.url,
+        d?.result?.image_urls?.[0]];
+    for (const item of candidates) {
+        const url = Array.isArray(item) ? item[0] : item;
+        if (typeof url === 'string' && /^(https?:\/\/|data:image\/)/i.test(url)) return url;
+    }
+    return '';
+}
+
+async function fetchApiJson(url, options = {}) {
+    let res;
+    try { res = await fetch(url, options); }
+    catch (e) { throw new Error('无法连接 API：' + e.message + '\n如请求本地 HTTP 模型，请检查 CORS / HTTPS 混合内容 / 浏览器局域网访问限制。'); }
+    const raw = await res.text();
+    let data;
+    try { data = JSON.parse(raw); }
+    catch (e) { throw new Error('API 返回非 JSON (HTTP ' + res.status + ')：' + raw.slice(0,350)); }
+    if (!res.ok) {
+        let msg = data?.error?.message || data?.error || data?.message || ('HTTP ' + res.status);
+        if (typeof msg !== 'string') msg = JSON.stringify(msg);
+        throw new Error('HTTP ' + res.status + '：' + msg);
+    }
+    return data;
+}
+
+function saveExtraSetting(id, key) {
+    const el = document.getElementById(id);
+    const v = el?.value.trim() || '';
+    try { if (v) localStorage.setItem(key,v); else localStorage.removeItem(key); } catch (e) {}
+    return v;
+}
+function getCustomEndpoint() {
+    let base = saveExtraSetting('customApiUrl','suishouji_custom_url').replace(/\/+$/,'');
+    if (!base) throw new Error('SYS_PROMPT: 请填写自定义 API 地址，例如 http://192.168.31.111:5001/v1/');
+    if (!/^https?:\/\//i.test(base)) throw new Error('API 地址必须以 http:// 或 https:// 开头');
+    if (base.endsWith('/chat/completions')) return base;
+    if (!/\/v1$/i.test(base) && !/\/v\d+(?:\.\d+)?$/i.test(base)) base += '/v1';
+    return base + '/chat/completions';
+}
+function getModelReply(data) {
+    const content = data?.choices?.[0]?.message?.content;
+    if (typeof content === 'string' && content.trim()) return content;
+    if (Array.isArray(content)) return content.map(x => x?.text || '').join('\n');
+    throw new Error('接口未返回 choices[0].message.content：' + JSON.stringify(data).slice(0,500));
+}
+function getSafeHistory() {
+    // 留出合理上下文窗口并避免含 base64 的记录被导出无限膨胀。
+    return chatContext.slice(-40);
+}
+async function addImagePartForModel(message) {
+    const src = modifiedImgSrc || originalImgSrc;
+    if (!src || imageDisplayContainer.style.display === 'none') return message;
+    let url = src;
+    let temp = null;
+    try {
+        if (/^https?:\/\//i.test(src)) {
+            const blob = await fetchImageBlobForShare(src);
+            temp = URL.createObjectURL(blob);
+            url = temp;
+        }
+        const converted = await getOptimizedBase64(url);
+        return {role: 'user', content: [
+            {type: 'text', text: message.content || '请分析这张图片。'},
+            {type: 'image_url', image_url: {url: converted.fullUrl}}
+        ]};
+    } finally { if (temp) URL.revokeObjectURL(temp); }
+}
+
+async function runAdvancedChat(mode) {
+    const content = universalText.value.trim();
+    const hasImg = mode === CUSTOM_MODE && !!(modifiedImgSrc || originalImgSrc) && imageDisplayContainer.style.display !== 'none';
+    if (!content && !hasImg) return alert('SYS_PROMPT: 输入内容或选择图像后再发送');
+    const btn = btnCombinedAction;
+    const old = btn.innerHTML;
+    btn.disabled = true;
+    responseWrap.style.display = 'block';
+    respStatus.textContent = 'CONNECTING...';
+    respStatus.style.color = '#00f0ff';
+    response.textContent = '⏳ 正在发送消息...';
+    try {
+        let url, apiKey = '', model;
+        if (mode === DEEPSEEK_MODE) {
+            if (!document.getElementById('directDeepseekKey').value.trim()) throw new Error('请先填写 DeepSeek/Poixe API Key');
+            url = '?api=deepseek'; model = 'deepseek-chat';
+        } else {
+            url = getCustomEndpoint();
+            model = saveExtraSetting('customModelName', 'suishouji_custom_model');
+            apiKey = saveExtraSetting('customApiKey','suishouji_custom_api_key');
+            if (!model) throw new Error('请输入自定义模型名称');
+        }
+        const baseMessage = {role:'user', content:content};
+        const message = hasImg ? await addImagePartForModel(baseMessage) : baseMessage;
+        const messages = [...getSafeHistory(), message];
+        const headers = {'Content-Type':'application/json'};
+        if (apiKey) headers['Authorization'] = 'Bearer ' + apiKey;
+        const started = performance.now();
+        const data = await fetchApiJson(url, {method:'POST', headers, body: JSON.stringify({model, messages, stream:false, max_tokens:4096})});
+        const reply = getModelReply(data);
+        // 保留图像会话以便二次询问；导出时压缩/过滤大 Base64 图片。
+        chatContext.push(message, {role:'assistant',content:reply});
+        if (chatContext.length > 50) chatContext = chatContext.slice(-50);
+        universalText.value = reply;
+        updateStats(); checkEmptyState();
+        const elapsed = ((performance.now()-started)/1000).toFixed(2);
+        respStatus.textContent = '✅ UPLINK SECURED [' + model + ']';
+        respStatus.style.color = '#00ff41';
+        response.textContent = 'MODEL: ' + model + ' | ⏱️ ' + elapsed + 's | TOKENS: ' + (data.usage?.total_tokens ?? '?') +
+          '\nMEMORY: ' + chatContext.length + '\n\nRESULT:\n' + reply + '\n\nRAW_JSON:\n' + JSON.stringify(data).slice(0,24000);
+    } catch(e) {
+        respStatus.textContent = '❌ LINK FAILED';
+        respStatus.style.color = '#ff2a2a';
+        response.textContent = 'SYS_ERR: ' + e.message;
+    } finally { btn.disabled=false; onModelChange(); }
+}
+
+function getHfLib() {
+    if (!hfClientLibPromise) hfClientLibPromise = import('https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js').catch(e=>{hfClientLibPromise=null; throw e;});
+    return hfClientLibPromise;
+}
+async function getHfSpace() {
+    const key = saveExtraSetting('hfApiKey','suishouji_hf_api_key');
+    if (hfAppPromise && hfAppCacheKey === key) return hfAppPromise;
+    hfAppCacheKey = key;
+    const lib = await getHfLib();
+    const options = key ? {hf_token:key, token:key} : {};
+    hfAppPromise = lib.Client.connect(HF_SPACE_URL, options).catch(async () => lib.Client.connect(HF_SPACE_ID, options));
+    try { return await hfAppPromise; }
+    catch(e) { hfAppPromise=null; throw new Error('HF Space 连接失败：' + e.message); }
+}
+function hfResultImage(obj) {
+    if (!obj) return '';
+    if (typeof obj === 'string') return obj;
+    if (Array.isArray(obj)) { for (const o of obj) {const result = hfResultImage(o); if(result) return result;} return ''; }
+    if (typeof obj === 'object') return obj.url || obj.path || obj.download_url || '';
+    return '';
+}
+async function runHfImage() {
+    const prompt = universalText.value.trim();
+    if (!prompt) return alert('SYS_PROMPT: 请输入 HF 生图或改图提示词');
+    const btn=btnCombinedAction; btn.disabled=true;
+    responseWrap.style.display='block';
+    respStatus.textContent='HF CONNECTING...'; respStatus.style.color='#00f0ff';
+    response.textContent='⏳ Loading Hugging Face Gradio client...';
+    try {
+        const {handle_file} = await getHfLib();
+        const app=await getHfSpace();
+        const source=modifiedImgSrc||originalImgSrc;
+        const hasImage=!!source && imageDisplayContainer.style.display!=='none';
+        const modeSetting=document.getElementById('hfGenerationMode').value;
+        const mode=modeSetting==='auto' ? (hasImage ? 'Edit an image' : 'Create an image') : modeSetting;
+        if(mode==='Edit an image' && !hasImage) throw new Error('HF 改图模式需要先选择或生成参考图片');
+        let reference=null;
+        if(mode==='Edit an image') {
+            const file=universalFile.files?.[0];
+            const selectedLocal=file && file.type.startsWith('image/') && source.startsWith('blob:') && !modifiedImgSrc;
+            const imageFile=selectedLocal ? file : await fetchImageBlobForShare(source);
+            reference=handle_file(imageFile);
+        }
+        const aspect=HF_ASPECT_MAP[document.getElementById('imgSize').value] || 'Square · 1:1';
+        const args=[prompt,mode,reference,aspect,40,42,true];
+        response.textContent='HF SPACE: '+HF_SPACE_ID+'\nMODE: '+mode+'\nASPECT: '+aspect+'\n⏳ QUEUING...\n';
+        const request=app.submit(HF_IMAGE_API_NAME,args);
+        let finalData=null;
+        for await(const progress of request) {
+            if(progress.type==='status') {
+                const queue=Number.isFinite(progress.queue_position) ? ' / QUEUE '+progress.queue_position : '';
+                respStatus.textContent='HF: '+(progress.stage||'WORKING')+queue;
+            }
+            if(progress.type==='data') finalData=progress.data;
+        }
+        const resolved=finalData || await request.result();
+        const outputs=Array.isArray(resolved?.data) ? resolved.data : (Array.isArray(resolved) ? resolved : []);
+        const finalUrl=hfResultImage(outputs[0]) || hfResultImage(outputs[1]);
+        if(!finalUrl) throw new Error('HF 没有返回有效的图片链接：'+JSON.stringify(resolved).slice(0,700));
+        setupGeneratedImage(finalUrl, 'HF_'+(mode==='Edit an image'?'EDIT':'CREATE')+'_COMPLETE',mode==='Edit an image' && hasImage);
+        const details=typeof outputs[3]==='string' ? outputs[3] : '';
+        response.textContent='✅ HF 完成\nMODE: '+mode+'\nSEED: '+(outputs[2]??'?')+'\n'+details+'\nIMAGE: '+finalUrl;
+    } catch(e) {
+        respStatus.textContent='❌ HF ERROR'; respStatus.style.color='#ff2a2a';
+        response.textContent='SYS_ERR: '+e.message+'\n\nSpace: '+HF_SPACE_URL;
+    } finally {btn.disabled=false; onModelChange();}
+}
+
+// 分流新增模式；其它原版功能使用原事件处理器，保持完全兼容。
+const originalCombinedClick=btnCombinedAction?.onclick;
+if(btnCombinedAction) {
+    btnCombinedAction.onclick=(event)=>{
+        const mode=document.getElementById('unifiedModel').value;
+        if(mode===DEEPSEEK_MODE||mode===CUSTOM_MODE) return runAdvancedChat(mode);
+        if(mode===HF_IMAGE_MODE) return runHfImage();
+        return originalCombinedClick?.call(btnCombinedAction,event);
+    };
+}
+
+// 记忆管理，临时会话；不强制清空其他内容。
+bindEvent('btnExportMemory','click',()=>{
+    if(!chatContext.length) return alert('SYS_INFO: 没有可以导出的对话记忆');
+    // Base64 图像会造成超大 JSON，导出时改为文本描述（不更改当前页面记忆）。
+    const safe=chatContext.map(m=>({role:m.role,content:Array.isArray(m.content)
+        ? m.content.map(p=>p.type==='image_url'?{type:'text',text:'[IMAGE_CONTENT_NOT_EXPORTED]'}:p)
+        :m.content}));
+    const blob=new Blob([JSON.stringify(safe,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download='chat_memory_'+Date.now()+'.json'; a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    respStatus.textContent='✅ MEMORY EXPORTED';
+});
+bindEvent('btnImportMemory','click',()=>document.getElementById('memoryFileInput').click());
+bindEvent('memoryFileInput','change',async(e)=>{
+    const file=e.target.files?.[0]; if(!file)return;
+    try {
+        if(file.size>5*1024*1024) throw new Error('记忆 JSON 最大 5MB');
+        const data=JSON.parse(await file.text());
+        if(!Array.isArray(data) || !data.every(x=>x&&['user','assistant','system'].includes(x.role)&&
+            (typeof x.content==='string'||Array.isArray(x.content)))) throw new Error('JSON 格式必须为含 role/content 的消息数组');
+        chatContext=data.slice(-50);
+        responseWrap.style.display='block'; respStatus.textContent='✅ MEMORY IMPORTED'; respStatus.style.color='#00ff41';
+        response.textContent='载入 '+chatContext.length+' 条记忆；接下来 DeepSeek / 自定义模型对话会使用这些上下文。';
+    } catch(err) {alert('SYS_ERR: '+err.message);} finally {e.target.value='';}
+});
+bindEvent('btnClearMemory','click',()=>{
+    if(!chatContext.length) return alert('SYS_INFO: 记忆已为空');
+    if(confirm('确认清空本页面的多轮对话记忆？')) {chatContext=[];respStatus.textContent='MEMORY CLEARED';}
+});
+
+// Web Speech 本地浏览器朗读：原新代码里的 TTS API 已注释，改为可实际使用的浏览器内置朗读。
+bindEvent('btnTts','click',()=>{
+    if(!('speechSynthesis' in window)) return alert('当前浏览器不支持语音朗读');
+    const btn=document.getElementById('btnTts');
+    if(window.speechSynthesis.speaking){window.speechSynthesis.cancel();btn.textContent='语音朗读';return;}
+    const content=universalText.value.trim(); if(!content)return alert('请先输入要朗读的文字');
+    const utter=new SpeechSynthesisUtterance(content); utter.lang='zh-CN';utter.rate=1;
+    utter.onend=()=>{btn.textContent='语音朗读';};utter.onerror=()=>{btn.textContent='语音朗读';};
+    btn.textContent='⏹ 停止朗读';window.speechSynthesis.speak(utter);
+});
+
+// 媒体元数据透视，使用原版 EXIF 库与赛博风控制台样式。
+const imageMetadataPreview=document.getElementById('imageMetadataPreview');
+let activeMetaToken=0;
+async function showImageMetadata(file) {
+    const token=++activeMetaToken;
+    if(!file||!file.type.startsWith('image/')) {imageMetadataPreview.style.display='none';imageMetadataPreview.textContent='';return;}
+    const info=['=== MEDIA_METADATA ===','NAME: '+file.name,'SIZE: '+(file.size/1024/1024).toFixed(2)+' MB','MIME: '+file.type];
+    try {
+        const bitmap=await createImageBitmap(file);
+        info.push('RESOLUTION: '+bitmap.width+' × '+bitmap.height+' px');
+        bitmap.close();
+    } catch(e) { /* 浏览器不支持的图片格式不影响其余元数据 */ }
+    try {
+        if(typeof exifr!=='undefined') {
+            const tags=await exifr.parse(file,true);
+            if(tags) {
+                for(const [k,v] of Object.entries(tags)){
+                    if(typeof v==='string'&&v.length>500)continue;
+                    if(v===null || typeof v==='object')continue;
+                    info.push(k+': '+String(v));
+                }
+            }
+        }
+    } catch(e){info.push('META_ERROR: '+e.message);}
+    if(token!==activeMetaToken)return;
+    imageMetadataPreview.textContent=info.join('\n');imageMetadataPreview.style.display='block';
+}
+universalFile.addEventListener('change',()=>{
+    showImageMetadata(universalFile.files?.[0]||null);
+});
+
+if(btnAiAction) {
+    btnAiAction.onclick = async () => {
+        const content = universalText.value.trim();
+        if (!content) return alert("SYS_PROMPT: 请输入提示词或润色要求！");
+        
+        const isImageMode = originalImgSrc && imageDisplayContainer.style.display !== "none";
+        
+        if (isImageMode && !checkKeyRequirement(null, true)) return;
+
+        const apiKey = getApiKey();
+        const imageApiKey = getImageApiKey(); 
+        const apiProxy = getApiProxy();
+
+        const oldText = btnAiAction.innerHTML; btnAiAction.disabled = true; responseWrap.style.display = "block";
+
+        if (isImageMode) {
+            btnAiAction.innerHTML = "⏳ 解析中..."; respStatus.textContent = "INITIALIZING RENDER...";
+            response.textContent = "⏳ 提取视觉矩阵并转换为算力指令...\n指令: " + content;
+
+            try {
+                let targetImgSrc = modifiedImgSrc ? modifiedImgSrc : originalImgSrc;
+                let optimized = await getOptimizedBase64(targetImgSrc);
+                const fullBase64Url = optimized.fullUrl;
+
+                const selectedResolution = document.getElementById('imageResolution').value || '1k';
+
+                btnAiAction.innerHTML = "⏳ 提交队列...";
+                const gptPayload = { model: "gpt-image-2", prompt: content, n: 1, resolution: selectedResolution, size: document.getElementById('imgSize').value, official_fallback: true, image_urls: [ fullBase64Url ] };
+
+                const createRes = await fetch("?api=gpt_image_create", { 
+                    method: 'POST', 
+                    headers: { 'X-Image-Key': imageApiKey, 'X-Proxy-Url': apiProxy, 'Content-Type': 'application/json' },
+                    body: JSON.stringify(gptPayload) 
+                });
+                const createData = await createRes.json();
+                let taskId = (Array.isArray(createData.data) && createData.data.length > 0) ? (createData.data[0].task_id || createData.data[0].id) : (createData.data?.id || createData.data?.task_id || createData.task_id || createData.id);
+                
+                if (!createRes.ok || !taskId) throw new Error(createData.error?.message || JSON.stringify(createData));
+
+                btnAiAction.innerHTML = "⏳ 等待回传...";
+                const { finalImageUrl } = await pollGptTask(taskId, content, "EDIT_COMPLETE", true);
+                setupGeneratedImage(finalImageUrl, "EDIT_COMPLETE", true);
+            } catch (e) {
+                respStatus.textContent = "❌ ERROR"; respStatus.style.color = "#ff2a2a";
+                response.textContent = "SYS_ERR: " + e.message;
+            }
+        } else {
+            btnAiAction.innerHTML = "⏳ 运算中..."; respStatus.textContent = "DEEP_THINKING...";
+            response.textContent = "🚀 正在穿透算力层，请稍候...";
+            try {
+                const res = await fetch('?api=chat', {
+                    method: 'POST',
+                    headers: { 'X-User-Key': apiKey, 'X-Proxy-Url': apiProxy, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [
+                            {role: "system", content: "你空间是一位文字精炼大师。请对用户提供的文本进行润色，要求：1. 保持原意不变；2. 优化逻辑结构；3. 增强文采。直接输出结果。"},
+                            {role: "user", content: content}
+                        ], temperature: 0.7
+                    })
+                });
+                const data = await res.json();
+                if(data.choices && data.choices[0].message) {
+                    universalText.value = data.choices[0].message.content.trim();
+                    updateStats(); checkEmptyState(); 
+                    respStatus.textContent = "✨ TASK_COMPLETE"; respStatus.style.color = "#00ff41";
+                    response.textContent = "✅ UPLINK_SUCCESS: 已替换文本缓冲区。";
+                } else { throw new Error(JSON.stringify(data)); }
+            } catch(e) {
+                respStatus.textContent = "❌ FAILED"; respStatus.style.color = "#ff2a2a";
+                response.textContent = "SYS_ERR: " + e.message;
+            }
+        }
+        btnAiAction.innerHTML = oldText; btnAiAction.disabled = false;
+    };
+}
+
+bindEvent("btnExtractPoints", "click", async () => {
+    const content = universalText.value.trim();
+    if (!content) return alert("SYS_PROMPT: 请在文本框输入需要提炼的文本内容！");
+    const apiKey = getApiKey();
+    const apiProxy = getApiProxy();
+
+    const btn = document.getElementById("btnExtractPoints"); const oldText = btn.innerHTML;
+    btn.innerHTML = "⏳ 提炼中..."; btn.disabled = true; responseWrap.style.display = "block";
+    respStatus.textContent = "DEEP_THINKING..."; respStatus.style.color = "#00f0ff";
+    response.textContent = "🚀 正在请求 DeepSeek 提炼核心要点...";
+
+    try {
+        const res = await fetch('?api=chat', {
+            method: 'POST',
+            headers: { 'X-User-Key': apiKey, 'X-Proxy-Url': apiProxy, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                messages: [
+                    {role: "system", content: "你是一个专业的文本 analysis 助手。请准确、简明地提炼用户提供文本的核心要点，使用结构化的列表形式输出，剥离冗余信息。"},
+                    {role: "user", content: content}
+                ], temperature: 0.3 
+            })
+        });
+        const data = await res.json();
+        if(data.choices && data.choices[0].message) {
+            universalText.value = data.choices[0].message.content.trim();
+            updateStats(); checkEmptyState(); 
+            respStatus.textContent = "✨ TASK_COMPLETE"; respStatus.style.color = "#00ff41";
+            response.textContent = "✅ UPLINK_SUCCESS: 核心要点已写入文本缓冲区。";
+        } else { throw new Error(JSON.stringify(data)); }
+    } catch(e) {
+        respStatus.textContent = "❌ FAILED"; respStatus.style.color = "#ff2a2a";
+        response.textContent = "SYS_ERR: " + e.message;
+    } finally { btn.innerHTML = oldText; btn.disabled = false; }
+});
+
+bindEvent("btnExtractLinks", "click", () => {
+    const text = universalText.value; if(!text.trim()) return alert("SYS_PROMPT: 请在文本框输入要处理的内容！");
+    responseWrap.style.display = "block"; respStatus.textContent = "PARSING..."; respStatus.style.color = "#00f0ff";
+    try {
+        let results = new Set(); 
+        const attrRegex = /(?:href|src)\s*=\s*["']([^"']+)["']/gi; let match;
+        while ((match = attrRegex.exec(text)) !== null) {
+            const url = match[1].trim();
+            if(url && !url.startsWith('data:') && !url.startsWith('javascript:') && url !== '#') results.add(url);
+        }
+        const urlRegex = /(https?:\/\/[^\s"'<>]+)/gi;
+        while ((match = urlRegex.exec(text)) !== null) { results.add(match[1].trim()); }
+
+        if (results.size > 0) {
+            universalText.value = Array.from(results).join('\n');
+            response.textContent = "✅ PARSE_SUCCESS: 成功提取并去重，共得 " + results.size + " 个有效链接。";
+        } else {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            results = new Set(lines); 
+            universalText.value = Array.from(results).join('\n');
+            response.textContent = "⚠️ SYS_WARN: 未发现特定链接矩阵，已对文本【按行去重】，保留 " + results.size + " 行。";
+        }
+        updateStats(); checkEmptyState(); respStatus.textContent = "DONE"; respStatus.style.color = "#00ff41";
+    } catch (e) { response.textContent = "SYS_ERR: " + e.message; respStatus.textContent = "❌ FAILED"; respStatus.style.color = "#ff2a2a"; }
+});
+
+function updateStats() {
+    const text = universalText.value || "";
+    document.getElementById("total").textContent = "总数: " + text.length;
+    document.getElementById("chinese").textContent = "汉字: " + ((text.match(/[\u4e00-\u9fa5]/g) || []).length);
+    document.getElementById("numbers").textContent = "数字: " + ((text.match(/\d/g) || []).length);
+    document.getElementById("punctuation").textContent = "标点: " + ((text.match(/[.,\/#!$%\^&\*;:{}=\-_`~()。,、；：？！…—·「」『』（）［］【】《》〈〉"']/g) || []).length);
+    document.getElementById("alphabet").textContent = "字母: " + ((text.match(/[a-zA-Z]/g) || []).length);
+    const words = text.split(/[\s.,\/#!$%\^&\*;:{}=\-_`~()。,、；：？！…—·「」『』（）［］【】《》〈〉"']+/).filter(w => w.trim().length > 0);
+    const wordCounts = {}; let duplicateCount = 0;
+    words.forEach(w => { wordCounts[w] = (wordCounts[w] || 0) + 1; });
+    for (let w in wordCounts) { if (wordCounts[w] > 1) duplicateCount += wordCounts[w]; }
+    document.getElementById("duplicate").textContent = "重复: " + duplicateCount;
+}
+
+universalText.addEventListener("input", () => { updateStats(); checkEmptyState(); });
+
+bindEvent("btnInvert", "click", () => { currentFilter += " invert(1)"; displayedImage.style.filter = currentFilter; });
+bindEvent("btnGray", "click", () => { currentFilter += " grayscale(1)"; displayedImage.style.filter = currentFilter; });
+bindEvent("btnRestore", "click", () => { currentFilter = ""; displayedImage.style.filter = ""; });
+bindEvent("btnHideResp", "click", () => { responseWrap.style.display = "none"; });
+
+bindEvent("optimize-btn", "click", () => {
+    let text = universalText.value; if (!text) return;
+    text = text.replace(/[*_]{1,3}([^*_]+)[*_]{1,3}/g, '$1').replace(/^([#\-*>+]+)\s+/gm, '').replace(/`/g, '');
+    text = text.split('\n').map(line => line.trim()).join('\n').replace(/\n{3,}/g, '\n\n');
+    universalText.value = text; updateStats(); checkEmptyState(); 
+});
+
+bindEvent("btnClearOutput", "click", () => {
+    const textToCopy = universalText.value;
+    const executeClear = (isCopied) => {
+        universalText.value = ""; universalFile.value = ""; response.textContent = ""; responseWrap.style.display = "none";
+        if (typeof window.__resetAudioLab === "function") window.__resetAudioLab();
+        images = []; currentImageIndex = -1; currentFilter = "";
+        originalImgSrc = ""; modifiedImgSrc = ""; isShowingModified = false;
+        
+        if(btnAiAction) btnAiAction.innerHTML = "✨ 智能润色";
+        onModelChange();
+        displayedImage.src = ""; displayedImage.style.filter = ""; displayedImage.style.cursor = "default";
+        displayedImage.removeAttribute("title");
+        
+        if(modifiedImgWrapper) { modifiedImgWrapper.style.display = "none"; modifiedImage.src = ""; }
+        imageDisplayContainer.style.display = "none"; editButtons.style.display = "none"; mediaPreview.innerHTML = "";
+        if(frameControls) frameControls.style.display = "none";
+        if(framePager) { framePager.style.display = "none"; framePager.textContent = ""; }
+
+        updateStats(); checkEmptyState(); 
+        
+        const timeLabel = document.getElementById("imageTimeLabel");
+        if(timeLabel) { timeLabel.innerHTML = ""; timeLabel.style.display = "none"; }
+        
+        const btn = document.getElementById("btnClearOutput");
+        if(btn) {
+            btn.textContent = isCopied ? "✓ 复制并重置" : "✓ 已重置"; 
+            btn.style.color = "#00ff41"; btn.style.borderColor = "#00ff41";
+            setTimeout(() => { btn.textContent = "📋 复制重置"; btn.style.color=""; btn.style.borderColor="";}, 1500);
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        universalText.focus({ preventScroll: true }); 
+    };
+
+    if (textToCopy) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(textToCopy).then(() => executeClear(true)).catch(() => executeClear(false));
+        } else {
+            const textArea = document.createElement("textarea"); textArea.value = textToCopy; document.body.appendChild(textArea);
+            textArea.select(); let success = false;
+            try { success = document.execCommand('copy'); } catch (err) {}
+            textArea.remove(); executeClear(success);
+        }
+    } else { executeClear(false); }
+});
+
+async function extractAudioToMP3(file, progressCallback) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const audioBuffer = await audioCtx.decodeAudioData(e.target.result);
+                
+                const channels = audioBuffer.numberOfChannels;
+                const sampleRate = audioBuffer.sampleRate;
+                const mp3encoder = new lamejs.Mp3Encoder(channels, sampleRate, 128); 
+                const mp3Data = [];
+                
+                const left = audioBuffer.getChannelData(0);
+                const right = channels > 1 ? audioBuffer.getChannelData(1) : left;
+                
+                const left16 = new Int16Array(left.length);
+                const right16 = channels > 1 ? new Int16Array(right.length) : null;
+                
+                for (let i = 0; i < left.length; i++) {
+                    left16[i] = left[i] < 0 ? left[i] * 0x8000 : left[i] * 0x7FFF;
+                    if (channels > 1) {
+                        right16[i] = right[i] < 0 ? right[i] * 0x8000 : right[i] * 0x7FFF;
+                    }
+                }
+                
+                const sampleBlockSize = 1152;
+                let i = 0;
+                
+                function encodeNextChunk() {
+                    const endTime = performance.now() + 25; 
+                    while (i < left16.length && performance.now() < endTime) {
+                        const leftChunk = left16.subarray(i, i + sampleBlockSize);
+                        let mp3buf;
+                        if (channels > 1) {
+                            const rightChunk = right16.subarray(i, i + sampleBlockSize);
+                            mp3buf = mp3encoder.encodeBuffer(leftChunk, rightChunk);
+                        } else {
+                            mp3buf = mp3encoder.encodeBuffer(leftChunk);
+                        }
+                        if (mp3buf.length > 0) mp3Data.push(mp3buf);
+                        i += sampleBlockSize;
+                    }
+                    
+                    if (i < left16.length) {
+                        if (progressCallback) progressCallback(Math.floor((i / left16.length) * 100));
+                        setTimeout(encodeNextChunk, 0); 
+                    } else {
+                        const mp3buf = mp3encoder.flush();
+                        if (mp3buf.length > 0) mp3Data.push(mp3buf);
+                        const blob = new Blob(mp3Data, { type: 'audio/mp3' });
+                        resolve(URL.createObjectURL(blob));
+                    }
+                }
+                
+                encodeNextChunk();
+            } catch (err) {
+                reject(err);
+            }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+bindEvent("btnFrames", "click", async () => {
+    // 默认每秒一帧；文本框中填纯数字时仍兼容原版自定义 FPS。
+    const fpsText = universalText.value.trim();
+    const fps = /^\d+(?:\.\d+)?$/.test(fpsText) ? Number(fpsText) : 1;
+    const file = universalFile.files[0];
+    if(!file || isNaN(fps)) return alert("SYS_PROMPT: 需在文本框输入FPS抽帧率(数字)，并挂载视频文件");
+    const btn = document.getElementById("btnFrames"); const old = btn.innerHTML;
+    
+    btn.innerHTML = "处理中..."; btn.disabled = true;
+    
+    responseWrap.style.display = "block"; 
+    respStatus.textContent = "⏳ EXTRACTING..."; respStatus.style.color = "#00f0ff";
+    response.textContent = "🎬 锁定目标: " + fps + " FPS\n正在分配本地算力引擎进行 [矩阵抽帧] 与 [音轨提取]...";
+
+    const video = document.createElement('video'); video.src = URL.createObjectURL(file);
+    
+    video.onloadedmetadata = async () => {
+        images = []; 
+        const total = Math.floor(video.duration * fps);
+        const startTime = performance.now();
+
+        for(let i = 0; i <= total; i++) {
+            video.currentTime = i / fps; await new Promise(r => video.onseeked = r);
+            const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            images.push(canvas.toDataURL('image/jpeg', 0.8));
+            
+            if (i % 3 === 0 || i === total) {
+                const currentCost = (performance.now() - startTime) / 1000;
+                const realTimeSpeed = currentCost > 0 ? (i / currentCost).toFixed(1) : 0;
+                respStatus.textContent = "⏳ 引擎运作: " + i + "/" + total + " 帧 | ⚡ " + realTimeSpeed + " FPS";
+            }
+        }
+
+        const costTime = ((performance.now() - startTime) / 1000).toFixed(2);
+        const processSpeed = costTime > 0 ? (images.length / costTime).toFixed(1) : 0;
+
+        currentImageIndex = 0; mediaPreview.innerHTML = ""; 
+        imageDisplayContainer.style.display = "flex"; editButtons.style.display = "grid";
+        
+        const timeLabel = document.getElementById("imageTimeLabel");
+        if (timeLabel) {
+            timeLabel.style.display = "block";
+            timeLabel.style.color = "#00ff41";
+            timeLabel.style.marginTop = "10px";
+            timeLabel.innerHTML = "✅ 解析完毕: <b>" + images.length + "</b> 帧 | ⚡ <b>" + processSpeed + " 帧/秒</b>";
+        }
+
+        respStatus.textContent = "⏳ 分离音轨中..."; 
+        response.textContent = "✅ 图像层提取成功！\n📊 矩阵数: " + images.length + " 帧\n⏱️ 耗时: " + costTime + " 秒\n⚡ 均速: " + processSpeed + " 帧/秒\n\n🎵 正在切分音轨通道并编码 MP3 格式...";
+        
+        showFrame(); 
+
+        const safeName = file.name.split('.').slice(0, -1).join('.') || file.name;
+
+        const resultDiv = document.createElement('div');
+        resultDiv.style.marginTop = "20px";
+        resultDiv.style.width = "100%";
+        resultDiv.style.textAlign = "center";
+        resultDiv.style.padding = "15px";
+        resultDiv.style.background = "#050505";
+        resultDiv.style.border = "1px solid #333";
+        resultDiv.style.borderRadius = "6px";
+
+        const isWechatClient = navigator.userAgent.toLowerCase().indexOf('micromessenger') !== -1;
+
+        const zipBtn = document.createElement('button');
+        zipBtn.className = "btn btn-ai";
+        zipBtn.style.cssText = "margin-bottom:15px; width:100%; border:none;";
+        
+        if (isWechatClient) {
+            zipBtn.style.display = 'none';
+        }
+
+        zipBtn.innerText = "📦 一键打包提取矩阵帧 (ZIP)";
+        zipBtn.onclick = async () => {
+            zipBtn.disabled = true;
+            const oldZipText = zipBtn.innerText;
+            try {
+                const zip = new JSZip();
+                const imgFolder = zip.folder("frames");
+                for (let j = 0; j < images.length; j++) {
+                    const b64 = images[j].split(',')[1];
+                    const timeSec = (j / fps).toFixed(2);
+                    const fName = "frame_" + String(j).padStart(4, '0') + "_" + timeSec + "s.jpg";
+                    imgFolder.file(fName, b64, {base64: true});
+                }
+                zipBtn.innerText = "正在压缩...";
+                const blob = await zip.generateAsync({type:"blob"}, (meta) => {
+                    zipBtn.innerText = "📦 COMPRESSING... " + meta.percent.toFixed(0) + "%";
+                });
+                
+                const zipUrl = URL.createObjectURL(blob);
+                document.getElementById('response').textContent += "\n\n📦 [ZIP 矩阵包] 封装完成！";
+                
+                const a = document.createElement('a');
+                a.href = zipUrl;
+                a.download = safeName + "_frames.zip";
+                a.click();
+                
+                zipBtn.innerText = "✅ 打包成功，链接已输出至终端日志";
+                setTimeout(() => { zipBtn.innerText = oldZipText; zipBtn.disabled = false; }, 3000);
+            } catch(e) {
+                alert("SYS_ERR 打包失败: " + e.message);
+                zipBtn.innerText = oldZipText; zipBtn.disabled = false;
+            }
+        };
+        resultDiv.appendChild(zipBtn);
+
+        try {
+            const mp3Url = await extractAudioToMP3(file, (progress) => {
+                respStatus.textContent = "🎵 编码 MP3: " + progress + "%";
+            });
+            
+            respStatus.textContent = "✅ DONE"; respStatus.style.color = "#00ff41";
+            response.textContent += "\n\n✅ 音频通道提取并转换 MP3 成功！";
+            
+            const audioLabel = document.createElement('div');
+            audioLabel.style.cssText = "font-size:13px; font-weight:bold; color:#00f0ff; margin-bottom:10px; font-family:'Share Tech Mono';";
+            audioLabel.innerText = "🎵 AUDIO_TRACK_ISOLATED";
+            
+            const audioEl = document.createElement('audio');
+            audioEl.controls = true; 
+            audioEl.src = mp3Url; 
+            audioEl.style.cssText = "width:100%; height:40px; outline:none;";
+            
+            const audioBtn = document.createElement('button');
+            audioBtn.className = "btn btn-tucao"; 
+            audioBtn.style.cssText = "margin-top:10px; width:100%; border:none;";
+            
+            if (isWechatClient) {
+                audioBtn.style.display = 'none';
+            }
+
+            audioBtn.innerText = "📥 保存 MP3 数据流";
+            audioBtn.onclick = () => {
+                const a = document.createElement('a');
+                a.href = mp3Url;
+                a.download = safeName + "_audio.mp3";
+                a.click();
+            };
+
+            resultDiv.appendChild(audioLabel);
+            resultDiv.appendChild(audioEl); 
+            resultDiv.appendChild(audioBtn);
+
+        } catch (err) {
+            console.error(err);
+            respStatus.textContent = "✅ 矩阵层提取完毕 (无音频)";
+            response.textContent += "\n⚠️ SYS_WARN: 音轨通道为空或格式暂不支持。";
+        }
+
+        mediaPreview.appendChild(resultDiv);
+        btn.innerHTML = old; btn.disabled = false;
+    };
+});
+
+function showFrame() {
+    if(images.length === 0) return;
+    const meta = document.getElementById('imageMetadataPreview');
+    if (meta) { meta.style.display = 'none'; meta.textContent = ''; } 
+    displayedImage.src = images[currentImageIndex]; displayedImage.style.display = "block";
+    originalImgSrc = images[currentImageIndex]; modifiedImgSrc = ""; onModelChange();
+
+    if(frameControls) frameControls.style.display = "grid"; 
+    if(framePager) {
+        framePager.style.display = "block";
+        framePager.textContent = "INDEX: " + String(currentImageIndex+1).padStart(4,'0') + " / " + String(images.length).padStart(4,'0') + " (支持方向键微调)";
+    }
+}
+
+function goToPrevFrame() { if(currentImageIndex > 0) { currentImageIndex--; showFrame(); } }
+function goToNextFrame() { if(currentImageIndex < images.length-1) { currentImageIndex++; showFrame(); } }
+
+bindEvent("prevButton", "click", goToPrevFrame);
+bindEvent("nextButton", "click", goToNextFrame);
+
+document.addEventListener("keydown", (e) => {
+    if (frameControls && frameControls.style.display !== "none" && images.length > 0) {
+        if (e.key === "ArrowLeft") { e.preventDefault(); goToPrevFrame(); } 
+        else if (e.key === "ArrowRight") { e.preventDefault(); goToNextFrame(); }
+    }
+});
+
+bindEvent("btnHtmlPreview", "click", () => {
+    const htmlContent = universalText.value; if(!htmlContent.trim()) return alert("SYS_PROMPT: 缓冲区为空，请装载 HTML 源码。");
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    window.open(URL.createObjectURL(blob), '_blank');
+});
+
+
+// 图像分享：只有用户点击时才读取/转换/上传；不在页面加载时访问 Imgur。
+async function fetchImageBlobForShare(src) {
+    if (!src) throw new Error('请先选择、抽取或生成图像');
+    let url = src;
+    // 第三方 AI 生成 URL 可能不支持浏览器 CORS；此时使用现有的安全图片读取中转。
+    const isRemote = /^https?:\/\//i.test(src);
+    try {
+        const res = await fetch(url, { credentials: 'omit', cache: 'no-store' });
+        if (!res.ok) throw new Error('源图 HTTP ' + res.status);
+        const blob = await res.blob();
+        if (!blob.size) throw new Error('图像内容为空');
+        return blob;
+    } catch (firstError) {
+        if (!isRemote) throw new Error('无法读取当前图片：' + firstError.message);
+        const proxyRes = await fetch('?api=qr_image&url=' + encodeURIComponent(src), { cache: 'no-store' });
+        if (!proxyRes.ok) {
+            const raw = await proxyRes.text();
+            let reason = raw.slice(0, 200);
+            try { reason = JSON.parse(raw).error?.message || reason; } catch (_) {}
+            throw new Error('远程图片读取失败：' + reason);
+        }
+        const blob = await proxyRes.blob();
+        if (!blob.size) throw new Error('远程图片为空');
+        return blob;
+    }
+}
+
+async function getShareLimitBytes() {
+    // 可自动适配常见的 PHP 2M/8M 限制，避免 $_FILES 为空。
+    try {
+        const res = await fetch('?api=share_limits', { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const config = await res.json();
+        if (config.file_uploads === false) throw new Error('服务器禁用了 PHP 文件上传');
+        const n = Number(config.max_bytes);
+        if (Number.isFinite(n) && n > 64 * 1024) return n;
+        throw new Error('服务器上传额度太小');
+    } catch (e) {
+        // 如果限额查询失败，使用安全的小文件目标；真实失败仍由后端返回明确原因。
+        if (e.message.includes('禁用了') || e.message.includes('太小')) throw e;
+        return 1500 * 1024;
+    }
+}
+
+async function toShareJpegWithinLimit(blob, maxBytes) {
+    const objectUrl = URL.createObjectURL(blob);
+    let img;
+    try {
+        img = await new Promise((resolve, reject) => {
+            const el = new Image();
+            el.onload = () => resolve(el);
+            el.onerror = () => reject(new Error('无法解码该图片，请转换为 JPG/PNG 再试'));
+            el.src = objectUrl;
+        });
+        const originalWidth = img.naturalWidth || img.width;
+        const originalHeight = img.naturalHeight || img.height;
+        if (!originalWidth || !originalHeight) throw new Error('图片尺寸不正确');
+        // 图片过大时优先限制最长边，再逐步降低质量和尺寸以适应服务器限制。
+        for (const maxSide of [4096, 3072, 2560, 2048, 1600, 1280, 960]) {
+            const ratio = Math.min(1, maxSide / Math.max(originalWidth, originalHeight));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(originalWidth * ratio));
+            canvas.height = Math.max(1, Math.round(originalHeight * ratio));
+            const ctx = canvas.getContext('2d');
+            if (!ctx) throw new Error('浏览器无法创建画布');
+            ctx.fillStyle = '#ffffff'; // JPEG 不支持透明，使用白底
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            for (const quality of [0.92, 0.85, 0.77, 0.67, 0.55]) {
+                const result = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+                if (result && result.size && result.size <= maxBytes) return result;
+            }
+        }
+        throw new Error('图像压缩后仍超过上传限制，请先缩小图像分辨率');
+    } finally {
+        URL.revokeObjectURL(objectUrl);
+    }
+}
+
+async function prepareShareImage(blob, maxBytes) {
+    if (!blob || blob.size < 1) throw new Error('未读取到有效图片');
+    if (['image/jpeg', 'image/png'].includes(blob.type) && blob.size <= maxBytes) {
+        return { blob, converted: false };
+    }
+    const converted = await toShareJpegWithinLimit(blob, maxBytes);
+    return { blob: converted, converted: true };
+}
+
+bindEvent('btnShareImage', 'click', async () => {
+    const btn = document.getElementById('btnShareImage');
+    if (btn.disabled) return;
+    const oldText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ 准备图像...';
+    responseWrap.style.display = 'block';
+    respStatus.textContent = '正在检查上传配置...';
+    respStatus.style.color = '#00f0ff';
+
+    try {
+        const selectedFile = universalFile.files && universalFile.files[0];
+        const currentSource = modifiedImgSrc || originalImgSrc;
+        let rawBlob;
+        let fileName = 'shared-image.png';
+
+        // 1. 必须优先选择当前修改/生成的图片，防止误传原来的本地文件。
+        if (modifiedImgSrc) {
+            rawBlob = await fetchImageBlobForShare(modifiedImgSrc);
+        } else if (selectedFile && selectedFile.type.startsWith('image/') &&
+                   originalImgSrc && originalImgSrc.startsWith('blob:') &&
+                   displayedImage.src === originalImgSrc) {
+            rawBlob = selectedFile;
+            fileName = selectedFile.name || fileName;
+        } else if (currentSource) {
+            rawBlob = await fetchImageBlobForShare(currentSource);
+        } else if (selectedFile && selectedFile.type.startsWith('image/')) {
+            rawBlob = selectedFile;
+            fileName = selectedFile.name || fileName;
+        } else {
+            throw new Error('请先选择、抽帧或生成一张图像');
+        }
+
+        const maxBytes = await getShareLimitBytes();
+        btn.textContent = '⏳ 检查图像大小...';
+        const prepared = await prepareShareImage(rawBlob, maxBytes);
+        const imageBlob = prepared.blob;
+        if (prepared.converted) {
+            fileName = 'shared-image.jpg';
+        } else if (!fileName.match(/\.(jpe?g|png)$/i)) {
+            fileName = 'shared-image.' + (imageBlob.type === 'image/png' ? 'png' : 'jpg');
+        }
+
+        btn.textContent = '⏳ 上传 Imgur...';
+        respStatus.textContent = '正在上传 Imgur...';
+        const formData = new FormData();
+        formData.append('image', imageBlob, fileName);
+        const uploadResponse = await fetch('?api=share_image', {
+            method: 'POST',
+            body: formData,
+            cache: 'no-store'
+            // 不要手动设置 Content-Type，否则 multipart boundary 会丢失。
+        });
+        const rawReply = await uploadResponse.text();
+        let payload;
+        try { payload = JSON.parse(rawReply); } catch (e) {
+            if (uploadResponse.status === 413) {
+                throw new Error('HTTP 413：Nginx/反向代理拒绝大文件，请增大 client_max_body_size');
+            }
+            throw new Error('服务器未返回 JSON（HTTP ' + uploadResponse.status + '）：' + rawReply.slice(0, 160));
+        }
+        if (!uploadResponse.ok || !payload.url) {
+            throw new Error(payload.error?.message || payload.error || ('图像分享失败（HTTP ' + uploadResponse.status + '）'));
+        }
+
+        universalText.value = payload.url;
+        universalText.dispatchEvent(new Event('input'));
+        respStatus.textContent = '✅ 图像分享成功';
+        respStatus.style.color = '#00ff41';
+        response.textContent = 'IMGUR_UPLOAD_OK\n' +
+            '上传大小：' + (imageBlob.size / 1024 / 1024).toFixed(2) + ' MB' +
+            (prepared.converted ? '（自动转换 / 压缩）' : '（原图）') + '\n' + payload.url;
+        btn.textContent = '✅ 链接已写入 TXT';
+        setTimeout(() => { if (!btn.disabled) btn.textContent = oldText; }, 2000);
+    } catch (error) {
+        respStatus.textContent = '❌ 图像分享失败';
+        respStatus.style.color = '#ff2a2a';
+        response.textContent = 'SYS_ERR: ' + error.message;
+        alert('SYS_ERR: ' + error.message);
+    } finally {
+        btn.disabled = false;
+        if (btn.textContent !== '✅ 链接已写入 TXT') btn.textContent = oldText;
+    }
+});
+
+bindEvent("btnGenerateQR", "click", () => {
+    const text = universalText.value.trim(); if(!text) return alert("SYS_PROMPT: 载入核心数据流块以生成二维码。");
+    const qr = new QRious({ value: text, size: 250 });
+    displayedImage.src = qr.toDataURL(); displayedImage.style.display = "block"; imageDisplayContainer.style.display = "flex";
+    originalImgSrc = displayedImage.src; modifiedImgSrc = ""; 
+    if(btnAiAction) btnAiAction.innerHTML = "🎨 AI 改图"; 
+    onModelChange();
+});
+
+bindEvent("btnDecodeQR", "click", () => {
+    const textVal = universalText.value.trim(); const file = universalFile.files[0];
+    const urlMatch = textVal.match(/https?:\/\/[^\s<>"']+/i);
+    let imgSrc = ""; const isUrl = !!urlMatch;
+    
+    if (isUrl) imgSrc = urlMatch[0];
+    else if (file && file.type.startsWith("image/")) imgSrc = URL.createObjectURL(file);
+    else return alert("SYS_PROMPT: 请挂载二维码图片，或在 TXT 中输入图片网址。");
+
+    const btn = document.getElementById("btnDecodeQR"); const old = btn.innerHTML; 
+    btn.innerHTML = "解析中..."; btn.disabled = true;
+
+    const img = new Image();
+    if (isUrl) img.crossOrigin = 'anonymous';
+    
+    img.onload = () => {
+        try {
+            const canvas = document.createElement('canvas'); canvas.width = img.width; canvas.height = img.height;
+            const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: "attemptBoth" });
+            if (code) { 
+                universalText.value = code.data; updateStats(); checkEmptyState(); copyToClipboard(code.data, btn); 
+            } else { alert("❌ SYS_ERR: 矩阵解密失败，未发现标准通讯码象。"); }
+        } catch (err) {
+            alert('远程图片可能禁止跨域画布读取（CORS）。请下载图片后上传识别。错误：' + err.message);
+        }
+        btn.innerHTML = old; btn.disabled = false;
+    };
+    img.onerror = () => { alert('远程图片加载失败或不允许跨域，请保存图片后上传识别。'); btn.innerHTML = old; btn.disabled = false; };
+    img.src = imgSrc;
+});
+  
+bindEvent("btnReadMeta", "click", async () => {
+    const file = universalFile.files[0]; if (!file) return alert("SYS_PROMPT: 载入需要穿透解析的物料节点。");
+    responseWrap.style.display = "block"; respStatus.textContent = "透视中..."; response.textContent = "⏳ DEEP_SCAN_INITIALIZED...\n";
+    try {
+        let metaText = "=== 📁 基础构造 ===\nSYS_NAME: " + file.name + "\nSYS_VOL: " + (file.size / 1024).toFixed(2) + " KB\n\n";
+        try {
+            const tags = await exifr.parse(file, true);
+            if (tags) { metaText += "=== 🏷️ 隐秘元数据层 ===\n"; for (const [k, v] of Object.entries(tags)) metaText += k + ": " + v + "\n"; }
+        } catch(e){}
+        response.textContent = metaText; respStatus.textContent = "✅ 透视完成"; respStatus.style.color = "#00ff41";
+    } catch (e) { response.textContent = "SYS_ERR: " + e.message; respStatus.style.color = "#ff2a2a"; }
+});
+
+let currentUrl = "https://www.baidu.com";
+let pingData = []; 
+const pingTextElem = document.getElementById("pingText");
+const pingModal = document.getElementById("pingModal");
+
+function openPingModal() {
+    pingModal.style.display = "flex";
+    void pingModal.offsetWidth; 
+    pingModal.classList.add("show");
+}
+
+function closePingModal(e) {
+    if (e && e.target.id === "pingSheet") return; 
+    pingModal.classList.remove("show");
+    setTimeout(() => { pingModal.style.display = "none"; }, 300);
+}
+
+function changeSite(url, name) {
+    currentUrl = url;
+    document.getElementById("siteName").innerText = name;
+    document.getElementById("descSite").innerText = name;
+    pingData = []; 
+    drawChart();
+    closePingModal();
+    doPing();
+}
+
+async function doPing() {
+    if(!pingTextElem) return;
+    const img = new Image();
+    const start = performance.now();
+    let isFinished = false; 
+
+    img.onload = function() {
+        if (isFinished) return;
+        isFinished = true;
+        const end = performance.now();
+        const ms = Math.floor(end - start);
+        pingTextElem.innerText = ms + " ms";
+        
+        if (ms < 50) pingTextElem.style.color = "#00ff41";
+        else if (ms < 100) pingTextElem.style.color = "#d9a23a";
+        else pingTextElem.style.color = "#ff2a2a";
+
+        addData(ms);
+    };
+
+    img.onerror = function() {
+        if (isFinished) return;
+        isFinished = true;
+        pingTextElem.innerText = "UPLINK_DOWN";
+        pingTextElem.style.color = "#ff2a2a"; 
+        addData(500); 
+    };
+
+    setTimeout(() => {
+        if (!isFinished) {
+            isFinished = true;
+            img.src = ""; 
+            pingTextElem.innerText = "TIMEOUT";
+            pingTextElem.style.color = "#ff2a2a";
+            addData(500); 
+        }
+    }, 2000);
+
+    img.src = currentUrl + "/favicon.ico?t=" + Date.now();
+}
+
+function addData(ms) {
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                    now.getMinutes().toString().padStart(2, '0') + ':' + 
+                    now.getSeconds().toString().padStart(2, '0');
+                    
+    pingData.push({ ms: ms, time: timeStr });
+    
+    if(pingData.length > 20) pingData.shift();
+    drawChart();
+}
+
+function drawChart() {
+    const canvas = document.getElementById("chart");
+    if(!canvas) return;
+    const ctx = canvas.getContext("2d");
+    
+    const rect = canvas.parentNode.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx.scale(2, 2);
+    
+    const w = rect.width;
+    const h = rect.height;
+
+    ctx.clearRect(0, 0, w, h);
+
+    const paddingLeft = 30;
+    const paddingBottom = 20;
+    const chartW = w - paddingLeft - 10; 
+    const chartH = h - paddingBottom;
+
+    const maxMs = pingData.length > 0 ? Math.max(...pingData.map(d => d.ms), 60) : 60; 
+    
+    ctx.strokeStyle = "#333"; 
+    ctx.lineWidth = 1;
+    ctx.fillStyle = "#666";   
+    ctx.font = "10px 'Share Tech Mono', ui-monospace, sans-serif";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+
+    const ySteps = 4; 
+    for(let i=0; i<=ySteps; i++){
+        let val = Math.round((maxMs / ySteps) * i);
+        let y = chartH - (i * (chartH / ySteps));
+        y = Math.max(y, 10);
+
+        ctx.beginPath();
+        ctx.moveTo(paddingLeft, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+
+        ctx.fillText(val, paddingLeft - 6, y);
+    }
+
+    if(pingData.length < 2) return;
+
+    let points = [];
+    pingData.forEach((d, i) => {
+        let x = paddingLeft + i * (chartW / (pingData.length - 1));
+        let y = chartH - (d.ms / maxMs) * (chartH - 10); 
+        points.push({x: x, y: Math.max(10, Math.min(y, chartH))});
+    });
+
+    let linePath = new Path2D();
+    linePath.moveTo(points[0].x, points[0].y);
+    
+    for (let i = 0; i < points.length - 1; i++) {
+        let xMid = (points[i].x + points[i + 1].x) / 2;
+        linePath.bezierCurveTo(xMid, points[i].y, xMid, points[i + 1].y, points[i + 1].x, points[i + 1].y);
+    }
+
+    let fillPath = new Path2D(linePath);
+    fillPath.lineTo(points[points.length - 1].x, chartH); 
+    fillPath.lineTo(points[0].x, chartH);                  
+    fillPath.closePath();                                  
+
+    const fillGradient = ctx.createLinearGradient(0, 0, 0, chartH);
+    fillGradient.addColorStop(0, "rgba(0, 255, 65, 0.15)"); 
+    fillGradient.addColorStop(1, "rgba(0, 255, 65, 0.0)");   
+
+    ctx.fillStyle = fillGradient;
+    ctx.fill(fillPath);
+
+    const lineGradient = ctx.createLinearGradient(paddingLeft, 0, w, 0);
+    lineGradient.addColorStop(0, "#00ff41");   
+    lineGradient.addColorStop(0.5, "#00f0ff"); 
+    lineGradient.addColorStop(1, "#00ff41");   
+
+    ctx.strokeStyle = lineGradient;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke(linePath);
+
+    ctx.fillStyle = "#666";
+    ctx.textBaseline = "top";
+    
+    ctx.textAlign = "left";
+    ctx.fillText(pingData[0].time, paddingLeft, chartH + 5); 
+    
+    ctx.textAlign = "right";
+    ctx.fillText(pingData[pingData.length - 1].time, points[points.length - 1].x, chartH + 5); 
+}
+
+setInterval(() => {
+    if (document.visibilityState === 'visible') doPing();
+}, 2000);
+
+setTimeout(doPing, 1000);
+<\/script>
+<script>
+/* 1015 AdSense 可见性与投放诊断：不修改广告请求或 Google 官方返回状态 */
+(function () {
+  try {
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('ad_debug') !== '1') return;
+    const pane = document.getElementById('adsenseDiagnostics1015');
+    const output = document.getElementById('adsenseDiagnosticText1015');
+    const slot = document.querySelector('#googleAdTop2282084339 ins.adsbygoogle');
+    if (!pane || !output) return;
+    pane.hidden = false;
+    pane.open = true;
+    const started = Date.now();
+    let interval;
+    const render = () => {
+      const rect = slot?.getBoundingClientRect();
+      const css = slot ? getComputedStyle(slot) : null;
+      const sdk = document.getElementById('adsenseSdk1015');
+      const state = slot?.getAttribute('data-ad-status') || '(尚未返回)';
+      const request = slot?.getAttribute('data-adsbygoogle-status') || '(尚未处理)';
+      const size = rect ? Math.round(rect.width) + ' × ' + Math.round(rect.height) + ' px' : '未找到广告节点';
+      const iframeCount = slot?.querySelectorAll('iframe').length || 0;
+      const elapsed = Math.round((Date.now() - started) / 1000);
+      let summary = '';
+      if (!slot) summary = '❌ 广告节点不存在，检查网页是不是最新版 t2.php。';
+      else if (css && (css.display === 'none' || css.visibility === 'hidden' || rect.width < 250)) summary = '⚠️ 广告区域不可见或宽度不足 250px，请检查页面样式与屏幕宽度。';
+      else if (window.__adsenseSdkFailed1015) summary = '❌ Google 广告脚本加载失败：检查广告拦截器、网络与控制台 Network。';
+      else if (window.__adsensePushError1015) summary = '❌ 广告初始化出现异常：' + window.__adsensePushError1015;
+      else if (state === 'filled') summary = '✅ Google 已返回广告素材；若仍看不到，检查 iframe 遮挡、网络或浏览器插件。';
+      else if (state === 'unfilled' || state === 'unfill-optimized') summary = '⚠️ Google 已处理广告请求，但没有广告填充。属于 AdSense 投放结果，PHP/CSS 无法强制显示。';
+      else if (window.__adsenseSdkLoaded1015 && request === 'done') summary = '⏳ 广告代码已处理请求，等待 Google 返回 filled/unfilled。';
+      else if (elapsed >= 15) summary = '⚠️ 15 秒后仍无广告状态。检查广告脚本是否被拦截、站点是否审核通过及浏览器 Console。';
+      else summary = '⏳ 正在等待 Google 广告脚本及广告填充结果。';
+      output.textContent = [
+        summary,
+        '域名：' + location.hostname,
+        '广告位：ca-pub-1964437526797765 / 2282084339',
+        '容器尺寸：' + size,
+        'CSS display：' + (css?.display || '-'),
+        'Google 脚本加载：' + (window.__adsenseSdkFailed1015 ? '失败' : window.__adsenseSdkLoaded1015 ? '成功' : '未确认'),
+        '广告初始化：' + (window.__adsensePushError1015 || (window.__adsensePushOK1015 ? '已提交' : '未提交')),
+        'data-adsbygoogle-status：' + request,
+        'data-ad-status：' + state,
+        '广告 iframe 数：' + iframeCount,
+        '等待秒数：' + elapsed,
+        '说明：filled=已返回广告；unfilled=Google无广告填充；未返回=尚不能确定。'
+      ].join('\n');
+      if (state === 'filled' || state === 'unfilled' || state === 'unfill-optimized' || elapsed >= 40) clearInterval(interval);
+    };
+    const obs = new MutationObserver(render);
+    if (slot) obs.observe(slot, { attributes: true, attributeFilter: ['data-ad-status', 'data-adsbygoogle-status', 'style'], childList: true });
+    interval = setInterval(render, 1500);
+    render();
+  } catch (err) { console.error('AdSense 诊断脚本发生错误：', err); }
+})();
+<\/script>
+<script>
+/* ==========================================================
+ * 音视频工作台 | 保持原页面 CSS / 原功能不变
+ * 与 webCut 同流程：PCM WAV 分段 -> Qwen Space 上传 / 调用 / 获取 SSE
+ * ========================================================== */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const view = $('audioLabCard');
+  if (!view) return;
+  const audioLab = {
+    buffer: null, name: '', originalFile: null, originalBlob: null,
+    playerUrl: '', wavPreviewUrl: '', revision: 0, busy: false, cues: [],
+    history: [], abort: null, extracting: false
+  };
+  const ac = () => {
+    if (!audioLab.context) audioLab.context = new (window.AudioContext || window.webkitAudioContext)();
+    return audioLab.context;
+  };
+  const notify = msg => { $('audioLabStatus').textContent = msg; };
+  const sleepTick = () => new Promise(resolve => setTimeout(resolve, 0));
+  const safeStem = name => (String(name || 'audio').replace(/\.[^.]+$/, '').replace(/[\\/:*?"<>|]/g, '_').slice(0, 110) || 'audio');
+  const clamp = (x, min, max) => Math.max(min, Math.min(max, x));
+  const audioTypes = /\.(mp3|wav|flac|m4a|aac|ogg|opus|webm|wma|aiff|alac)$/i;
+  const videoTypes = /\.(mp4|mov|mkv|avi|webm|m4v|ts)$/i;
+  const isVideo = f => !!f && (f.type.startsWith('video/') || videoTypes.test(f.name) && !f.type.startsWith('audio/'));
+  const isAudio = f => !!f && (f.type.startsWith('audio/') || audioTypes.test(f.name));
+  const formatTime = s => `${String(Math.floor(Math.max(0, s) / 3600)).padStart(2, '0')}:${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+  function download(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 120000);
+  }
+  function setBusy(active) {
+    audioLab.busy = active;
+    for (const id of ['audioLabChoose', 'audioLabKeep', 'audioLabUndo', 'audioLabPreview', 'audioLabExport', 'btnExtractAudio']) {
+      const b = $(id); if (!b) continue;
+      b.disabled = active || (['audioLabKeep','audioLabPreview','audioLabExport'].includes(id) && !audioLab.buffer) ||
+        (id === 'audioLabUndo' && !audioLab.history.length);
+    }
+  }
+  function openPanel() { view.hidden = false; view.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+  $('audioLabClose').addEventListener('click', () => { view.hidden = true; });
+
+  function cleanPlayer() {
+    $('audioLabPlayer').pause(); $('audioLabPlayer').removeAttribute('src'); $('audioLabPlayer').load();
+    if (audioLab.playerUrl) URL.revokeObjectURL(audioLab.playerUrl);
+    audioLab.playerUrl = '';
+  }
+  function invalidateASR(message) {
+    if (audioLab.abort) audioLab.abort.abort();
+    audioLab.cues = []; $('audioAsrResults').style.display = 'none'; $('audioAsrCues').replaceChildren();
+    if (message) notify(message);
+  }
+  function resetEditor() {
+    invalidateASR(); cleanPlayer(); audioLab.buffer = null; audioLab.name = '';
+    audioLab.originalFile = null; audioLab.originalBlob = null; audioLab.history = [];
+    audioLab.revision++; $('audioLabName').textContent='暂无音频。可以使用页面底部上传的音视频，或在此导入。';
+    $('audioLabStart').value='0'; $('audioLabEnd').value='0'; $('audioLabWave').getContext('2d').clearRect(0, 0, $('audioLabWave').width, $('audioLabWave').height);
+    setBusy(false);
+  }
+  function install(buffer, name, blob, resetHistory = true) {
+    if (!buffer || !Number.isFinite(buffer.duration) || buffer.duration <= 0) throw Error('无法读取有效音频');
+    cleanPlayer(); invalidateASR();
+    audioLab.buffer = buffer; audioLab.name = name || 'audio'; audioLab.originalBlob = blob || null;
+    audioLab.revision++; if (resetHistory) audioLab.history = [];
+    $('audioLabStart').value = '0'; $('audioLabEnd').value = buffer.duration.toFixed(3);
+    $('audioLabName').textContent = `${name} · ${formatTime(buffer.duration)} · ${buffer.sampleRate} Hz · ${buffer.numberOfChannels} 声道`;
+    if (blob) {
+      audioLab.playerUrl = URL.createObjectURL(blob);
+      $('audioLabPlayer').src = audioLab.playerUrl;
+    }
+    drawWave(); setBusy(false);
+    notify(`✅ 已载入：${name}；拖动波形、输入选段时间后可剪辑 / 转写。`);
+  }
+  function params(scope = 'selection') {
+    const b = audioLab.buffer;
+    if (!b) throw Error('请先导入音频，或先从视频提取音频');
+    const start = scope === 'full' ? 0 : Number($('audioLabStart').value);
+    const end = scope === 'full' ? b.duration : Number($('audioLabEnd').value);
+    const gain = Number($('audioLabGain').value), fadeIn = Number($('audioLabFadeIn').value), fadeOut = Number($('audioLabFadeOut').value);
+    if (![start, end, gain, fadeIn, fadeOut].every(Number.isFinite) || start < 0 || end > b.duration + .001 || end <= start) throw Error('选段时间有误：结束需大于开始，并且不能超过音频总时长');
+    if (gain < -60 || gain > 24 || fadeIn < 0 || fadeOut < 0) throw Error('增益应为 -60 至 24 dB，淡入淡出不能为负数');
+    return { start, end, gain, fadeIn, fadeOut, normalize:$('audioLabNormalize').checked };
+  }
+  function selectedRange() { const b = audioLab.buffer; if (!b) return [0,0]; return [Number($('audioLabStart').value) / b.duration, Number($('audioLabEnd').value) / b.duration]; }
+  function drawWave() {
+    const canvas = $('audioLabWave'), b = audioLab.buffer; if (!b) return;
+    const dpr = clamp(window.devicePixelRatio || 1,1,2), w = Math.max(200, Math.floor(canvas.clientWidth || 500)), h = 105;
+    canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    const ctx = canvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.fillStyle = '#050505'; ctx.fillRect(0,0,w,h);
+    const samples = b.getChannelData(0), len = samples.length;
+    ctx.strokeStyle='#00f0ff'; ctx.lineWidth=1;
+    ctx.beginPath();
+    const increment=Math.max(1,Math.floor(len / w));
+    for(let x=0;x<w;x++){
+      const from=Math.floor(x*len/w),to=Math.min(len,Math.max(from+1,Math.floor((x+1)*len/w)));
+      let lo=1,hi=-1;
+      // 高频率长音频按可视区间覆盖采样，不让绘制阻塞浏览器。
+      const skip=Math.max(1,Math.floor((to-from)/160));
+      for(let i=from;i<to;i+=skip){const v=samples[i];if(v<lo)lo=v;if(v>hi)hi=v;}
+      ctx.moveTo(x,h/2-hi*h*.43);ctx.lineTo(x,h/2-lo*h*.43);
+    }
+    ctx.stroke();
+    let [s,e]=selectedRange();s=clamp(s,0,1);e=clamp(e,0,1);
+    ctx.fillStyle='rgba(0,255,65,.12)'; ctx.fillRect(s*w,0,Math.max(0,e-s)*w,h);
+    ctx.strokeStyle='#00ff41';ctx.lineWidth=2;
+    for(const pos of [s,e]){ctx.beginPath();ctx.moveTo(pos*w,0);ctx.lineTo(pos*w,h);ctx.stroke();}
+  }
+  for(const id of ['audioLabStart','audioLabEnd']) $(id).addEventListener('input', () => drawWave());
+  window.addEventListener('resize', () => { if (!view.hidden) drawWave(); });
+  let pointerStart = null;
+  $('audioLabWave').addEventListener('pointerdown', e => {
+    if (!audioLab.buffer) return;
+    const r=e.currentTarget.getBoundingClientRect(); pointerStart=clamp((e.clientX-r.left)/r.width,0,1);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    $('audioLabStart').value=(pointerStart*audioLab.buffer.duration).toFixed(3);
+    $('audioLabEnd').value=(Math.min(audioLab.buffer.duration, pointerStart*audioLab.buffer.duration+.05)).toFixed(3);
+    drawWave();
+  });
+  $('audioLabWave').addEventListener('pointermove', e => {
+    if(pointerStart === null || !audioLab.buffer) return;
+    const r=e.currentTarget.getBoundingClientRect(),other=clamp((e.clientX-r.left)/r.width,0,1);
+    $('audioLabStart').value=(Math.min(pointerStart,other)*audioLab.buffer.duration).toFixed(3);
+    $('audioLabEnd').value=(Math.max(pointerStart,other)*audioLab.buffer.duration).toFixed(3);
+    drawWave();
+  });
+  for(const event of ['pointerup','pointercancel','lostpointercapture']) $('audioLabWave').addEventListener(event, () => { pointerStart=null; });
+
+  function processedChannels(p) {
+    const b=audioLab.buffer, start=Math.max(0,Math.round(p.start*b.sampleRate)),end=Math.min(b.length,Math.round(p.end*b.sampleRate));
+    if (end <= start) throw Error('选段过短');
+    const out=Array.from({length:b.numberOfChannels},(_,c)=>b.getChannelData(c).slice(start,end));
+    let max=0;
+    if (p.normalize) for(const channel of out) for(const v of channel) if(Math.abs(v)>max)max=Math.abs(v);
+    const gain=Math.pow(10,p.gain/20)*(max?0.98/max:1),fadeIn=p.fadeIn*b.sampleRate,fadeOut=p.fadeOut*b.sampleRate;
+    for(const channel of out) for(let i=0;i<channel.length;i++){
+      const envelope=clamp(Math.min(fadeIn ? i/fadeIn : 1,fadeOut ? (channel.length-1-i)/fadeOut:1),0,1);
+      channel[i]=clamp(channel[i]*envelope*gain,-1,1);
+    }
+    return out;
+  }
+  function pcmWav(channels,rate) {
+    const len=channels[0].length,bytes=len*channels.length*2;
+    if (bytes > 0xFFFFFFFF-36) throw Error('WAV 过大');
+    const ab=new ArrayBuffer(44+bytes),dv=new DataView(ab);
+    function str(p,s){for(let i=0;i<s.length;i++)dv.setUint8(p+i,s.charCodeAt(i));}
+    str(0,'RIFF');dv.setUint32(4,bytes+36,true);str(8,'WAVE');str(12,'fmt ');dv.setUint32(16,16,true);
+    dv.setUint16(20,1,true);dv.setUint16(22,channels.length,true);dv.setUint32(24,rate,true);
+    dv.setUint32(28,rate*channels.length*2,true);dv.setUint16(32,channels.length*2,true);dv.setUint16(34,16,true);
+    str(36,'data');dv.setUint32(40,bytes,true);
+    let p=44;
+    for(let i=0;i<len;i++) for(const channel of channels){const v=clamp(channel[i],-1,1);dv.setInt16(p,v<0?Math.round(v*32768):Math.round(v*32767),true);p+=2;}
+    return ab;
+  }
+  async function encodeMP3(channels,rate) {
+    if(typeof lamejs==='undefined'||!lamejs.Mp3Encoder) throw Error('MP3 编码器未加载，请尝试 WAV 或检查 CDN');
+    const n=Math.min(2,channels.length),encoder=new lamejs.Mp3Encoder(n,rate,192),data=[];
+    const block=1152, l=new Int16Array(block),r=new Int16Array(block),length=channels[0].length;
+    for(let i=0;i<length;i+=block){
+      const count=Math.min(block,length-i);
+      for(let j=0;j<block;j++){
+        const left=j<count?clamp(channels[0][i+j],-1,1):0;
+        const right=j<count?clamp((channels[1]||channels[0])[i+j],-1,1):0;
+        l[j]=left<0?left*32768:left*32767;
+        if(n===2)r[j]=right<0?right*32768:right*32767;
+      }
+      const mp3=n===2?encoder.encodeBuffer(l.subarray(0,count),r.subarray(0,count)):encoder.encodeBuffer(l.subarray(0,count));
+      if(mp3?.length)data.push(new Uint8Array(mp3));
+      if(i && i%(block*300)===0){notify(`🎵 MP3 编码中 ${(100*i/length).toFixed(0)}%`);await sleepTick();}
+    }
+    const last=encoder.flush();if(last.length)data.push(new Uint8Array(last));
+    return new Blob(data,{type:'audio/mpeg'});
+  }
+
+  let ff, ffPromise, ffWorkerUrl;
+  async function loadFFmpeg() {
+    if(ff) return ff;
+    if(ffPromise) return ffPromise;
+    ffPromise=(async()=>{
+      notify('⌛ 正在初始化浏览器 FFmpeg（首次可能下载约 32MB WASM，音视频不会上传服务器）…');
+      const [pkg,util]=await Promise.all([import('https://esm.sh/@ffmpeg/ffmpeg@0.12.15'),import('https://esm.sh/@ffmpeg/util@0.12.2')]);
+      const workerScript = `import 'https://cdnjs.cloudflare.com/ajax/libs/ffmpeg/0.12.15/esm/worker.min.js';
+const original = self.onmessage;
+self.onmessage = e => { if (e && e.data && e.data.data && 'coreURL' in e.data.data) { e.data.data.coreURL = 'https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm/ffmpeg-core.js'; } return original.call(self,e); };`;
+      ffWorkerUrl=URL.createObjectURL(new Blob([workerScript],{type:'text/javascript'}));
+      const instance=new pkg.FFmpeg();
+      const base='https://unpkg.com/@ffmpeg/core@0.12.10/dist/esm';
+      await instance.load({
+        classWorkerURL: ffWorkerUrl,
+        coreURL: await util.toBlobURL(`${base}/ffmpeg-core.js`,'text/javascript'),
+        wasmURL: await util.toBlobURL(`${base}/ffmpeg-core.wasm`,'application/wasm')
+      });
+      ff=instance;return instance;
+    })().catch(e=>{ffPromise=null; if(ffWorkerUrl)URL.revokeObjectURL(ffWorkerUrl);throw e;});
+    return ffPromise;
+  }
+  let ffQueue=Promise.resolve();
+  function ffJob(task) {
+    // 所有文件操作串行运行，避免多次点击产生虚拟文件覆盖。
+    const job=ffQueue.catch(()=>{}).then(async()=>task(await loadFFmpeg()));
+    ffQueue=job.catch(()=>{});return job;
+  }
+  async function ffTranscode(source, filename, output, args) {
+    return ffJob(async instance=>{
+      const extension=(filename.split('.').pop()||'bin').replace(/[^a-zA-Z0-9]/g,'').slice(0,8)||'bin';
+      const input=`tcq_input.${extension}`,result=`tcq_output.${output}`;
+      try {
+        await instance.writeFile(input,new Uint8Array(await source.arrayBuffer()));
+        const exit=await instance.exec(['-hide_banner','-loglevel','error','-y','-i',input,...args,result],180000);
+        if(exit!==0)throw Error(`FFmpeg 转码失败（exit ${exit}），可能是视频无音轨或格式不兼容`);
+        const data=await instance.readFile(result);
+        if(!(data instanceof Uint8Array)||data.length<44)throw Error('音轨为空或无可用音频流');
+        return new Blob([data],{type:output==='wav'?'audio/wav':output==='mp3'?'audio/mpeg':'application/octet-stream'});
+      } finally {
+        for(const item of [input,result])try{await instance.deleteFile(item);}catch{}
+      }
+    });
+  }
+  async function decodeFile(file) {
+    const context=ac();
+    try { return {buffer:await context.decodeAudioData(await file.arrayBuffer()),blob:file}; }
+    catch(nativeError) {
+      notify('当前浏览器不能直接解码该容器，尝试 FFmpeg 转换为 WAV…');
+      try {
+        const blob=await ffTranscode(file,file.name,'wav',['-vn','-map','0:a:0','-ac','2','-c:a','pcm_s16le','-f','wav']);
+        return {buffer:await context.decodeAudioData(await blob.arrayBuffer()),blob};
+      }catch(wasmError) { throw Error(`音频解码失败：${wasmError.message}。可先转换为 WAV 或 MP3 后重试。`); }
+    }
+  }
+  async function beginLoad(file) {
+    if(!file) return false;
+    if(audioLab.busy) return false;
+    if(file.size>120*1024*1024)throw Error('浏览器处理上限建议 120MB，超大文件请用桌面 webCut 或本地 FFmpeg');
+    setBusy(true);
+    try {
+      notify('⌛ 正在读取音频…');
+      const decoded=await decodeFile(file);
+      audioLab.originalFile=file;
+      install(decoded.buffer,file.name,decoded.blob);
+      return true;
+    } finally { setBusy(false); }
+  }
+  $('audioLabChoose').addEventListener('click',()=>{$('audioLabFile').click();});
+  $('audioLabFile').addEventListener('change',async e=>{
+    const file=e.target.files?.[0];if(!file)return;
+    try{await beginLoad(file);}catch(error){notify('❌ '+error.message);}finally{e.target.value='';}
+  });
+  async function fromCurrentFile(open = true) {
+    if(open)openPanel();
+    if(audioLab.buffer)return true;
+    const file=universalFile.files?.[0];
+    if(!file || (!isAudio(file) && !isVideo(file)))return false;
+    await beginLoad(file);
+    return !!audioLab.buffer;
+  }
+  $('btnAudioEdit').addEventListener('click',async()=>{
+    try {
+      if(!(await fromCurrentFile())) {notify('请在页面底部选择音频/视频，或点击“导入音视频”。');$('audioLabFile').click();}
+    }catch(e){notify('❌ '+e.message);}
+  });
+  $('audioLabKeep').addEventListener('click',()=>{
+    try {
+      const p=params(),b=audioLab.buffer,from=Math.floor(p.start*b.sampleRate),to=Math.min(b.length,Math.ceil(p.end*b.sampleRate));
+      const trimmed=ac().createBuffer(b.numberOfChannels,to-from,b.sampleRate);
+      for(let c=0;c<b.numberOfChannels;c++)trimmed.copyToChannel(b.getChannelData(c).slice(from,to),c);
+      audioLab.history.push({buffer:b,name:audioLab.name,blob:audioLab.originalBlob});
+      if(audioLab.history.length>10)audioLab.history.shift();
+      const wav=new Blob([pcmWav(Array.from({length:trimmed.numberOfChannels},(_,c)=>trimmed.getChannelData(c)),trimmed.sampleRate)],{type:'audio/wav'});
+      install(trimmed, audioLab.name.replace(/\.[^.]+$/,'')+'_clip.wav',wav,false);
+      notify('✂ 已保留选段，原素材保留在撤销历史中；旧 ASR 时间轴已清空。');
+    }catch(e){notify('❌ '+e.message);}
+  });
+  $('audioLabUndo').addEventListener('click',()=>{
+    const last=audioLab.history.pop();if(!last)return;
+    install(last.buffer,last.name,last.blob,false);
+    notify('↶ 已撤销上一次裁剪');
+  });
+  async function exportOptions(blob,format) {
+    if(format==='wav')return blob;
+    const maps={mp3:['-c:a','libmp3lame','-b:a','192k'],flac:['-c:a','flac'],m4a:['-c:a','aac','-b:a','192k','-movflags','+faststart'],aac:['-c:a','aac','-b:a','192k','-f','adts'],ogg:['-c:a','libvorbis','-b:a','192k'],opus:['-c:a','libopus','-b:a','192k','-ar','48000'],webm:['-c:a','libopus','-b:a','192k','-ar','48000']};
+    if(format==='mp3'){
+      // 已加载的 lamejs 优先，避免 MP3 导出必须拉取约 32MB 的 FFmpeg。
+      try{
+        const decoded=await ac().decodeAudioData(await blob.arrayBuffer());
+        return await encodeMP3(Array.from({length:decoded.numberOfChannels},(_,i)=>decoded.getChannelData(i)),decoded.sampleRate);
+      }catch(e){notify('浏览器 MP3 编码失败，切换 FFmpeg…');}
+    }
+    if(!maps[format])throw Error('不支持的目标音频格式');
+    return await ffTranscode(blob,'tcq_audio.wav',format,['-vn',...maps[format]]);
+  }
+  async function makeProcessedWav() {
+    const p=params($('audioLabScope').value),channels=processedChannels(p);
+    return new Blob([pcmWav(channels,audioLab.buffer.sampleRate)],{type:'audio/wav'});
+  }
+  $('audioLabPreview').addEventListener('click',async()=>{
+    if(audioLab.busy)return;
+    try {
+      setBusy(true); const wav=await makeProcessedWav();cleanPlayer();audioLab.playerUrl=URL.createObjectURL(wav);
+      $('audioLabPlayer').src=audioLab.playerUrl;
+      await $('audioLabPlayer').play();notify('▶ 正在试听当前设置处理后的音频。');
+    }catch(e){notify('❌ '+e.message);}finally{setBusy(false);}
+  });
+  $('audioLabExport').addEventListener('click',async()=>{
+    if(audioLab.busy)return;
+    try {
+      setBusy(true);notify('⌛ 正在本地生成音频…');
+      const format=$('audioLabFormat').value;
+      const blob=await exportOptions(await makeProcessedWav(),format);
+      download(blob,`${safeStem(audioLab.name)}_edited.${format}`);
+      notify(`✅ ${format.toUpperCase()} 导出完成，文件大小 ${(blob.size/1048576).toFixed(2)} MB。`);
+    }catch(e){notify('❌ 导出失败：'+e.message);}finally{setBusy(false);}
+  });
+
+  // 单独提取音轨，避免原“视频分离”必须先抽取所有画面。
+  $('btnExtractAudio').addEventListener('click',async()=>{
+    const file=universalFile.files?.[0] || audioLab.originalFile;
+    if(!isVideo(file)){ alert('请先通过页面底部的文件选择框载入视频（MP4/MOV/WebM 等）');return; }
+    if(audioLab.busy)return;
+    openPanel();setBusy(true);
+    try{
+      notify('🎞️ 正在仅提取视频音轨，无须抽取画面…');
+      let mp3;
+      try {
+        mp3=await ffTranscode(file,file.name,'mp3',['-map','0:a:0','-vn','-c:a','libmp3lame','-b:a','192k']);
+      }catch(e){
+        notify('FFmpeg 提取失败，尝试浏览器解码回退…');
+        try {
+          const b=await ac().decodeAudioData(await file.arrayBuffer());
+          mp3=await encodeMP3(Array.from({length:b.numberOfChannels},(_,i)=>b.getChannelData(i)),b.sampleRate);
+        }catch(nativeError){throw Error('视频无可解码的音轨，或 FFmpeg CDN/WASM 无法加载：'+e.message);}
+      }
+      if(mp3.size<200)throw Error('提取结果为空');
+      const decoded=await ac().decodeAudioData(await mp3.arrayBuffer());
+      audioLab.originalFile=file;
+      install(decoded,`${safeStem(file.name)}_audio.mp3`,mp3);
+      download(mp3,`${safeStem(file.name)}_audio.mp3`);
+      notify(`✅ 成功提取音频：${(mp3.size/1048576).toFixed(2)} MB，已下载 MP3 并载入剪辑工作台。`);
+    }catch(e){notify('❌ 视频提取音频失败：'+e.message);}finally{setBusy(false);}
+  });
+
+  function chunkWav(buffer,start,end) {
+    const rate=16000, length=Math.max(1,Math.round((end-start)*rate));
+    const pcm=new Float32Array(length),channels=buffer.numberOfChannels,sr=buffer.sampleRate;
+    const arrays=Array.from({length:channels},(_,ch)=>buffer.getChannelData(ch));
+    for(let i=0;i<length;i++){
+      const at=(start+i/rate)*sr,j=Math.min(buffer.length-1,Math.floor(at)),k=Math.min(buffer.length-1,j+1),blend=at-j;
+      let mix=0;
+      for(const data of arrays)mix+=data[j]*(1-blend)+data[k]*blend;
+      pcm[i]=mix/channels;
+    }
+    return new Blob([pcmWav([pcm],rate)],{type:'audio/wav'});
+  }
+  function decodeSSE(raw) {
+    for(const block of raw.replace(/\r\n/g,'\n').split('\n\n')){
+      const lines=block.split('\n');const event=lines.find(l=>l.startsWith('event:'))?.slice(6).trim();
+      const data=lines.filter(l=>l.startsWith('data:')).map(l=>l.slice(5).trimStart()).join('\n');
+      if(event==='error')throw Error('Qwen 服务识别失败：'+data.slice(0,250));
+      if(event==='complete'){
+        let result;
+        try{result=JSON.parse(data);}catch{throw Error('Qwen 服务返回了无效 JSON');}
+        const text=Array.isArray(result)?result[0]:Array.isArray(result?.data)?result.data[0]:null;
+        if(typeof text!=='string')throw Error('Qwen 识别结果格式不符合预期');
+        if(/^(Request failed|Processing error|No recognition result|No text content|Please upload)/i.test(text)) throw Error(text.slice(0,180));
+        return text.trim();
+      }
+    }
+    throw Error('Qwen 任务未返回 complete 结果，可能超时或连接中断');
+  }
+  async function qwenRequest(op,{body,token,signal,id}={}){
+    const q=`?api=qwen_asr&op=${encodeURIComponent(op)}${id?'&id='+encodeURIComponent(id):''}`;
+    const headers={'X-TCQ-ASR':'1'};if(token)headers['X-ASR-Token']=token;
+    if(op==='upload')headers['Content-Type']='audio/wav';
+    if(op==='call')headers['Content-Type']='application/json';
+    const res=await fetch(q,{method:op==='result'?'GET':'POST',headers,body,signal,cache:'no-store'});
+    const content=await res.text();
+    if(!res.ok){let message='HTTP '+res.status;try{message=JSON.parse(content)?.error?.message || message;}catch{}throw Error(message);}
+    if(op==='result')return decodeSSE(content);
+    try{return JSON.parse(content);}catch{throw Error('ASR 服务没有返回有效 JSON');}
+  }
+  function newSubtitleRow(cue,index){
+    const row=document.createElement('div');row.className='audio-subtitle-row';
+    const jump=document.createElement('button');jump.className='btn';jump.type='button';jump.textContent=`${formatTime(cue.start)} – ${formatTime(cue.end)} · 第 ${index+1} 段`;
+    jump.onclick=()=>{const p=$('audioLabPlayer');try{if(audioLab.originalBlob){p.currentTime=cue.start;p.play();}else notify('当前播放器未装载源音频。');}catch{}};
+    const text=document.createElement('textarea');text.className='input-style';text.rows=2;text.value=cue.text;
+    text.setAttribute('aria-label',`第 ${index+1} 条字幕`);
+    text.addEventListener('input',()=>cue.text=text.value);
+    row.append(jump,text);return row;
+  }
+  function renderCues(){
+    const list=$('audioAsrCues');list.replaceChildren();
+    audioLab.cues.forEach((cue,i)=>list.appendChild(newSubtitleRow(cue,i)));
+    $('audioAsrResults').style.display=audioLab.cues.length?'block':'none';
+  }
+  function subtTime(t,format){const ms=Math.max(0,Math.round(t*1000));return `${String(Math.floor(ms/3600000)).padStart(2,'0')}:${String(Math.floor(ms/60000)%60).padStart(2,'0')}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}${format==='srt'?',':'.'}${String(ms%1000).padStart(3,'0')}`;}
+  function subtitleExport(format){
+    const cues=audioLab.cues.filter(c=>c.text.trim()&&c.end>c.start).sort((a,b)=>a.start-b.start);
+    if(!cues.length)throw Error('没有可导出的识别文本');
+    if(format==='txt')return cues.map(c=>c.text.trim()).join('\n');
+    const prefix=format==='vtt'?'WEBVTT\n\n':'';
+    return prefix+cues.map((c,i)=>`${i+1}\n${subtTime(c.start,format)} --> ${subtTime(c.end,format)}\n${c.text.trim()}\n`).join('\n');
+  }
+  $('audioAsrToText').onclick=()=>{
+    try{
+      const txt=subtitleExport('txt');universalText.value=universalText.value.trim()?universalText.value.trimEnd()+'\n'+txt:txt;
+      universalText.dispatchEvent(new Event('input',{bubbles:true}));notify('✅ 转写文字已添加到上方主文本框。');
+    }catch(e){notify('❌ '+e.message);}
+  };
+  for(const [id,ext] of [['audioAsrTxt','txt'],['audioAsrSrt','srt'],['audioAsrVtt','vtt']]){
+    $(id).addEventListener('click',()=>{
+      try{download(new Blob([subtitleExport(ext)],{type:'text/plain;charset=utf-8'}),`${safeStem(audioLab.name)}_asr.${ext}`);notify(`✅ 已保存 ${ext.toUpperCase()}，可在导出前修改每条字幕文字。`);}
+      catch(e){notify('❌ '+e.message);}
+    });
+  }
+  $('audioAsrCancel').addEventListener('click',()=>{if(audioLab.abort)audioLab.abort.abort();});
+  $('btnAudioAsr').addEventListener('click',async()=>{
+    openPanel();
+    try{
+      if(!(await fromCurrentFile(false))) {notify('请先在页面底部选择音频/视频，或点击“导入音视频”。');$('audioLabFile').click();return;}
+      $('audioAsrRun').focus();
+      notify('已就绪，确认识别范围和语言后点击「开始识别」。');
+    }catch(e){notify('❌ '+e.message);}
+  });
+  $('audioAsrRun').addEventListener('click',async()=>{
+    if(audioLab.abort) return;
+    if(!audioLab.buffer){
+      try{if(!(await fromCurrentFile())){notify('❌ 请先载入音视频');return;}}
+      catch(e){notify('❌ '+e.message);return;}
+    }
+    const token=$('audioAsrToken').value.trim();
+    if(token && !/^hf_[A-Za-z0-9_-]{4,256}$/.test(token)){notify('❌ Hugging Face Token 需要 hf_ 开头，不是其他平台的 sk- Key。');return;}
+    const secs=Number($('audioAsrChunk').value);
+    if(!Number.isInteger(secs)||secs<2||secs>30){notify('❌ 分段时长需为 2–30 秒');return;}
+    let start,end;
+    try {({start,end}=params($('audioAsrScope').value));}catch(e){notify('❌ '+e.message);return;}
+    const context=$('audioAsrContext').value.slice(0,2000),language=$('audioAsrLanguage').value,itn=$('audioAsrITN').checked;
+    const abort=new AbortController();audioLab.abort=abort;
+    const signal=abort.signal,revision=audioLab.revision,all=audioLab.buffer,previous=audioLab.cues.slice(),next=[];
+    $('audioAsrRun').disabled=true;$('audioAsrCancel').disabled=false;
+    try{
+      $('audioLabPlayer').pause();
+      const count=Math.ceil((end-start)/secs);
+      for(let i=0;i<count;i++){
+        if(signal.aborted)throw new DOMException('已取消','AbortError');
+        if(audioLab.revision!==revision)throw Error('源音频已发生变化，请重新运行识别');
+        const left=start+i*secs,right=Math.min(end,left+secs);
+        notify(`🎤 Qwen ASR：${i+1}/${count} 段 · ${left.toFixed(1)}–${right.toFixed(1)} 秒\n正在上传 16kHz 音频分段…`);
+        const wav=chunkWav(all,left,right);
+        const uploaded=await qwenRequest('upload',{body:wav,token,signal});
+        const remote=uploaded?.[0];
+        if(typeof remote!=='string'||!remote.startsWith('/'))throw Error('Space 音频上传返回格式无效');
+        const data=[{path:remote,orig_name:'audio_chunk.wav',meta:{_type:'gradio.FileData'}},context,language,itn];
+        notify(`🎤 Qwen ASR：${i+1}/${count} 段 · 排队 / 识别中…`);
+        const job=await qwenRequest('call',{body:JSON.stringify({data}),token,signal});
+        if(!/^[A-Za-z0-9_-]{1,128}$/.test(job?.event_id||''))throw Error('Space 没有返回任务编号');
+        const content=await qwenRequest('result',{id:job.event_id,token,signal});
+        if(content)next.push({start:left,end:right,text:content});
+      }
+      if(!next.length)throw Error('音频中未检测到有效语音');
+      audioLab.cues=next;renderCues();
+      notify(`✅ 识别结束：${next.length}/${count} 段。可逐段修改、导出 TXT/SRT/VTT。\n注意：时间范围为分段估算，需要人工校对。`);
+    }catch(e){
+      audioLab.cues=previous;renderCues();
+      let message=String(e.message||e);if(token)message=message.split(token).join('[Token]');
+      notify(signal.aborted?'识别已取消，原有字幕保留。':`❌ Qwen ASR 失败：${message.slice(0,400)}（已完成 ${next.length} 段，本次未覆盖旧结果）`);
+    }finally{
+      if(audioLab.abort===abort)audioLab.abort=null;
+      $('audioAsrRun').disabled=false;$('audioAsrCancel').disabled=true;
+    }
+  });
+  // 音视频来源变化时旧转写不再关联新素材，但不清空用户主文本框。
+  universalFile.addEventListener('change',()=>{if(audioLab.buffer||audioLab.abort)resetEditor();});
+  // 兼容主页面原“复制重置”按钮的现有处理流程。
+  window.__resetAudioLab = resetEditor;
+})();
+
+<\/script>
 </body>
+</html>
+
+</script>
+
+<script src="/assets/js/footer.js"></script></body>
 </html>
