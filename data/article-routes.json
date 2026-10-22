@@ -80,5 +80,16 @@
     ],
     "file": "data/html/10.html",
     "markdown": "data/md/10.md"
+  },
+  "11": {
+    "url": "/hi.html",
+    "aliases": [
+      "/11",
+      "/11.html",
+      "/blog/11.html",
+      "/blog/posts/issue-11.html"
+    ],
+    "file": "data/html/11.html",
+    "markdown": "data/md/11.md"
   }
 }
