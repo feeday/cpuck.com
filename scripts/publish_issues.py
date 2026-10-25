@@ -219,6 +219,23 @@ li p{color:#5b6677;margin:7px 0 12px;font-size:14px;overflow-wrap:anywhere}.page
 
 
 
+def validate_routes(root, plans):
+    claimed = {}
+    for key, plan in plans.items():
+        for route in [plan["url"], *plan.get("aliases", [])]:
+            if not re.fullmatch(r"/(?:blog/(?:posts/)?)?[A-Za-z0-9][A-Za-z0-9_-]*(?:\.html)?", route):
+                raise ValueError(f"Unsafe article route: {route}")
+            file = output_path(route)
+            top = file.split("/")[0].split(".")[0].lower()
+            if top in {"data", "assets", "scripts", "tests", "gpu", "index", "404", "cname", "readme", "favicon", "sitemap", "robots"}:
+                raise ValueError(f"Reserved site route: {route}")
+            if file in claimed and claimed[file] != key:
+                raise ValueError(f"Duplicate article route: {route}")
+            if (Path(root) / file).exists():
+                raise ValueError(f"Article route would overwrite site file: {route}")
+            claimed[file] = key
+
+
 def publish(root, issues, owner):
     root = Path(root)
     index = root / "data/posts.json"
