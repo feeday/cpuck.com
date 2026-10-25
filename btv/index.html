@@ -327,8 +327,27 @@ const GITHUB_REPO = (() => {
 })();
 const ISSUE_PREFIX_COMMENT = '[留言]';
 const ISSUE_PREFIX_VIDEO = '[投稿]';
+const ISSUE_CACHE_KEY = 'cpuck:btv:github-issues:v1';
+const ISSUE_CACHE_TTL = 5 * 60 * 1000;
 let database = [], currentIndex = 0, latestCommentId = null, cachedIssues = [];
-let lastGithubFetch = 0;
+let lastGithubFetch = 0, lastGithubAttempt = 0, githubIssuesError = '', issueCacheHydrated = false;
+function hydrateIssueCache() {
+  if (issueCacheHydrated) return;
+  issueCacheHydrated = true;
+  try {
+    const saved = JSON.parse(localStorage.getItem(ISSUE_CACHE_KEY) || 'null');
+    if (saved && Array.isArray(saved.items)) {
+      cachedIssues = saved.items.filter(item => !item.pull_request);
+      lastGithubFetch = Number(saved.fetchedAt) || 0;
+      lastGithubAttempt = lastGithubFetch;
+    }
+  } catch (e) { console.warn('读取 GitHub 留言缓存失败：', e); }
+}
+function saveIssueCache() {
+  try {
+    localStorage.setItem(ISSUE_CACHE_KEY, JSON.stringify({fetchedAt:lastGithubFetch,items:cachedIssues}));
+  } catch (e) { console.warn('保存 GitHub 留言缓存失败：', e); }
+}
 const $ = id => document.getElementById(id);
 const repoIsConfigured = () => /^[a-z\d_.-]+\/[a-z\d_.-]+$/i.test(GITHUB_REPO);
 function githubSetupNotice() {
@@ -362,13 +381,28 @@ function submitGithubIssue(title, body) {
 }
 async function fetchIssues(force=false) {
   if (!repoIsConfigured()) return [];
-  if (!force && Date.now()-lastGithubFetch < 60000) return cachedIssues;
+  hydrateIssueCache();
+  const now = Date.now();
+  // 页面轮询和刷新优先复用缓存，避免匿名 GitHub API 请求过密。
+  if (!force && ((lastGithubFetch && now-lastGithubFetch < ISSUE_CACHE_TTL) ||
+      (lastGithubAttempt && now-lastGithubAttempt < ISSUE_CACHE_TTL))) return cachedIssues;
   const endpoint = `https://api.github.com/repos/${GITHUB_REPO}/issues?state=open&per_page=100&sort=created&direction=desc`;
-  const res = await fetch(endpoint,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'});
-  if (!res.ok) throw Error(res.status===404?'仓库不存在、未公开或未开启 Issues':`GitHub API HTTP ${res.status}`);
-  cachedIssues = (await res.json()).filter(item=>!item.pull_request);
-  lastGithubFetch = Date.now();
-  return cachedIssues;
+  lastGithubAttempt = now;
+  try {
+    const res = await fetch(endpoint,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'});
+    if (!res.ok) throw Error(res.status===404?'仓库不存在、未公开或未开启 Issues':`GitHub API HTTP ${res.status}`);
+    cachedIssues = (await res.json()).filter(item=>!item.pull_request);
+    lastGithubFetch = Date.now();
+    lastGithubAttempt = lastGithubFetch;
+    githubIssuesError = '';
+    saveIssueCache();
+    return cachedIssues;
+  } catch (e) {
+    githubIssuesError = e?.message || '网络请求失败';
+    console.warn('GitHub Issues API 读取失败：', e);
+    // API 暂时限流或离线时返回上次缓存；视频播放列表不依赖此接口。
+    return cachedIssues;
+  }
 }
 async function loadDatabase(force=false) {
   const originals = [];
@@ -440,7 +474,12 @@ async function loadComments(isAutoRefresh=false,force=false) {
     if(isAutoRefresh && !force && latestCommentId===items[0]?.id)return;
     latestCommentId=items[0]?.id||null;
     list.replaceChildren();
-    if(!items.length){list.textContent='NO LOGS FOUND · 暂无公开留言';return;}
+    if(!items.length){
+      list.textContent = githubIssuesError
+        ? 'GitHub 留言接口暂时不可用（'+githubIssuesError+'）。视频播放不受影响，请稍后重试。'
+        : 'NO LOGS FOUND · 暂无公开留言';
+      return;
+    }
     for(const item of items){
       const div=document.createElement('div');div.className='group mb-4';
       const head=document.createElement('div');head.className='flex justify-between items-baseline mb-1';
@@ -453,7 +492,10 @@ async function loadComments(isAutoRefresh=false,force=false) {
       content.textContent=String(item.body||item.title.slice(ISSUE_PREFIX_COMMENT.length)).slice(0,2000);
       div.append(head,content);list.append(div);
     }
-  } catch(e) { if(!isAutoRefresh) list.textContent='CONNECTION LOST: '+e.message;console.warn(e); }
+  } catch(e) {
+    if(!isAutoRefresh) list.textContent='留言暂时无法加载，视频播放不受影响。'+(e?.message?' 原因：'+e.message:'');
+    console.warn(e);
+  }
 }
 async function postComment() {
   const input=$('message'), content=input.value.trim();
@@ -474,15 +516,22 @@ function submitPlaylist() {
 async function manualRefresh() {
   const icon=$('refresh-icon'); icon.classList.add('fa-spin');
   const old=database[currentIndex]?.src;
-  try { await fetchIssues(true); await loadDatabase(); if(database.length){const i=database.findIndex(x=>x.src===old);loadCase(i<0?0:i,false);} await loadComments(false,true); $('comment-list').scrollTop=0; }
-  finally {icon.classList.remove('fa-spin');}
+  try {
+    await loadDatabase(true);
+    if(database.length){const i=database.findIndex(x=>x.src===old);loadCase(i<0?0:i,false);}
+    await loadComments(false,false);
+    $('comment-list').scrollTop=0;
+  } catch(e) {
+    console.warn('手动刷新失败：',e);
+    if(!database.length) $('video-container').textContent='播放列表暂时无法加载，请稍后重试。';
+  } finally {icon.classList.remove('fa-spin');}
 }
 function toggleExtensionFrame(){ $('extension-drawer').classList.toggle('translate-x-full'); }
 window.addEventListener('load',async()=>{
   $('performance-result').textContent='加载:'+Math.round(performance.now())+'ms';
   await loadDatabase();if(database.length)loadCase(0,false);
   await loadComments();
-  // 匿名 GitHub API 每小时通常限制 60 次。低频轮询且使用 60 秒缓存。
+  // 低频轮询并使用 5 分钟缓存；GitHub API 故障时继续显示缓存留言和本地视频列表。
   setInterval(()=>{if(document.visibilityState==='visible')loadComments(true)},120000);
   document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
     if(e.key==='ArrowRight')changePage(1);if(e.key==='ArrowLeft')changePage(-1);});
