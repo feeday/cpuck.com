@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s1flQ/huFgy6VuBRpjBeumh+VIkMGvfrjrkRMtTeQo8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>realfaketop · CPuck</title>
+<style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
+:root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-underline-offset:4px; }
+button,summary { cursor:pointer; }
+button { font:inherit; }
+a:focus-visible,button:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+main { width:min(820px,calc(100% - 48px)); margin:40px auto 80px; padding:32px 52px 26px; border:1px solid var(--line); border-radius:16px; background:var(--paper); box-shadow:0 8px 36px #14203305; overflow-wrap:anywhere; }
+.page-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:25px; border-bottom:1px solid var(--line); font-size:13px; }
+.page-nav a { color:var(--muted); text-decoration:none; }
+.page-nav .home-link { color:var(--heading); font-weight:650; letter-spacing:.02em; }
+.nav-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; }
+.page-nav a:hover { color:var(--accent); }
+.theme-toggle { border:1px solid var(--line); border-radius:7px; padding:4px 10px; background:var(--paper); color:var(--muted); font-size:12px; }
+.article-header { padding:32px 0 28px; margin-bottom:28px; border-bottom:1px solid var(--line); }
+.article-label { margin:0 0 12px; color:var(--accent); font-size:11px; letter-spacing:.14em; font-weight:650; }
+.article-title { margin:0 0 16px; color:var(--heading); font-size:clamp(27px,4vw,38px); line-height:1.35; letter-spacing:-.035em; font-weight:750; }
+.article-meta { display:flex; flex-wrap:wrap; gap:8px 20px; color:var(--muted); font-size:12px; }
+article > :first-child { margin-top:0; }
+article > :last-child { margin-bottom:0; }
+article p { margin:0 0 1.25em; }
+article :is(h1,h2,h3,h4,h5,h6) { color:var(--heading); line-height:1.5; scroll-margin-top:28px; font-weight:650; }
+article h1 { font-size:28px; margin:1.7em 0 .8em; }
+article h2 { font-size:23px; margin:2em 0 .85em; padding-bottom:10px; border-bottom:1px solid var(--line); }
+article h3 { font-size:19px; margin:1.7em 0 .7em; }
+article :is(h4,h5,h6) { font-size:16px; margin:1.5em 0 .65em; }
+article :is(ul,ol) { padding-left:1.6em; margin:0 0 1.3em; }
+article li { padding-left:.2em; margin:.3em 0; }
+article li > :is(ul,ol) { margin:.4em 0; }
+article li > p { margin:.4em 0; }
+article strong { color:var(--heading); font-weight:650; }
+article blockquote { margin:1.5em 0; padding:14px 20px; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; background:var(--soft); color:var(--muted); }
+article blockquote > :last-child { margin-bottom:0; }
+article hr { height:1px; border:0; background:var(--line); margin:32px 0; }
+article :is(img,video) { max-width:100%; height:auto; border-radius:8px; }
+article table { display:block; max-width:100%; width:max-content; overflow:auto; border-collapse:collapse; margin:24px 0; font-size:14px; line-height:1.65; }
+article :is(td,th) { border:1px solid var(--line); padding:11px 15px; min-width:80px; }
+article th { background:var(--soft); color:var(--heading); font-weight:650; }
+article tr:nth-child(even) td { background:var(--soft); }
+article code { padding:.15em .38em; border-radius:4px; background:var(--soft); color:var(--heading); font: .87em/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+article pre { overflow:auto; padding:18px; background:var(--code); border-radius:8px; }
+article pre code { padding:0; background:none; font:inherit; overflow-wrap:normal; }
+.code-frame { position:relative; margin:22px 0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--code); }
+.code-fold { margin:0; }
+.code-fold summary { padding:10px 100px 10px 16px; background:var(--soft); color:var(--muted); font-size:12px; line-height:22px; }
+.code-fold[open] summary { border-bottom:1px solid var(--line); }
+.code-fold pre { margin:0; padding:17px 18px; white-space:pre; overflow:auto; font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; border-radius:0; }
+.copy-code { position:absolute; right:9px; top:8px; padding:3px 9px; border:1px solid var(--line); border-radius:5px; color:var(--muted); background:var(--paper); font:12px/20px system-ui,sans-serif; }
+.copy-code:hover { color:var(--accent); border-color:var(--accent); }
+.article-footer { display:flex; justify-content:space-between; gap:16px; padding-top:22px; margin-top:42px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.article-footer a { text-decoration:none; }
+.article-toc { position:fixed; left:calc(50% + 320px); top:62px; width:220px; font-size:12px; line-height:1.65; }
+.article-toc summary { padding:0 10px 14px; color:var(--heading); font-weight:650; }
+.article-toc nav { max-height:calc(100vh - 180px); overflow:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; border-left:1px solid var(--line); }
+.article-toc nav a { display:block; padding:6px 12px; color:var(--muted); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; overflow-wrap:anywhere; }
+.article-toc nav a:hover { color:var(--heading); }
+.article-toc nav a[aria-current] { color:var(--accent); border-left-color:var(--accent); background:var(--soft); }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:7px 12px; text-decoration:none; font-size:12px; box-shadow:0 3px 12px #00000005; }
+@media(min-width:1200px) { .has-toc main { width:820px; margin-left:calc(50% - 540px); margin-right:0; } }
+@media(max-width:1199px) { .article-toc { left:auto; right:20px; top:auto; bottom:74px; width:min(280px,calc(100% - 40px)); padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:10px; z-index:20; box-shadow:0 8px 32px #0000000d; } .article-toc summary { padding:0; } .article-toc[open] summary { padding-bottom:10px; } .article-toc nav { max-height:40vh; } }
+@media(max-width:600px) { body { font-size:15px; } main { width:100%; margin:0 0 90px; padding:22px 22px 28px; border:0; border-radius:0; box-shadow:none; } body { background:var(--paper); } .page-nav { gap:12px; padding-bottom:20px; } .nav-actions { gap:10px; font-size:12px; } .article-header { padding:26px 0 22px; margin-bottom:24px; } .article-title { font-size:28px; } article h1 { font-size:24px; } article h2 { font-size:21px; } article table { font-size:13px; } article :is(td,th) { padding:9px 11px; } .back-top { right:20px; bottom:20px; } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print { body,main { background:white; color:black; } main,.has-toc main { width:100%; margin:0; border:0; padding:0; box-shadow:none; } .page-nav,.article-toc,.back-top,.copy-code,.article-footer { display:none; } }
+</style></head><body><main id="article-top">
+<nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
+<div class="nav-actions"><a href="https://github.com/feeday/cpuck.com/issues/12">编辑原文</a><a href="/data/md/12.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
+<header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">realfaketop</h1>
+<div class="article-meta"><span>更新于 <time datetime="2026-10-25T01:36:10Z">2026年10月25日 09:36</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article><h1 dir="auto">AI 图像生成模型排行榜（文生图）</h1>
+<p dir="auto">数据来源：<a href="https://artificialanalysis.ai/zh/image/leaderboard/text-to-image?models=all" rel="nofollow">Artificial Analysis — Text to Image Leaderboard</a></p>
+<blockquote>
+<p dir="auto">排名依据：Elo 评分。样本数、95% 置信区间、发布日期及 API 价格以榜单数据为准。</p>
+</blockquote>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th align="right">排名</th>
+<th>模型</th>
+<th align="right">Elo</th>
+<th align="right">误差范围</th>
+<th>95% 置信区间</th>
+<th align="right">样本数</th>
+<th>发布日期</th>
+<th align="right">API 价格（美元/1000 张）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="right">1</td>
+<td>GPT Image 2.5 Sunburst (max)</td>
+<td align="right">1222</td>
+<td align="right">±10</td>
+<td>1212–1232</td>
+<td align="right">13,014</td>
+<td>2026-09</td>
+<td align="right">210.7</td>
+</tr>
+<tr>
+<td align="right">2</td>
+<td>GPT Image 2.5 Flare (max)</td>
+<td align="right">1207</td>
+<td align="right">±10</td>
+<td>1197–1217</td>
+<td align="right">12,364</td>
+<td>2026-09</td>
+<td align="right">210.7</td>
+</tr>
+<tr>
+<td align="right">3</td>
+<td>GPT Image 2 (high)</td>
+<td align="right">1186</td>
+<td align="right">±11</td>
+<td>1175–1197</td>
+<td align="right">12,835</td>
+<td>2026-04</td>
+<td align="right">211.0</td>
+</tr>
+<tr>
+<td align="right">4</td>
+<td>Nano Banana 2.1</td>
+<td align="right">1176</td>
+<td align="right">±12</td>
+<td>1164–1188</td>
+<td align="right">6,210</td>
+<td>2026-10</td>
+<td align="right">33.6</td>
+</tr>
+<tr>
+<td align="right">5</td>
+<td>MAI-Image-2.6</td>
+<td align="right">1166</td>
+<td align="right">±12</td>
+<td>1154–1178</td>
+<td align="right">8,342</td>
+<td>2026-08</td>
+<td align="right">38.9</td>
+</tr>
+<tr>
+<td align="right">6</td>
+<td>Grok Imagine Image 2.0</td>
+<td align="right">1166</td>
+<td align="right">±12</td>
+<td>1154–1178</td>
+<td align="right">7,481</td>
+<td>2026-08</td>
+<td align="right">60.0</td>
+</tr>
+<tr>
+<td align="right">7</td>
+<td>Nano Banana 2 (Gemini 3.1 Flash Image)</td>
+<td align="right">1140</td>
+<td align="right">±10</td>
+<td>1130–1150</td>
+<td align="right">16,075</td>
+<td>2026-02</td>
+<td align="right">67.0</td>
+</tr>
+<tr>
+<td align="right">8</td>
+<td>Muse Image</td>
+<td align="right">1127</td>
+<td align="right">±11</td>
+<td>1116–1138</td>
+<td align="right">8,479</td>
+<td>2026-07</td>
+<td align="right">10.0</td>
+</tr>
+<tr>
+<td align="right">9</td>
+<td>GPT Image 1.5 (high)</td>
+<td align="right">1123</td>
+<td align="right">±11</td>
+<td>1112–1134</td>
+<td align="right">12,830</td>
+<td>2025-12</td>
+<td align="right">133.0</td>
+</tr>
+<tr>
+<td align="right">10</td>
+<td>MAI-Image-2.6-Flash</td>
+<td align="right">1119</td>
+<td align="right">±12</td>
+<td>1107–1131</td>
+<td align="right">5,482</td>
+<td>2026-09</td>
+<td align="right">19.5</td>
+</tr>
+<tr>
+<td align="right">11</td>
+<td>Nano Banana Pro (Gemini 3 Pro Image)</td>
+<td align="right">1118</td>
+<td align="right">±10</td>
+<td>1108–1128</td>
+<td align="right">15,174</td>
+<td>2025-11</td>
+<td align="right">134.0</td>
+</tr>
+<tr>
+<td align="right">12</td>
+<td>MAI-Image-2.5</td>
+<td align="right">1118</td>
+<td align="right">±11</td>
+<td>1107–1129</td>
+<td align="right">13,789</td>
+<td>2026-06</td>
+<td align="right">48.1</td>
+</tr>
+<tr>
+<td align="right">13</td>
+<td>FLUX 3 Image</td>
+<td align="right">1117</td>
+<td align="right">±12</td>
+<td>1105–1129</td>
+<td align="right">6,115</td>
+<td>2026-10</td>
+<td align="right">48.0</td>
+</tr>
+<tr>
+<td align="right">14</td>
+<td>MAI-Image-2.5-Pro</td>
+<td align="right">1114</td>
+<td align="right">±10</td>
+<td>1104–1124</td>
+<td align="right">12,200</td>
+<td>2026-07</td>
+<td align="right">108.5</td>
+</tr>
+<tr>
+<td align="right">15</td>
+<td>Nano Banana 2 Lite (Gemini 3.1 Flash Lite Image)</td>
+<td align="right">1107</td>
+<td align="right">±10</td>
+<td>1097–1117</td>
+<td align="right">15,080</td>
+<td>2026-06</td>
+<td align="right">33.6</td>
+</tr>
+<tr>
+<td align="right">16</td>
+<td>Seedream 5.0 Pro</td>
+<td align="right">1100</td>
+<td align="right">±11</td>
+<td>1089–1111</td>
+<td align="right">11,633</td>
+<td>2026-07</td>
+<td align="right">90.0</td>
+</tr>
+<tr>
+<td align="right">17</td>
+<td>Qwen-Image-3.0-Pro</td>
+<td align="right">1095</td>
+<td align="right">±12</td>
+<td>1083–1107</td>
+<td align="right">6,332</td>
+<td>2026-07</td>
+<td align="right">40.0</td>
+</tr>
+<tr>
+<td align="right">18</td>
+<td>Qwen-Image-3.0</td>
+<td align="right">1070</td>
+<td align="right">±12</td>
+<td>1058–1082</td>
+<td align="right">6,090</td>
+<td>2026-07</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">19</td>
+<td>Qwen-Image-2.1-Pro</td>
+<td align="right">1056</td>
+<td align="right">±12</td>
+<td>1044–1068</td>
+<td align="right">4,970</td>
+<td>2026-10</td>
+<td align="right">35.3</td>
+</tr>
+<tr>
+<td align="right">20</td>
+<td>grok-imagine-image-quality</td>
+<td align="right">1049</td>
+<td align="right">±9</td>
+<td>1040–1058</td>
+<td align="right">16,728</td>
+<td>2026-05</td>
+<td align="right">50.0</td>
+</tr>
+<tr>
+<td align="right">21</td>
+<td>FLUX 3 Image Klein</td>
+<td align="right">1043</td>
+<td align="right">±12</td>
+<td>1031–1055</td>
+<td align="right">5,184</td>
+<td>2026-10</td>
+<td align="right">9.0</td>
+</tr>
+<tr>
+<td align="right">22</td>
+<td>Qwen-Image-2.1</td>
+<td align="right">1042</td>
+<td align="right">±12</td>
+<td>1030–1054</td>
+<td align="right">5,712</td>
+<td>2026-09</td>
+<td align="right">暂无 API</td>
+</tr>
+<tr>
+<td align="right">23</td>
+<td>Fibo 2.0</td>
+<td align="right">1039</td>
+<td align="right">±12</td>
+<td>1027–1051</td>
+<td align="right">5,113</td>
+<td>2026-10</td>
+<td align="right">32.0</td>
+</tr>
+<tr>
+<td align="right">24</td>
+<td>Krea 2 Large</td>
+<td align="right">1034</td>
+<td align="right">±9</td>
+<td>1025–1043</td>
+<td align="right">14,513</td>
+<td>2026-05</td>
+<td align="right">60.0</td>
+</tr>
+<tr>
+<td align="right">25</td>
+<td>Qwen Image 2.0 Pro (2026-04-22)</td>
+<td align="right">1030</td>
+<td align="right">±11</td>
+<td>1019–1041</td>
+<td align="right">6,138</td>
+<td>2026-04</td>
+<td align="right">75.0</td>
+</tr>
+<tr>
+<td align="right">26</td>
+<td>MAI-Image-2.5-Flash</td>
+<td align="right">1029</td>
+<td align="right">±11</td>
+<td>1018–1040</td>
+<td align="right">5,855</td>
+<td>2026-06</td>
+<td align="right">20.0</td>
+</tr>
+<tr>
+<td align="right">27</td>
+<td>Qwen-Image-2.1-Turbo</td>
+<td align="right">1029</td>
+<td align="right">±12</td>
+<td>1017–1041</td>
+<td align="right">4,625</td>
+<td>2026-10</td>
+<td align="right">16.0</td>
+</tr>
+<tr>
+<td align="right">28</td>
+<td>Wan 2.6 Image</td>
+<td align="right">1027</td>
+<td align="right">±12</td>
+<td>1015–1039</td>
+<td align="right">5,370</td>
+<td>2025-12</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">29</td>
+<td>Recraft V4.1 Utility</td>
+<td align="right">1026</td>
+<td align="right">±11</td>
+<td>1015–1037</td>
+<td align="right">7,452</td>
+<td>2026-05</td>
+<td align="right">35.0</td>
+</tr>
+<tr>
+<td align="right">30</td>
+<td>Seedream 4.5</td>
+<td align="right">1026</td>
+<td align="right">±12</td>
+<td>1014–1038</td>
+<td align="right">6,392</td>
+<td>2025-12</td>
+<td align="right">40.0</td>
+</tr>
+<tr>
+<td align="right">31</td>
+<td>FLUX.2 [flex]</td>
+<td align="right">1026</td>
+<td align="right">±11</td>
+<td>1015–1037</td>
+<td align="right">6,082</td>
+<td>2025-11</td>
+<td align="right">60.0</td>
+</tr>
+<tr>
+<td align="right">32</td>
+<td>Ideogram 4.0 (Quality)</td>
+<td align="right">1026</td>
+<td align="right">±10</td>
+<td>1016–1036</td>
+<td align="right">10,688</td>
+<td>2026-06</td>
+<td align="right">100.0</td>
+</tr>
+<tr>
+<td align="right">33</td>
+<td>Luma UNI 1 Max</td>
+<td align="right">1023</td>
+<td align="right">±12</td>
+<td>1011–1035</td>
+<td align="right">5,539</td>
+<td>2026-05</td>
+<td align="right">100.0</td>
+</tr>
+<tr>
+<td align="right">34</td>
+<td>grok-imagine-image</td>
+<td align="right">1022</td>
+<td align="right">±11</td>
+<td>1011–1033</td>
+<td align="right">6,330</td>
+<td>2026-01</td>
+<td align="right">20.0</td>
+</tr>
+<tr>
+<td align="right">35</td>
+<td>FLUX.2 [max]</td>
+<td align="right">1021</td>
+<td align="right">±10</td>
+<td>1011–1031</td>
+<td align="right">11,097</td>
+<td>2025-12</td>
+<td align="right">70.0</td>
+</tr>
+<tr>
+<td align="right">36</td>
+<td>Krea 2 Medium Turbo</td>
+<td align="right">1020</td>
+<td align="right">±11</td>
+<td>1009–1031</td>
+<td align="right">6,060</td>
+<td>2026-06</td>
+<td align="right">15.0</td>
+</tr>
+<tr>
+<td align="right">37</td>
+<td>Recraft V4.1 Utility Pro</td>
+<td align="right">1017</td>
+<td align="right">±9</td>
+<td>1008–1026</td>
+<td align="right">15,414</td>
+<td>2026-05</td>
+<td align="right">210.0</td>
+</tr>
+<tr>
+<td align="right">38</td>
+<td>HiDream-O1-Image-1.5</td>
+<td align="right">1017</td>
+<td align="right">±11</td>
+<td>1006–1028</td>
+<td align="right">12,168</td>
+<td>2026-06</td>
+<td align="right">80.0</td>
+</tr>
+<tr>
+<td align="right">39</td>
+<td>Seedream 5.0 Lite</td>
+<td align="right">1017</td>
+<td align="right">±12</td>
+<td>1005–1029</td>
+<td align="right">5,605</td>
+<td>2026-02</td>
+<td align="right">35.0</td>
+</tr>
+<tr>
+<td align="right">40</td>
+<td>Ideogram 4.5 (High)</td>
+<td align="right">1015</td>
+<td align="right">±15</td>
+<td>1000–1030</td>
+<td align="right">2,888</td>
+<td>2026-09</td>
+<td align="right">100.0</td>
+</tr>
+<tr>
+<td align="right">41</td>
+<td>Wan2.6 Text to Image</td>
+<td align="right">1014</td>
+<td align="right">±12</td>
+<td>1002–1026</td>
+<td align="right">5,561</td>
+<td>2026-01</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">42</td>
+<td>GPT Image 1 (high)</td>
+<td align="right">1013</td>
+<td align="right">±12</td>
+<td>1001–1025</td>
+<td align="right">5,518</td>
+<td>2025-04</td>
+<td align="right">167.0</td>
+</tr>
+<tr>
+<td align="right">43</td>
+<td>Krea 2 Medium</td>
+<td align="right">1012</td>
+<td align="right">±9</td>
+<td>1003–1021</td>
+<td align="right">14,449</td>
+<td>2026-05</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">44</td>
+<td>FLUX.2 [pro]</td>
+<td align="right">1003</td>
+<td align="right">±10</td>
+<td>993–1013</td>
+<td align="right">10,826</td>
+<td>2025-11</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">45</td>
+<td>Ideogram 4.0</td>
+<td align="right">1002</td>
+<td align="right">±10</td>
+<td>992–1012</td>
+<td align="right">10,102</td>
+<td>2026-06</td>
+<td align="right">60.0</td>
+</tr>
+<tr>
+<td align="right">46</td>
+<td>FLUX.2 [dev]</td>
+<td align="right">1000</td>
+<td align="right">锚点</td>
+<td>固定参照点</td>
+<td align="right">18,040</td>
+<td>2025-11</td>
+<td align="right">12.0</td>
+</tr>
+<tr>
+<td align="right">47</td>
+<td>Ming-Image-0.1-Design</td>
+<td align="right">999</td>
+<td align="right">±9</td>
+<td>990–1008</td>
+<td align="right">20,241</td>
+<td>2026-09</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">48</td>
+<td>P-Image-Ideogram (High)</td>
+<td align="right">995</td>
+<td align="right">±14</td>
+<td>981–1009</td>
+<td align="right">3,572</td>
+<td>2026-07</td>
+<td align="right">15.0</td>
+</tr>
+<tr>
+<td align="right">49</td>
+<td>FLUX.2 [dev] Turbo</td>
+<td align="right">994</td>
+<td align="right">±11</td>
+<td>983–1005</td>
+<td align="right">6,274</td>
+<td>2025-12</td>
+<td align="right">8.0</td>
+</tr>
+<tr>
+<td align="right">50</td>
+<td>Cosmos3-Super-Text2Image (agentic)</td>
+<td align="right">993</td>
+<td align="right">±10</td>
+<td>983–1003</td>
+<td align="right">11,549</td>
+<td>2026-05</td>
+<td align="right">暂无 API</td>
+</tr>
+<tr>
+<td align="right">51</td>
+<td>Luma UNI 1</td>
+<td align="right">992</td>
+<td align="right">±12</td>
+<td>980–1004</td>
+<td align="right">5,559</td>
+<td>2026-05</td>
+<td align="right">40.4</td>
+</tr>
+<tr>
+<td align="right">52</td>
+<td>P-Image-Ideogram (Very High)</td>
+<td align="right">992</td>
+<td align="right">±15</td>
+<td>977–1007</td>
+<td align="right">2,776</td>
+<td>2026-07</td>
+<td align="right">33.0</td>
+</tr>
+<tr>
+<td align="right">53</td>
+<td>Qwen Image 2.0 (2026-03-03)</td>
+<td align="right">990</td>
+<td align="right">±16</td>
+<td>974–1006</td>
+<td align="right">2,633</td>
+<td>2026-03</td>
+<td align="right">35.0</td>
+</tr>
+<tr>
+<td align="right">54</td>
+<td>HunyuanImage 3.0 (Tencent Cloud)</td>
+<td align="right">989</td>
+<td align="right">±16</td>
+<td>973–1005</td>
+<td align="right">2,531</td>
+<td>2025-09</td>
+<td align="right">32.0</td>
+</tr>
+<tr>
+<td align="right">55</td>
+<td>FLUX.2 [dev] Flash</td>
+<td align="right">988</td>
+<td align="right">±12</td>
+<td>976–1000</td>
+<td align="right">5,344</td>
+<td>2025-12</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td align="right">56</td>
+<td>HunyuanImage 3.0 Instruct</td>
+<td align="right">987</td>
+<td align="right">±12</td>
+<td>975–999</td>
+<td align="right">5,683</td>
+<td>2026-01</td>
+<td align="right">暂无 API</td>
+</tr>
+<tr>
+<td align="right">57</td>
+<td>Wan 2.7</td>
+<td align="right">986</td>
+<td align="right">±12</td>
+<td>974–998</td>
+<td align="right">5,491</td>
+<td>2026-04</td>
+<td align="right">26.0</td>
+</tr>
+<tr>
+<td align="right">58</td>
+<td>Cosmos3-Super-Text2Image</td>
+<td align="right">985</td>
+<td align="right">±10</td>
+<td>975–995</td>
+<td align="right">10,887</td>
+<td>2026-05</td>
+<td align="right">40.0</td>
+</tr>
+<tr>
+<td align="right">59</td>
+<td>Nano Banana (Gemini 2.5 Flash Image)</td>
+<td align="right">985</td>
+<td align="right">±12</td>
+<td>973–997</td>
+<td align="right">5,312</td>
+<td>2025-08</td>
+<td align="right">39.0</td>
+</tr>
+<tr>
+<td align="right">60</td>
+<td>Ideogram 4.0 Fast (Quality)</td>
+<td align="right">982</td>
+<td align="right">±12</td>
+<td>970–994</td>
+<td align="right">5,946</td>
+<td>2026-07</td>
+<td align="right">17.5</td>
+</tr>
+<tr>
+<td align="right">61</td>
+<td>Ideogram 4.0 Instant</td>
+<td align="right">981</td>
+<td align="right">±12</td>
+<td>969–993</td>
+<td align="right">5,492</td>
+<td>2026-07</td>
+<td align="right">7.5</td>
+</tr>
+<tr>
+<td align="right">62</td>
+<td>Wan 2.7 Pro</td>
+<td align="right">979</td>
+<td align="right">±12</td>
+<td>967–991</td>
+<td align="right">5,498</td>
+<td>2026-04</td>
+<td align="right">75.0</td>
+</tr>
+<tr>
+<td align="right">63</td>
+<td>HiDream-O1-Image</td>
+<td align="right">975</td>
+<td align="right">±10</td>
+<td>965–985</td>
+<td align="right">10,662</td>
+<td>2026-05</td>
+<td align="right">40.0</td>
+</tr>
+<tr>
+<td align="right">64</td>
+<td>P-Image-Ideogram (Medium)</td>
+<td align="right">972</td>
+<td align="right">±14</td>
+<td>958–986</td>
+<td align="right">3,761</td>
+<td>2026-07</td>
+<td align="right">10.0</td>
+</tr>
+<tr>
+<td align="right">65</td>
+<td>Cosmos3-Super-Text2Image-4Step</td>
+<td align="right">970</td>
+<td align="right">±10</td>
+<td>960–980</td>
+<td align="right">9,044</td>
+<td>2026-07</td>
+<td align="right">暂无 API</td>
+</tr>
+<tr>
+<td align="right">66</td>
+<td>HunyuanImage 3.5 (Preview)</td>
+<td align="right">970</td>
+<td align="right">±12</td>
+<td>958–982</td>
+<td align="right">5,586</td>
+<td>2026-09</td>
+<td align="right">24.0</td>
+</tr>
+<tr>
+<td align="right">67</td>
+<td>Ideogram 4.0 Fast</td>
+<td align="right">963</td>
+<td align="right">±12</td>
+<td>951–975</td>
+<td align="right">5,438</td>
+<td>2026-07</td>
+<td align="right">10.5</td>
+</tr>
+<tr>
+<td align="right">68</td>
+<td>P-Image-Ideogram (Low)</td>
+<td align="right">959</td>
+<td align="right">±14</td>
+<td>945–973</td>
+<td align="right">3,832</td>
+<td>2026-07</td>
+<td align="right">7.5</td>
+</tr>
+<tr>
+<td align="right">69</td>
+<td>Qwen Image Plus 2601</td>
+<td align="right">952</td>
+<td align="right">±16</td>
+<td>936–968</td>
+<td align="right">2,584</td>
+<td>2026-01</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">70</td>
+<td>Recraft V4.1 Flash</td>
+<td align="right">949</td>
+<td align="right">±12</td>
+<td>937–961</td>
+<td align="right">5,770</td>
+<td>2026-09</td>
+<td align="right">7.0</td>
+</tr>
+<tr>
+<td align="right">71</td>
+<td>GPT Image 1 Mini (medium)</td>
+<td align="right">936</td>
+<td align="right">±17</td>
+<td>919–953</td>
+<td align="right">2,333</td>
+<td>2025-10</td>
+<td align="right">11.0</td>
+</tr>
+<tr>
+<td align="right">72</td>
+<td>Z-Image Turbo</td>
+<td align="right">936</td>
+<td align="right">±11</td>
+<td>925–947</td>
+<td align="right">8,170</td>
+<td>2025-12</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td align="right">73</td>
+<td>HunyuanImage 3.0</td>
+<td align="right">932</td>
+<td align="right">±16</td>
+<td>916–948</td>
+<td align="right">2,443</td>
+<td>2025-09</td>
+<td align="right">暂无 API</td>
+</tr>
+<tr>
+<td align="right">74</td>
+<td>Dreamina 3.1</td>
+<td align="right">931</td>
+<td align="right">±17</td>
+<td>914–948</td>
+<td align="right">2,372</td>
+<td>2025-08</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">75</td>
+<td>FLUX.2 [klein] 9B</td>
+<td align="right">929</td>
+<td align="right">±10</td>
+<td>919–939</td>
+<td align="right">10,730</td>
+<td>2026-01</td>
+<td align="right">15.0</td>
+</tr>
+<tr>
+<td align="right">76</td>
+<td>FLUX.1 Kontext [max]</td>
+<td align="right">929</td>
+<td align="right">±12</td>
+<td>917–941</td>
+<td align="right">5,276</td>
+<td>2025-05</td>
+<td align="right">80.0</td>
+</tr>
+<tr>
+<td align="right">77</td>
+<td>Kling Image 3.0 Omni</td>
+<td align="right">918</td>
+<td align="right">±17</td>
+<td>901–935</td>
+<td align="right">2,672</td>
+<td>2026-02</td>
+<td align="right">28.0</td>
+</tr>
+<tr>
+<td align="right">78</td>
+<td>FLUX.1 Kontext [pro]</td>
+<td align="right">917</td>
+<td align="right">±18</td>
+<td>899–935</td>
+<td align="right">2,229</td>
+<td>2025-05</td>
+<td align="right">40.0</td>
+</tr>
+<tr>
+<td align="right">79</td>
+<td>ERNIE Image Turbo</td>
+<td align="right">914</td>
+<td align="right">±10</td>
+<td>904–924</td>
+<td align="right">10,560</td>
+<td>2026-04</td>
+<td align="right">10.5</td>
+</tr>
+<tr>
+<td align="right">80</td>
+<td>Ideogram 3.0</td>
+<td align="right">911</td>
+<td align="right">±18</td>
+<td>893–929</td>
+<td align="right">2,333</td>
+<td>2025-03</td>
+<td align="right">60.0</td>
+</tr>
+<tr>
+<td align="right">81</td>
+<td>P-Image-Ideogram (Very Low)</td>
+<td align="right">909</td>
+<td align="right">±15</td>
+<td>894–924</td>
+<td align="right">3,309</td>
+<td>2026-07</td>
+<td align="right">3.0</td>
+</tr>
+<tr>
+<td align="right">82</td>
+<td>ERNIE Image</td>
+<td align="right">907</td>
+<td align="right">±10</td>
+<td>897–917</td>
+<td align="right">10,760</td>
+<td>2026-04</td>
+<td align="right">31.5</td>
+</tr>
+<tr>
+<td align="right">83</td>
+<td>Qwen Image</td>
+<td align="right">903</td>
+<td align="right">±18</td>
+<td>885–921</td>
+<td align="right">2,339</td>
+<td>2025-08</td>
+<td align="right">20.0</td>
+</tr>
+<tr>
+<td align="right">84</td>
+<td>P-Image</td>
+<td align="right">900</td>
+<td align="right">±18</td>
+<td>882–918</td>
+<td align="right">2,351</td>
+<td>2025-12</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td align="right">85</td>
+<td>FLUX.1 Krea [dev]</td>
+<td align="right">896</td>
+<td align="right">±39</td>
+<td>857–935</td>
+<td align="right">515</td>
+<td>2025-07</td>
+<td align="right">25.0</td>
+</tr>
+<tr>
+<td align="right">86</td>
+<td>Vidu Q2</td>
+<td align="right">896</td>
+<td align="right">±17</td>
+<td>879–913</td>
+<td align="right">2,524</td>
+<td>2025-11</td>
+<td align="right">30.0</td>
+</tr>
+<tr>
+<td align="right">87</td>
+<td>Z-Image Base</td>
+<td align="right">891</td>
+<td align="right">±17</td>
+<td>874–908</td>
+<td align="right">2,500</td>
+<td>2026-01</td>
+<td align="right">10.0</td>
+</tr>
+<tr>
+<td align="right">88</td>
+<td>GLM-Image</td>
+<td align="right">885</td>
+<td align="right">±18</td>
+<td>867–903</td>
+<td align="right">2,457</td>
+<td>2026-01</td>
+<td align="right">50.0</td>
+</tr>
+<tr>
+<td align="right">89</td>
+<td>Lucid Origin Ultra</td>
+<td align="right">877</td>
+<td align="right">±17</td>
+<td>860–894</td>
+<td align="right">2,689</td>
+<td>2025-08</td>
+<td align="right">86.7</td>
+</tr>
+<tr>
+<td align="right">90</td>
+<td>FLUX1.1 [pro]</td>
+<td align="right">870</td>
+<td align="right">±19</td>
+<td>851–889</td>
+<td align="right">2,247</td>
+<td>2024-10</td>
+<td align="right">40.0</td>
+</tr>
+<tr>
+<td align="right">91</td>
+<td>Lucid Origin Fast</td>
+<td align="right">860</td>
+<td align="right">±18</td>
+<td>842–878</td>
+<td align="right">2,611</td>
+<td>2025-08</td>
+<td align="right">17.9</td>
+</tr>
+<tr>
+<td align="right">92</td>
+<td>LongCat Image</td>
+<td align="right">856</td>
+<td align="right">±19</td>
+<td>837–875</td>
+<td align="right">2,146</td>
+<td>2025-12</td>
+<td align="right">130.0</td>
+</tr>
+<tr>
+<td align="right">93</td>
+<td>FLUX1.1 [pro] Ultra</td>
+<td align="right">855</td>
+<td align="right">±19</td>
+<td>836–874</td>
+<td align="right">2,284</td>
+<td>2024-11</td>
+<td align="right">60.0</td>
+</tr>
+<tr>
+<td align="right">94</td>
+<td>FIBO</td>
+<td align="right">849</td>
+<td align="right">±19</td>
+<td>830–868</td>
+<td align="right">2,258</td>
+<td>2025-10</td>
+<td align="right">40.0</td>
+</tr>
+<tr>
+<td align="right">95</td>
+<td>Luma Photon</td>
+<td align="right">843</td>
+<td align="right">±19</td>
+<td>824–862</td>
+<td align="right">2,251</td>
+<td>2024-12</td>
+<td align="right">19.0</td>
+</tr>
+<tr>
+<td align="right">96</td>
+<td>FLUX.2 [klein] 4B</td>
+<td align="right">837</td>
+<td align="right">±12</td>
+<td>825–849</td>
+<td align="right">6,418</td>
+<td>2026-01</td>
+<td align="right">14.0</td>
+</tr>
+<tr>
+<td align="right">97</td>
+<td>Phoenix 0.9 Ultra</td>
+<td align="right">833</td>
+<td align="right">±20</td>
+<td>813–853</td>
+<td align="right">2,214</td>
+<td>2024-06</td>
+<td align="right">76.2</td>
+</tr>
+<tr>
+<td align="right">98</td>
+<td>Phoenix 1.0 Fast</td>
+<td align="right">827</td>
+<td align="right">±20</td>
+<td>807–847</td>
+<td align="right">2,151</td>
+<td>2024-12</td>
+<td align="right">19.4</td>
+</tr>
+<tr>
+<td align="right">99</td>
+<td>SRPO</td>
+<td align="right">826</td>
+<td align="right">±20</td>
+<td>806–846</td>
+<td align="right">2,154</td>
+<td>2025-09</td>
+<td align="right">26.0</td>
+</tr>
+<tr>
+<td align="right">100</td>
+<td>FLUX.1 [dev]</td>
+<td align="right">823</td>
+<td align="right">±45</td>
+<td>778–868</td>
+<td align="right">511</td>
+<td>2024-08</td>
+<td align="right">25.0</td>
+</tr>
+<tr>
+<td align="right">101</td>
+<td>FIBO Lite</td>
+<td align="right">813</td>
+<td align="right">±16</td>
+<td>797–829</td>
+<td align="right">3,300</td>
+<td>2025-11</td>
+<td align="right">20.0</td>
+</tr>
+<tr>
+<td align="right">102</td>
+<td>HiDream-O1-Image-Dev</td>
+<td align="right">810</td>
+<td align="right">±20</td>
+<td>790–830</td>
+<td align="right">2,323</td>
+<td>2026-05</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td align="right">103</td>
+<td>Luma Photon Flash</td>
+<td align="right">769</td>
+<td align="right">±23</td>
+<td>746–792</td>
+<td align="right">2,052</td>
+<td>2024-12</td>
+<td align="right">5.0</td>
+</tr>
+<tr>
+<td align="right">104</td>
+<td>FLUX.1 [schnell]</td>
+<td align="right">740</td>
+<td align="right">±20</td>
+<td>720–760</td>
+<td align="right">3,045</td>
+<td>2024-08</td>
+<td align="right">3.0</td>
+</tr>
+<tr>
+<td align="right">105</td>
+<td>OmniGen V2</td>
+<td align="right">717</td>
+<td align="right">±26</td>
+<td>691–743</td>
+<td align="right">2,043</td>
+<td>2025-06</td>
+<td align="right">150.0</td>
+</tr>
+<tr>
+<td align="right">106</td>
+<td>Bagel</td>
+<td align="right">594</td>
+<td align="right">±35</td>
+<td>559–629</td>
+<td align="right">2,081</td>
+<td>2025-05</td>
+<td align="right">100.0</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto"><strong>说明：</strong> API 价格为原始榜单提供的每 1,000 张图片价格，单位为美元；不同模型的输出分辨率、生成质量和计费规则可能不同，不宜只按价格直接判断性价比。</p></article>
+<footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
+</main><script>(() => {
+  const article = document.querySelector('article');
+  if (!article) return;
+  const themeButton = document.querySelector('.theme-toggle');
+  const setTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    if (themeButton) {
+      themeButton.textContent = theme === 'dark' ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+    }
+  };
+  let theme = 'light';
+  try { theme = localStorage.getItem('cpuck-article-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+  setTheme(theme);
+  themeButton?.addEventListener('click', () => {
+    theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try { localStorage.setItem('cpuck-article-theme', theme); } catch {}
+  });
+  const readingTime = document.querySelector('.reading-time');
+  if (readingTime) readingTime.textContent = '约 ' + Math.max(1, Math.ceil(article.textContent.replace(/\s/g, '').length / 500)) + ' 分钟阅读';
+  const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const toc = document.createElement('details');
+  toc.className = 'article-toc';
+  const summary = document.createElement('summary');
+  summary.textContent = '文章目录';
+  toc.append(summary);
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', '文章目录');
+  const links = [];
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      let id = 'article-section-' + (index + 1);
+      while (document.getElementById(id)) id += '-';
+      heading.id = id;
+    }
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(heading.id);
+    link.textContent = heading.textContent.trim();
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
+    link.addEventListener('click', () => {
+      if (matchMedia('(max-width: 1199px)').matches) toc.open = false;
+    });
+    nav.append(link);
+    links.push(link);
+  });
+  if (headings.length) {
+    toc.append(nav);
+    toc.open = matchMedia('(min-width: 1200px)').matches;
+    document.body.classList.add('has-toc');
+    document.body.append(toc);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const current = entries.find(entry => entry.isIntersecting);
+        if (!current) return;
+        const index = headings.indexOf(current.target);
+        links.forEach((link, i) => {
+          if (i === index) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, {rootMargin: '0px 0px -65% 0px'});
+      headings.forEach(heading => observer.observe(heading));
+    }
+  }
+  article.querySelectorAll('pre').forEach(pre => {
+    const details = document.createElement('details');
+    details.className = 'code-fold';
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
+    const toggle = document.createElement('summary');
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = '复制代码';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent);
+        button.textContent = '已复制';
+      } catch {
+        details.open = true;
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = '已选中，请手动复制';
+      }
+      setTimeout(() => { button.textContent = '复制代码'; }, 2200);
+    });
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
+  });
+  const top = document.createElement('a');
+  top.href = '#article-top';
+  top.className = 'back-top';
+  top.textContent = '↑ 顶部';
+  top.setAttribute('aria-label', '返回顶部');
+  document.body.append(top);
+})();
+</script></body></html>
