@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import shutil
 import sys
-from publish_issues import alias_page, output_path, validate_routes, write
+from publish_issues import alias_page, output_path, site_base, validate_routes, write
 
 
 def stage(root, destination):
@@ -24,7 +24,7 @@ def stage(root, destination):
         write(destination / output_path(plan['url']), page)
         source.unlink()
         for alias in plan.get('aliases', []):
-            write(destination / output_path(alias), alias_page(plan['url']))
+            write(destination / output_path(alias), alias_page(plan['url'], site_base(root)))
         # Preserve existing Markdown downloads only in the deployed artifact.
         if plan.get('markdown'):
             md = destination / plan['markdown']
