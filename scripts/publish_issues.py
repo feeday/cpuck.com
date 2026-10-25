@@ -27,6 +27,9 @@ def render(issue, canonical_url=None):
     script_hash = base64.b64encode(hashlib.sha256(script.encode()).digest()).decode()
     title = html.escape(issue["title"])
     canonical_tag = f'<link rel="canonical" href="{html.escape(canonical_url, quote=True)}">' if canonical_url else ""
+    raw_description = re.sub(r"\s+", " ", issue.get("body_text") or issue.get("body") or "").strip()
+    raw_description = re.sub(r"<!--\s*permalink:.*?-->", "", raw_description, flags=re.I).strip()
+    description_tag = f'<meta name="description" content="{html.escape(raw_description[:180], quote=True)}">' if raw_description else ""
     source = html.escape(issue["html_url"], quote=True)
     updated = datetime.fromisoformat(issue["updated_at"].replace("Z", "+00:00")).astimezone(timezone(timedelta(hours=8)))
     display_date = updated.strftime("%Y年%m月%d日 %H:%M")
@@ -39,6 +42,7 @@ def render(issue, canonical_url=None):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" type="image/png" href="/favicon.png">
 {canonical_tag}
+{description_tag}
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-{script_hash}'; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>{title} · CPuck</title>
 <style>{css}</style></head><body><main id="article-top">
@@ -122,14 +126,19 @@ def page_metadata(root, route, plans, posts):
     if not description and post:
         description = re.sub(r"\s+", " ", html.unescape(post.get("desc", ""))).strip()
     if not description and source:
-        visible = re.sub(r"<(script|style|svg|noscript)\b[^>]*>[\s\S]*?</\1>", " ", source, flags=re.I)
-        body_match = re.search(r"<body\b[^>]*>([\s\S]*?)</body>", visible, re.I)
-        visible = body_match.group(1) if body_match else visible
+        article_match = re.search(r"<article\b[^>]*>([\s\S]*?)</article>", source, re.I)
+        if article_match:
+            visible = article_match.group(1)
+        else:
+            visible = re.sub(r"<(script|style|svg|noscript)\b[^>]*>[\s\S]*?</\1>", " ", source, flags=re.I)
+            body_match = re.search(r"<body\b[^>]*>([\s\S]*?)</body>", visible, re.I)
+            visible = body_match.group(1) if body_match else visible
+            visible = re.sub(r"<(nav|header|footer)\b[^>]*>[\s\S]*?</\1>", " ", visible, flags=re.I)
         visible = html.unescape(re.sub(r"<[^>]+>", " ", visible))
         visible = re.sub(r"\s+", " ", visible).strip()
         description = visible[:180].rstrip()
-    if not description:
-        description = f"{title}。CPuck 网站页面。"
+    if len(description) < 20:
+        description = f"{title}：CPuck 网站文章或工具页面。"
     if len(description) > 240:
         description = description[:237].rstrip() + "..."
     lastmod = ""
