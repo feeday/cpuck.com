@@ -1,129 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:cpuck="https://cpuck.com/xml/sitemap/1.0">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- cPuck -->
   <url>
     <loc>https://cpuck.com/</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>cPuck</cpuck:title>
-    <cpuck:description>我们是一个简洁高效的 AI 导航网站。收录 ChatGPT、Gemini、Llama 等最新 AI 工具、大模型、数据集及开发资源。提供 IP 查询、代码编辑等实用开发者工具，助您快速探索人工智能世界。</cpuck:description>
   </url>
   <!-- 1 · CPuck -->
   <url>
     <loc>https://cpuck.com/1.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>1 · CPuck</cpuck:title>
-    <cpuck:description>← 资源导航 · 原始 Issue / 编辑 · Markdown 1 更新：2026-09-13T03:16:36Z 23</cpuck:description>
   </url>
   <!-- 3G-USB · CPuck -->
   <url>
     <loc>https://cpuck.com/3g-usb.html</loc>
     <lastmod>2026-09-26</lastmod>
-    <cpuck:title>3G-USB · CPuck</cpuck:title>
-    <cpuck:description>Windows 11 修复华为 WCDMA USB 上网卡驱动记录 设备信息 设备： HUAWEI Mobile Connect - USB Device 硬件 ID： USB\VID_12D1&amp;PID_1446 驱动： ewusbdev.sys 驱动版本： 1.0.0.7 驱动日期： 2009/07/23 设备类型： HUAWEI WCDMA 3</cpuck:description>
   </url>
   <!-- 2 · CPuck -->
   <url>
     <loc>https://cpuck.com/5.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>2 · CPuck</cpuck:title>
-    <cpuck:description>← 资源导航 · 原始 Issue / 编辑 · Markdown 2 更新：2026-09-13T05:50:56Z 233</cpuck:description>
   </url>
   <!-- MDE 工作台 -->
   <url>
     <loc>https://cpuck.com/aigx-x.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>MDE 工作台</cpuck:title>
-    <cpuck:description>AIGC 工作台：完整内置 API 对话测试与 Markdown 智能编辑器，适配 PC 与移动端。</cpuck:description>
   </url>
   <!-- 弹幕视频留言 | CPuck -->
   <url>
     <loc>https://cpuck.com/btv/</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>弹幕视频留言 | CPuck</cpuck:title>
-    <cpuck:description>弹幕视频留言与视听互动页面，可边看视频、听音乐边发表吐槽。</cpuck:description>
   </url>
   <!-- cbg · CPuck -->
   <url>
     <loc>https://cpuck.com/cbg.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>cbg · CPuck</cpuck:title>
-    <cpuck:description>← CPuck 编辑原文 Markdown 深色 CPuck · 文章 cbg 更新于 2026年10月05日 21:07 （北京时间） 456 CPuck · 记录与分享 返回资源导航 →</cpuck:description>
   </url>
   <!-- 音频分析台 -->
   <url>
     <loc>https://cpuck.com/dB.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>音频分析台</cpuck:title>
-    <cpuck:description>5 合 1 在线音频工作台，提供音频监听、录音与多功能音频处理操作。</cpuck:description>
   </url>
   <!-- CPuck Demo | CPuck -->
   <url>
     <loc>https://cpuck.com/demo.html</loc>
     <lastmod>2026-09-13</lastmod>
-    <cpuck:title>CPuck Demo | CPuck</cpuck:title>
-    <cpuck:description>CPuck 自动发布模板演示文章，用于验证文章生成与部署流程。</cpuck:description>
   </url>
   <!-- 在线显卡烤机测试 -->
   <url>
     <loc>https://cpuck.com/gpu/</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>在线显卡烤机测试</cpuck:title>
-    <cpuck:description>在线显卡烤机与帧率测试工具，测试前请注意设备温度并避免长时间高负载。</cpuck:description>
   </url>
   <!-- hi · CPuck -->
   <url>
     <loc>https://cpuck.com/hi.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>hi · CPuck</cpuck:title>
-    <cpuck:description>← CPuck 编辑原文 Markdown 深色 CPuck · 文章 hi 更新于 2026年10月22日 21:46 （北京时间） 123 CPuck · 记录与分享 返回资源导航 →</cpuck:description>
   </url>
   <!-- Qwen3-ASR-Demo · CPuck -->
   <url>
     <loc>https://cpuck.com/qwen3-asr-demo.html</loc>
     <lastmod>2026-10-06</lastmod>
-    <cpuck:title>Qwen3-ASR-Demo · CPuck</cpuck:title>
-    <cpuck:description>通过阿里语音识别调用抱脸空间填写密钥音频转文字 import os import re import tempfile from pathlib import Path import gradio as gr from gradio_client import Client, handle_file # pip install gradio gradio_</cpuck:description>
   </url>
   <!-- realfaketop · CPuck -->
   <url>
     <loc>https://cpuck.com/realfaketop.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>realfaketop · CPuck</cpuck:title>
-    <cpuck:description>AI 大语言模型排行榜（Artificial Analysis Intelligence Index） 数据来源：Artificial Analysis — Model Leaderboards 以下内容根据提供的榜单文本整理。保留原始排序、模型名称、上下文窗口、开发商、Artificial Analysis Intelligence Index、每任务成</cpuck:description>
   </url>
   <!-- 网站地图 | CPuck -->
   <url>
     <loc>https://cpuck.com/sitemap.html</loc>
-    <cpuck:title>网站地图 | CPuck</cpuck:title>
-    <cpuck:description>CPuck 所有公开页面的标题、简介、更新时间与链接索引。</cpuck:description>
   </url>
   <!-- vuhk-hu · CPuck -->
   <url>
     <loc>https://cpuck.com/vuhk-hu.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>vuhk-hu · CPuck</cpuck:title>
-    <cpuck:description>← CPuck 编辑原文 Markdown 深色 CPuck · 文章 vuhk-hu 更新于 2026年10月05日 20:29 （北京时间） 456 CPuck · 记录与分享 返回资源导航 →</cpuck:description>
   </url>
   <!-- win11-key · CPuck -->
   <url>
     <loc>https://cpuck.com/win11-key.html</loc>
     <lastmod>2026-09-13</lastmod>
-    <cpuck:title>win11-key · CPuck</cpuck:title>
-    <cpuck:description>Windows 11 是否“正版”？普通人判断指南 目的：用 Windows 自带命令判断当前系统是什么版本、是否已激活、使用的是 Retail / OEM / MAK / KMS 哪种授权通道，并理解“已激活”和“授权来源合规”不是一回事。 不需要安装任何第三方软件。 一句话先讲明白 判断 Windows 是否“正版”，最好分成两件事： 系统是否已</cpuck:description>
   </url>
   <!-- CPuck 在线工具箱 -->
   <url>
     <loc>https://cpuck.com/wxm/</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>CPuck 在线工具箱</cpuck:title>
-    <cpuck:description>在线工具箱，集成文本整理、链接去重、二维码识别、视频音频处理与记忆导入导出等实用功能。</cpuck:description>
   </url>
   <!-- 在线表格工具 | CPuck -->
   <url>
     <loc>https://cpuck.com/xlsx.html</loc>
     <lastmod>2026-10-25</lastmod>
-    <cpuck:title>在线表格工具 | CPuck</cpuck:title>
-    <cpuck:description>在线表格查询与管理工具，支持 XLSX 文件导入、数据筛选和导出。</cpuck:description>
   </url>
 </urlset>
