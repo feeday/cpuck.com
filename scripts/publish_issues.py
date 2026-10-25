@@ -172,8 +172,7 @@ def generate_sitemap(root, plans):
         title, description, lastmod, _ = page_metadata(root, route, plans, posts)
         entries.append({"route": route, "title": title, "description": description, "lastmod": lastmod})
     xml = ['<?xml version="1.0" encoding="UTF-8"?>',
-           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
-           '        xmlns:cpuck="https://cpuck.com/xml/sitemap/1.0">']
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for item in entries:
         safe_comment = re.sub(r"--+", "—", item["title"]).strip("- ")
         xml.append("  <!-- " + safe_comment + " -->")
@@ -181,8 +180,6 @@ def generate_sitemap(root, plans):
         xml.append("    <loc>" + html.escape(base + item["route"], quote=False) + "</loc>")
         if item["lastmod"]:
             xml.append("    <lastmod>" + item["lastmod"] + "</lastmod>")
-        xml.append("    <cpuck:title>" + html.escape(item["title"], quote=False) + "</cpuck:title>")
-        xml.append("    <cpuck:description>" + html.escape(item["description"], quote=False) + "</cpuck:description>")
         xml.append("  </url>")
     xml.append("</urlset>")
     write(root / "sitemap.xml", "\n".join(xml) + "\n")
