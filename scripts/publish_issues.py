@@ -166,12 +166,21 @@ def generate_sitemap(root, plans):
     posts_path = root / "data/posts.json"
     posts = json.loads(posts_path.read_text(encoding="utf-8")) if posts_path.exists() else []
     urls = {"/", "/sitemap.html"}
-    for page in root.glob("*.html"):
-        if page.name.lower() not in {"index.html", "404.html"}:
-            urls.add("/" + page.name)
-    for page in root.glob("*/index.html"):
-        if page.parent.name.lower() not in {"assets", "data", "scripts", "tests", ".github"}:
-            urls.add("/" + page.parent.name + "/")
+    excluded_dirs = {"assets", "data", "scripts", "tests", ".github", ".git", "node_modules"}
+    for page in root.rglob("*.html"):
+        relative = page.relative_to(root)
+        if relative.name.lower() in {"index.html", "404.html"}:
+            continue
+        if any(part.lower() in excluded_dirs for part in relative.parts[:-1]):
+            continue
+        urls.add("/" + relative.as_posix())
+    for page in root.rglob("index.html"):
+        relative = page.relative_to(root)
+        if len(relative.parts) == 1:
+            continue
+        if any(part.lower() in excluded_dirs for part in relative.parts[:-1]):
+            continue
+        urls.add("/" + page.parent.relative_to(root).as_posix().rstrip("/") + "/")
     for plan in plans.values():
         route = plan.get("url", "")
         if route.startswith("/") and not route.startswith("//"):
