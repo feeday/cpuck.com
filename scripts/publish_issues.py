@@ -35,6 +35,7 @@ def render(issue):
     return f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="/favicon.png">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-{script_hash}'; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>{title} · CPuck</title>
 <style>{css}</style></head><body><main id="article-top">
@@ -76,6 +77,7 @@ def output_path(url):
 def alias_page(url):
     target = html.escape(url, quote=True)
     return (f'<!doctype html><html><head><meta charset="utf-8">'
+            f'<link rel="icon" type="image/png" href="/favicon.png">'
             f'<meta http-equiv="refresh" content="0;url={target}">'
             f'<link rel="canonical" href="{target}"><title>文章跳转</title></head>'
             f'<body><a href="{target}">阅读文章</a></body></html>\n')
@@ -96,6 +98,36 @@ def validate_routes(root, plans):
             if (Path(root) / file).exists():
                 raise ValueError(f"Article route would overwrite site file: {route}")
             claimed[file] = key
+
+
+def generate_sitemap(root, plans):
+    """Build a Google-compatible sitemap from public pages and canonical article routes."""
+    root = Path(root)
+    cname = (root / "CNAME").read_text(encoding="utf-8").strip() if (root / "CNAME").exists() else "url.cpuck.com"
+    domain = re.sub(r"^https?://", "", cname).strip("/")
+    if not domain or "/" in domain:
+        raise ValueError("CNAME must contain a single domain name")
+    base = "https://" + domain
+    urls = {"/"}
+    # Include root-level static pages, but not the duplicate homepage or a 404 page.
+    for page in root.glob("*.html"):
+        if page.name.lower() not in {"index.html", "404.html"}:
+            urls.add("/" + page.name)
+    # Include actual one-level app entry points such as /btv/ and /gpu/.
+    for page in root.glob("*/index.html"):
+        if page.parent.name.lower() not in {"assets", "data", "scripts", "tests", ".github"}:
+            urls.add("/" + page.parent.name + "/")
+    # Article routes are canonical; compatibility aliases are intentionally excluded.
+    for plan in plans.values():
+        route = plan.get("url", "")
+        if route.startswith("/") and not route.startswith("//"):
+            urls.add(route)
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for route in sorted(urls):
+        lines.extend(["  <url>", "    <loc>" + html.escape(base + route, quote=False) + "</loc>", "  </url>"])
+    lines.append("</urlset>")
+    write(root / "sitemap.xml", "\n".join(lines) + "\n")
 
 
 def publish(root, issues, owner):
@@ -143,6 +175,7 @@ def publish(root, issues, owner):
     for path in ["data/posts.json", "data/search.json"]:
         write(root / path, json.dumps(posts, ensure_ascii=False, indent=2) + "\n")
     write(manifest, json.dumps(plans, ensure_ascii=False, indent=2) + "\n")
+    generate_sitemap(root, plans)
     return posts
 
 
