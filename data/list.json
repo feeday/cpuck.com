@@ -4,7 +4,7 @@
   "title": "AI News",
   "desc": "模型资讯排行榜",
   "links": {
-    "http": "https://artificialanalysis.ai/?intelligence=coding-index",
+    "http": "https://artificialanalysis.ai/zh/leaderboards/models",
     "hfCn": "https://aihot.news/",
     "hf": "https://arxiv.org/list/cs.AI/recent"
   },
