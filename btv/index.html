@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="no-referrer">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>─=≡Σ((( つ•̀ω•́)つ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+    <script>LA.init({id:"JRHGRBPWC7lJIaXq",ck:"JRHGRBPWC7lJIaXq"})</script>
+    
+   <link rel="fluid-icon" href="https://github.com/fluidicon.png" title="GitHub">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { 
+            --bg-deep: #030303; 
+            --bg-panel: #0a0a0a;
+            --accent: #00ff41; 
+            --accent-dim: rgba(0, 255, 65, 0.1);
+            --danger: #ff2a2a;
+            --tech-blue: #00f0ff;
+            --border-color: #333;
+        }
+        
+        body { 
+            font-family: 'Share Tech Mono', monospace; 
+            background-color: var(--bg-deep); 
+            color: #d4d4d4; 
+            overflow: hidden; 
+            height: 100dvh;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .scanlines {
+            position: fixed; inset: 0; pointer-events: none; z-index: 2;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+        }
+        
+        .tech-border {
+            position: relative;
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border-radius: 4px;
+        }
+        .tech-border::before { content: ''; position: absolute; top: -1px; left: -1px; width: 8px; height: 8px; border-top: 2px solid var(--accent); border-left: 2px solid var(--accent); border-top-left-radius: 4px; }
+        .tech-border::after { content: ''; position: absolute; bottom: -1px; right: -1px; width: 8px; height: 8px; border-bottom: 2px solid var(--accent); border-right: 2px solid var(--accent); border-bottom-right-radius: 4px; }
+
+        .embedded-drawer {
+            background: #050505;
+            border: 1px solid var(--tech-blue);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cyber-btn {
+            position: relative;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color);
+            color: #888;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            border-radius: 4px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .cyber-btn:hover:not(:disabled) {
+            background: var(--accent-dim); border-color: var(--accent); color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-dim); text-shadow: 0 0 5px var(--accent);
+        }
+
+        .monitor-frame {
+            position: relative; width: 100%; height: 100%; background: #000; border: 1px solid #333;
+            border-radius: 4px; overflow: hidden;
+        }
+        .monitor-overlay {
+            position: absolute; inset: 0; pointer-events: none; z-index: 5;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+        }
+        .monitor-label {
+            position: absolute; top: 10px; left: 10px; z-index: 10;
+            background: rgba(0,0,0,0.8); padding: 2px 8px;
+            font-size: 10px; color: var(--accent); border: 1px solid var(--accent); border-radius: 2px;
+        }
+        .bili-full { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+        .cyber-scroll::-webkit-scrollbar { width: 4px; }
+        .cyber-scroll::-webkit-scrollbar-thumb { background: var(--tech-blue); }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .cyber-input { 
+            background: #000; border: 1px solid #333; color: var(--tech-blue); 
+            font-family: 'Share Tech Mono'; width: 100%; transition: 0.3s; border-radius: 6px;
+        }
+        .cyber-input:focus { outline: none; border-color: var(--tech-blue); box-shadow: 0 0 10px rgba(0,240,255,0.2); }
+
+        .nav-link:hover { color: var(--tech-blue); text-shadow: 0 0 5px var(--tech-blue); }
+        .nav-link i { margin-right: 4px; }
+        
+        #delay a { 
+            color: var(--tech-blue) !important; 
+            text-decoration: none !important; 
+            display: flex !important; 
+            align-items: center !important; 
+            height: 100% !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            line-height: 1 !important; 
+        }
+        #delay a:hover { text-shadow: 0 0 5px var(--tech-blue); }
+    </style>
+</head>
+<body class="flex flex-col h-[100dvh] overflow-hidden relative selection:bg-green-500 selection:text-black">
+
+    <div class="scanlines"></div>
+
+    <header class="hidden lg:flex h-12 bg-black/80 border-b border-[#222] items-center justify-between px-6 z-20 shrink-0 backdrop-blur-sm">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-biohazard text-green-500 animate-pulse text-lg"></i>
+            <span class="text-xl font-[Orbitron] font-black text-white tracking-widest">
+                ─=≡Σ<span class="text-green-500">((( つ•̀ω•́)つ</span>
+            </span>
+        </div>
+        
+        <div class="hidden md:flex gap-6 text-[10px] font-mono text-gray-500 tracking-wider">
+      
+          <!-- ==================== 1. 网络工具与基础空间 ==================== -->
+<!-- PING0：网络/IP/路由工具，使用终端命令行图标，极客感更强 -->
+
+
+<!-- Google Labs Flow：AI 实验室/灵感流，魔术棒（如支持 FA6 可改用 fa-wand-magic-sparkles） -->
+<a href="https://www.doubao.com/" target="_blank" class="nav-link transition"><i class="fas fa-microchip"></i>Doubao</a>
+
+<a href="https://chatgpt.com/" target="_blank" class="nav-link transition">
+    <i class="fas fa-code"></i> ChatGPT
+
+
+<a href="https://labs.google/fx/zh/tools/flow" target="_blank" class="nav-link transition"><i class="fas fa-magic"></i>Banana</a>    
+  
+  <!-- LLM Benchmark：大模型硬核跑分，使用微芯片图标，直击模型底层算力和架构跑分 -->
+<a href="https://huggingface.co/spaces/" target="_blank" class="nav-link transition"><i class="fas fa-terminal"></i>ZERO</a>  
+<!-- ==================== 2. 开发、算力与 Token 管理 ==================== -->
+<!-- Cloud Studio：云端代码空间 -->
+<a href="https://cloudstudio.net/" target="_blank" class="nav-link transition"><i class="fas fa-laptop-code"></i>STUDIO</a>
+<a href="https://colab.research.google.com/ " target="_blank" class="nav-link transition"><i class="fas fa-laptop-code"></i>Colab</a>
+
+
+<!-- Poixe：Token/密钥日志管理，使用密匙图标 -->
+<a href="http://cpu.jy6d.com/" target="_blank" class="nav-link transition"><i class="fas fa-key"></i>CPU</a>
+  
+  <a href="https://poorpaul.dev/leaderboard" target="_blank" class="nav-link transition" title="Gemini"><i class="fas fa-brain"></i>Tokens</a>
+  
+  <a href="https://www.photopea.com/" target="_blank" class="nav-link transition">
+    <i class="fas fa-image"></i> Photopea
+</a>
+
+
+<a href="https://translate.google.com/" target="_blank" class="nav-link transition">
+    <i class="fas fa-desktop"></i> Translate
+</a>        
+          
+
+<!-- Gemini AI：相比传统的旧版 robot，使用 brain (大脑) 更符合 AGI/大模型时代 -->
+<a href="https://aihot.news/" target="_blank" class="nav-link transition" title="Gemini"><i class="fas fa-brain"></i>AIHOT</a>
+
+<a href="https://ai-bot.cn/ai-tools/" target="_blank" class="nav-link transition" title="Gemini"><i class="fas fa-brain"></i>Tools</a>
+
+
+
+<!-- ==================== 4. AI 鉴伪、评测与数据榜单 ==================== -->
+<!-- 腾讯 Matrix AI 鉴伪：深度伪造/真伪检测，保留极具安全辨识度的指纹图标 -->
+<a href="https://matrix.tencent.com/ai-detect/" target="_blank" class="nav-link transition"><i class="fas fa-fingerprint"></i>AI-DETECT</a>
+
+
+
+
+          
+          
+        </div>
+
+        <div class="text-[10px] font-mono text-gray-500 flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-green-500 box-shadow-green"></span>
+            <span>SYSTEM: ONLINE</span>
+        </div>
+    </header>
+
+    <div class="flex-grow flex flex-col lg:flex-row overflow-hidden relative z-10 p-2 lg:p-4 gap-2 lg:gap-4 min-h-0">
+        
+        <div class="h-[35vh] lg:h-auto lg:w-[65%] xl:w-[70%] flex flex-col gap-2 shrink-0 lg:shrink min-h-0">
+            <div class="monitor-frame relative flex-grow tech-border min-h-0">
+                
+                <div class="absolute top-2 right-2 z-20 flex items-center gap-2">
+                    <a id="bili-source-btn" href="#" target="_blank" title="在新窗口打开原视频" 
+                       class="flex items-center gap-2 px-2 py-1 bg-black/80 border border-gray-700 rounded text-[10px] font-mono text-gray-400 hover:text-[#00f0ff] hover:border-[#00f0ff] transition backdrop-blur-sm group">
+                        <i class="fab fa-bilibili"></i>
+                        <span>SOURCE</span>
+                    </a>
+                </div>
+
+                <div class="monitor-overlay"></div>
+                
+                <div id="video-container" class="w-full h-full relative z-0">
+                    <div class="absolute inset-0 flex items-center justify-center text-gray-700 animate-pulse font-mono text-xs">
+                        ESTABLISHING UPLINK...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="h-10 tech-border flex items-center justify-between px-4 bg-black/40 shrink-0">
+                <button id="btn-prev" onclick="changePage(-1)" class="text-xs text-gray-500 hover:text-white transition">
+                    <i class="fas fa-caret-left mr-1"></i> PREV
+                </button>
+                <div class="text-xs font-mono text-gray-600">
+                    FILE_INDEX: <span id="page-indicator" class="text-white">00 / 00</span>
+                </div>
+                <button id="btn-next" onclick="changePage(1)" class="text-xs text-gray-500 hover:text-white transition">
+                    NEXT <i class="fas fa-caret-right ml-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 lg:flex-none lg:w-[35%] xl:w-[30%] flex flex-col min-h-0 relative">
+            
+            <div class="embedded-drawer w-full h-full relative overflow-hidden">
+                
+                <div class="p-2 sm:p-3 border-b border-gray-800 flex flex-nowrap justify-between items-center gap-2 shrink-0 bg-[#050505] z-20">
+                    
+                    <div class="flex-1 flex text-[10px] font-mono opacity-90 items-stretch h-[26px] text-[#00f0ff] overflow-hidden">
+                        <div class="flex-1 border border-gray-700 border-r-0 rounded-l bg-black/60 overflow-x-auto no-scrollbar flex items-center px-1.5 sm:px-2 min-w-0">
+                            <span id="delay" class="whitespace-nowrap flex items-center h-full gap-2">
+                                <a href="https://video.cpuck.com/" target="_blank" rel="noopener noreferrer" title="Poixe AI 代理：生成万字七毛，分析图像三厘">
+                                    <strong>在线免费视频音频编辑工具</strong>
+                                </a>
+                                <span class="text-gray-500">Github 开源推荐</span>
+                            </span>
+                        </div>
+                        <span id="performance-result" class="px-1.5 sm:px-2 border border-gray-700 rounded-r flex items-center whitespace-nowrap bg-black/60 shrink-0">
+                            加载:--ms
+                        </span>
+                    </div>
+                    
+                    <div class="flex items-center bg-[#0a0a0a] border border-gray-700 rounded text-[10px] shadow-[0_0_10px_rgba(0,0,0,0.5)] shrink-0">
+                        <button onclick="manualRefresh()" class="px-2.5 py-1 text-gray-400 hover:text-[#00f0ff] hover:bg-[rgba(0,240,255,0.1)] transition-all cursor-pointer group" title="同步最新数据">
+                            <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-300" id="refresh-icon"></i>
+                        </button>
+                        <div class="w-px h-3.5 bg-gray-700"></div>
+                        <button onclick="toggleExtensionFrame()" class="px-2.5 py-1 text-gray-400 hover:text-[#00ff41] hover:bg-[rgba(0,255,65,0.1)] transition-all cursor-pointer group" title="AIGC">
+                            <i class="fas fa-satellite-dish group-hover:scale-110 transition-transform"></i>
+                        </button>
+                    </div>
+
+                </div>
+                
+                <div id="comment-list" class="flex-grow overflow-y-auto p-4 space-y-6 cyber-scroll relative z-10 min-h-0">
+                    <div class="text-center text-gray-600 text-xs mt-10 font-mono animate-pulse">DOWNLOADING PACKETS...</div>
+                </div>
+                
+                <div class="p-3 lg:p-4 border-t border-gray-800 shrink-0 relative z-10 bg-[#050505]">
+                    <form id="cyber-form" onsubmit="event.preventDefault(); postComment();" class="flex flex-col gap-2">
+                        <input type="hidden" name="username" id="hidden-username" value="吐槽墙">
+                        <div>
+                            <textarea id="message" name="content" placeholder="留言（GitHub 登录提交），或粘贴 B 站视频 / BV 号..." class="cyber-input px-3 py-2 text-[13px] h-16 lg:h-20 resize-none" required maxlength="2000" autocomplete="off" spellcheck="false"></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" id="send-btn" class="cyber-btn flex-1 min-w-0 py-2 lg:py-2.5 text-xs font-bold border-[#00f0ff] text-[#00f0ff] hover:bg-[#00f0ff] hover:text-black shrink-0">
+                                TRANSMIT
+                            </button>
+                            <button type="button" id="playlist-btn" onclick="submitPlaylist()" class="cyber-btn flex-1 min-w-0 py-2 lg:py-2.5 text-xs font-bold border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black shrink-0" title="识别 B 站链接，通过 GitHub Issue 投稿">
+                                SMART DETECT
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="extension-drawer" class="absolute inset-0 z-50 bg-[#050505] flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out border-l border-[#00ff41]">
+                    <div class="p-2 sm:p-3 border-b border-[#00ff41]/50 flex justify-between items-center bg-black/90 backdrop-blur z-10 shrink-0 shadow-[0_0_15px_rgba(0,255,65,0.2)]">
+                        <span class="text-[10px] font-mono text-[#00ff41] tracking-widest flex items-center">
+                            <i class="fas fa-network-wired mr-2 animate-pulse"></i>
+                            TERMINAL_UPLINK
+                        </span>
+                        <button onclick="toggleExtensionFrame()" class="text-gray-400 hover:text-[#ff2a2a] transition-colors px-2 cursor-pointer outline-none">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                    <iframe id="ext-iframe" src="https://cpuck.com/wxm/" class="flex-grow w-full h-full border-none bg-black" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads"
+                  
+
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+          ></iframe>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+<script>
+/* GitHub Pages 静态版。站长只需更改一次仓库名，访客不需要填写 token。 */
+const GITHUB_REPO = 'feeday/REPLACE_WITH_REPO';
+const ISSUE_PREFIX_COMMENT = '[留言]';
+const ISSUE_PREFIX_VIDEO = '[投稿]';
+let database = [], currentIndex = 0, latestCommentId = null, cachedIssues = [];
+let lastGithubFetch = 0;
+const $ = id => document.getElementById(id);
+const repoIsConfigured = () => /^[a-z\d_.-]+\/[a-z\d_.-]+$/i.test(GITHUB_REPO) && !GITHUB_REPO.includes('REPLACE_WITH');
+function githubSetupNotice() {
+  return '站长尚未配置 GitHub 仓库。请修改 index.html 顶部 GITHUB_REPO 为 username/repository，并启用仓库 Issues。';
+}
+function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function bilibiliBV(value) {
+  const input = String(value || '').trim();
+  let found = input.match(/^(BV[a-zA-Z0-9]{10})\/?$/i);
+  if (found) return 'BV' + found[1].slice(2);
+  try {
+    const url = new URL(input);
+    if (!['https:','http:'].includes(url.protocol) || !(url.hostname==='bilibili.com'||url.hostname.endsWith('.bilibili.com'))) return null;
+    found = url.pathname.match(/(?:^|\/)video\/(BV[a-zA-Z0-9]{10})(?:\/|$)/i);
+    return found ? 'BV' + found[1].slice(2) : null;
+  } catch { return null; }
+}
+function submitGithubIssue(title, body) {
+  if (!repoIsConfigured()) { alert(githubSetupNotice()); return false; }
+  const url = `https://github.com/${GITHUB_REPO}/issues/new?` + new URLSearchParams({title,body});
+  // GitHub 授权与提交在 github.com 完成，不在静态页面保存写入密钥。
+  const opened = window.open(url, '_blank', 'noopener,noreferrer');
+  if (!opened) alert('浏览器可能拦截了新窗口。请允许弹出窗口后重试。');
+  return true;
+}
+async function fetchIssues(force=false) {
+  if (!repoIsConfigured()) return [];
+  if (!force && Date.now()-lastGithubFetch < 60000) return cachedIssues;
+  const endpoint = `https://api.github.com/repos/${GITHUB_REPO}/issues?state=open&per_page=100&sort=created&direction=desc`;
+  const res = await fetch(endpoint,{headers:{Accept:'application/vnd.github+json'},cache:'no-store'});
+  if (!res.ok) throw Error(res.status===404?'仓库不存在、未公开或未开启 Issues':`GitHub API HTTP ${res.status}`);
+  cachedIssues = (await res.json()).filter(item=>!item.pull_request);
+  lastGithubFetch = Date.now();
+  return cachedIssues;
+}
+async function loadDatabase(force=false) {
+  const originals = [];
+  try {
+    const r = await fetch('./btv/videos.txt?t='+Date.now(),{cache:'no-store'});
+    if (r.ok) {
+      const lines=(await r.text()).split(/\r?\n/);
+      for(const line of lines) { const bv=bilibiliBV(line.trim()); if(bv)originals.push(bv); }
+    }
+  } catch(e){console.warn('读取 btv/videos.txt 失败：',e);}
+  try {
+    const issues=await fetchIssues(force);
+    for(const issue of [...issues].reverse()) {
+      if(String(issue.title||'').startsWith(ISSUE_PREFIX_VIDEO)) {
+        const bv=bilibiliBV(String(issue.title).slice(ISSUE_PREFIX_VIDEO.length).trim()) || bilibiliBV(issue.body||'');
+        if(bv)originals.push(bv);
+      }
+    }
+  } catch(e){console.warn('GitHub 投稿读取失败：',e);}
+  const unique=[...new Set(originals)];
+  database=unique.map((bv,index)=>({id:String(index+1).padStart(2,'0'),src:bv,desc:'TARGET_ID: '+bv}));
+  if (!database.length) {
+    $('video-container').textContent='暂无视频。可创建 btv/videos.txt 或通过 SMART DETECT 提交 GitHub Issue。';
+    $('page-indicator').textContent='00 / 00';
+  }
+}
+function changePage(direction) {
+  if(!database.length)return;
+  currentIndex=(currentIndex+direction+database.length)%database.length;
+  loadCase(currentIndex);
+}
+function loadCase(index, auto=true) {
+  if(!database.length)return;
+  currentIndex=Math.min(Math.max(index,0),database.length-1);
+  const bv=database[currentIndex].src;
+  $('page-indicator').textContent=`${String(currentIndex+1).padStart(2,'0')} / ${String(database.length).padStart(2,'0')}`;
+  $('bili-source-btn').href=`https://www.bilibili.com/video/${encodeURIComponent(bv)}/`;
+  if (auto) loadVideo();
+  else {
+    const container=$('video-container');
+    container.replaceChildren();
+    const prompt=document.createElement('div');
+    prompt.className='w-full h-full flex flex-col items-center justify-center cursor-pointer text-gray-600 hover:text-green-400 font-mono text-xs';
+    prompt.textContent='▶ CLICK TO ESTABLISH UPLINK';
+    prompt.onclick=loadVideo; container.append(prompt);
+  }
+}
+function loadVideo() {
+  if(!database.length)return;
+  const frame=document.createElement('iframe'); frame.className='bili-full';
+  frame.src=`https://player.bilibili.com/player.html?bvid=${encodeURIComponent(database[currentIndex].src)}&page=1&high_quality=1&danmaku=0&autoplay=1`;
+  frame.allowFullscreen=true;
+  frame.referrerPolicy='strict-origin-when-cross-origin';
+  frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';
+  $('video-container').replaceChildren(frame);
+}
+function timeAgo(s) {
+  const seconds=Math.max(0,Math.floor((Date.now()-new Date(s).getTime())/1000));
+  if(!Number.isFinite(seconds))return '';
+  if(seconds<60)return 'NOW'; if(seconds<3600)return Math.floor(seconds/60)+'M';
+  if(seconds<86400)return Math.floor(seconds/3600)+'H'; return Math.floor(seconds/86400)+'D';
+}
+async function loadComments(isAutoRefresh=false,force=false) {
+  const list=$('comment-list');
+  if(!repoIsConfigured()) { list.textContent=githubSetupNotice();return; }
+  try {
+    const issues=await fetchIssues(force);
+    const items=issues.filter(i=>String(i.title||'').startsWith(ISSUE_PREFIX_COMMENT)).slice(0,20);
+    if(isAutoRefresh && !force && latestCommentId===items[0]?.id)return;
+    latestCommentId=items[0]?.id||null;
+    list.replaceChildren();
+    if(!items.length){list.textContent='NO LOGS FOUND · 暂无公开留言';return;}
+    for(const item of items){
+      const div=document.createElement('div');div.className='group mb-4';
+      const head=document.createElement('div');head.className='flex justify-between items-baseline mb-1';
+      const author=document.createElement('a'); author.className='text-[14px] font-bold text-gray-300 group-hover:text-[#00f0ff] transition-colors';
+      author.href=item.html_url;author.target='_blank';author.rel='noopener noreferrer';
+      author.textContent=item.user?.login || 'GitHub 用户';
+      const when=document.createElement('span');when.className='text-[10px] text-gray-600 font-mono';when.textContent=timeAgo(item.created_at);
+      head.append(author,when);
+      const content=document.createElement('div');content.className='text-[13px] text-gray-400 break-words leading-relaxed whitespace-pre-wrap';
+      content.textContent=String(item.body||item.title.slice(ISSUE_PREFIX_COMMENT.length)).slice(0,2000);
+      div.append(head,content);list.append(div);
+    }
+  } catch(e) { if(!isAutoRefresh) list.textContent='CONNECTION LOST: '+e.message;console.warn(e); }
+}
+async function postComment() {
+  const input=$('message'), content=input.value.trim();
+  if(!content){input.focus();return;}
+  if(content.length>2000){alert('留言最多 2000 字');return;}
+  // 请访问 GitHub 提交 Issue，不能在静态网页上伪造提交成功。
+  const title=ISSUE_PREFIX_COMMENT+' '+content.replace(/\s+/g,' ').slice(0,70);
+  if(submitGithubIssue(title,content)) alert('已尝试打开 GitHub 投稿页。请登录并点击 Submit new issue，提交完成后留言才会公开显示。');
+}
+function extractBilibiliBvidClient(v){return bilibiliBV(v);}
+function submitPlaylist() {
+  const input=$('message'),bv=bilibiliBV(input.value);
+  if(!bv){alert('仅支持 Bilibili 视频完整链接或 BV 号');input.focus();return;}
+  if(database.some(v=>v.src===bv)){alert('该视频已在播放列表中');return;}
+  if(submitGithubIssue(ISSUE_PREFIX_VIDEO+' '+bv,'Bilibili 视频投稿：\nhttps://www.bilibili.com/video/'+bv+'/'))
+    alert('已尝试打开 GitHub 投稿页。请登录并提交 Issue；发布后刷新网站即可看到投稿。');
+}
+async function manualRefresh() {
+  const icon=$('refresh-icon'); icon.classList.add('fa-spin');
+  const old=database[currentIndex]?.src;
+  try { await fetchIssues(true); await loadDatabase(); if(database.length){const i=database.findIndex(x=>x.src===old);loadCase(i<0?0:i,false);} await loadComments(false,true); $('comment-list').scrollTop=0; }
+  finally {icon.classList.remove('fa-spin');}
+}
+function toggleExtensionFrame(){ $('extension-drawer').classList.toggle('translate-x-full'); }
+window.addEventListener('load',async()=>{
+  $('performance-result').textContent='加载:'+Math.round(performance.now())+'ms';
+  await loadDatabase();if(database.length)loadCase(0,false);
+  await loadComments();
+  // 匿名 GitHub API 每小时通常限制 60 次。低频轮询且使用 60 秒缓存。
+  setInterval(()=>{if(document.visibilityState==='visible')loadComments(true)},120000);
+  document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA'].includes(document.activeElement?.tagName))return;
+    if(e.key==='ArrowRight')changePage(1);if(e.key==='ArrowLeft')changePage(-1);});
+});
+</script>
+</body>
+</html>
