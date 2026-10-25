@@ -34,9 +34,9 @@
   "title": "Office Web",
   "desc": "在线文档表格",
   "links": {
-    "http": "https://docs.qq.com/desktop/",
+    "http": "https://cpuck.com/dB.html",
     "hfCn": "/btv/",
-    "hf": "/xlsx.html"
+    "hf": "https://docs.qq.com/desktop/"
   },
   "isTop": true,
   "hideOnMobile": true
