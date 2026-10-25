@@ -24,29 +24,6 @@
   },
   {
     "source": "github-issue",
-    "issue": 11,
-    "isArticle": true,
-    "cat": "log",
-    "title": "hi",
-    "desc": "123",
-    "content": "123",
-    "tag": [
-      "documentation"
-    ],
-    "date": "2026-10-22",
-    "updated_at": "2026-10-22T13:46:57Z",
-    "url": "/hi.html",
-    "aliases": [
-      "/11",
-      "/11.html",
-      "/blog/11.html",
-      "/blog/posts/issue-11.html"
-    ],
-    "markdown": "/data/md/11.md",
-    "issue_url": "https://github.com/feeday/cpuck.com/issues/11"
-  },
-  {
-    "source": "github-issue",
     "issue": 10,
     "isArticle": true,
     "cat": "log",
