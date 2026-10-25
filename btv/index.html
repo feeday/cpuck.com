@@ -318,16 +318,24 @@
     </div>
 
 <script>
-/* GitHub Pages 静态版。站长只需更改一次仓库名，访客不需要填写 token。 */
-const GITHUB_REPO = 'feeday/REPLACE_WITH_REPO';
+/* 本仓库 GitHub Issues。GitHub Pages 项目路径自动识别；自定义域名使用对应仓库兜底。 */
+const GITHUB_REPO = (() => {
+  const host = window.location.hostname.toLowerCase();
+  const match = host.match(/^([a-z\d-]+)\.github\.io$/);
+  if (match) {
+    const project = window.location.pathname.split('/').filter(Boolean)[0];
+    return match[1] + '/' + (project || match[1] + '.github.io');
+  }
+  return 'feeday/cpuck.com';
+})();
 const ISSUE_PREFIX_COMMENT = '[留言]';
 const ISSUE_PREFIX_VIDEO = '[投稿]';
 let database = [], currentIndex = 0, latestCommentId = null, cachedIssues = [];
 let lastGithubFetch = 0;
 const $ = id => document.getElementById(id);
-const repoIsConfigured = () => /^[a-z\d_.-]+\/[a-z\d_.-]+$/i.test(GITHUB_REPO) && !GITHUB_REPO.includes('REPLACE_WITH');
+const repoIsConfigured = () => /^[a-z\d_.-]+\/[a-z\d_.-]+$/i.test(GITHUB_REPO);
 function githubSetupNotice() {
-  return '站长尚未配置 GitHub 仓库。请修改 index.html 顶部 GITHUB_REPO 为 username/repository，并启用仓库 Issues。';
+  return '无法识别当前 GitHub 仓库：' + GITHUB_REPO + '。请检查 Pages 发布路径及仓库 Issues 设置。';
 }
 function escapeHtml(s) { return String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function bilibiliBV(value) {
@@ -345,8 +353,14 @@ function submitGithubIssue(title, body) {
   if (!repoIsConfigured()) { alert(githubSetupNotice()); return false; }
   const url = `https://github.com/${GITHUB_REPO}/issues/new?` + new URLSearchParams({title,body});
   // GitHub 授权与提交在 github.com 完成，不在静态页面保存写入密钥。
-  const opened = window.open(url, '_blank', 'noopener,noreferrer');
-  if (!opened) alert('浏览器可能拦截了新窗口。请允许弹出窗口后重试。');
+  // noopener 模式下 window.open 可能返回 null，即使标签页实际打开，也不应误报被拦截。
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.target = '_blank';
+  anchor.rel = 'noopener noreferrer';
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
   return true;
 }
 async function fetchIssues(force=false) {
@@ -362,7 +376,7 @@ async function fetchIssues(force=false) {
 async function loadDatabase(force=false) {
   const originals = [];
   try {
-    const r = await fetch('./btv/videos.txt?t='+Date.now(),{cache:'no-store'});
+    const r = await fetch('./videos.txt?t='+Date.now(),{cache:'no-store'});
     if (r.ok) {
       const lines=(await r.text()).split(/\r?\n/);
       for(const line of lines) { const bv=bilibiliBV(line.trim()); if(bv)originals.push(bv); }
