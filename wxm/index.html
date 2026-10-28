@@ -10,6 +10,10 @@
 /* 微信内精简主按钮区，其他浏览器仍显示全部功能 */
 html.wechat-client #mainToolsGrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 html.wechat-client #mainToolsGrid > :not([data-wechat-keep]){display:none!important}
+/* 仅微信内隐藏这三个按钮，不删除节点或事件，普通浏览器保持原样 */
+html.wechat-client #mainToolsGrid > #btnAudioEdit,
+html.wechat-client #mainToolsGrid > a[href*="poixe.com"][data-wechat-keep],
+html.wechat-client #mainToolsGrid > a[href*="apimart.ai"][data-wechat-keep]{display:none!important}
 html.wechat-client #btnClearOutput{order:1}
 html.wechat-client #btnCombinedAction{order:2}
 html.wechat-client #optimize-btn{order:3}
