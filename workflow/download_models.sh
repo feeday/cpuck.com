@@ -49,7 +49,7 @@ fi
 download_file() {
   local repo_path="$1" target_path="$2" source_path="$MODEL_DIR/$repo_path"
   mkdir -p "$(dirname -- "$target_path")"
-  if [[ -s "$target_path" ]]; then echo "[跳过] 已存在：$target_path"; return 0; fi
+  if [[ "$source_path" != "$target_path" && -s "$target_path" ]]; then echo "[跳过] 已存在：$target_path"; return 0; fi
   echo "[下载] $repo_path"
   "$HF_BIN" download "$HF_REPO" "$repo_path" --local-dir "$MODEL_DIR"
   [[ -s "$source_path" ]] || { echo "[错误] 下载后未找到：$source_path" >&2; return 1; }
