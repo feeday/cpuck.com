@@ -44,7 +44,7 @@ if [[ -n "${HF_ENDPOINT:-}" ]]; then
 else
   echo "[信息] 使用 Hugging Face 官方端点"
 fi
-"$HF_BIN" --version
+"$HF_BIN" version
 
 download_file() {
   local repo_path="$1" target_path="$2" source_path="$MODEL_DIR/$repo_path"
