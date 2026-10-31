@@ -37,7 +37,7 @@ https://huggingface.co/Comfy-Org/MiniMax-H3
 2. 多参考生视频：下载 REF2VA 扩散模型和所有共用模型。
 3. 全部工作流：下载两种扩散模型及所有共用模型。
 
-下载使用 Hugging Face 官方 CLI 的 hf download 命令，不会把模型权重提交到本 Git 仓库。脚本会跳过目标目录中已经存在的非空文件；下载中断后重新运行即可继续使用 Hugging Face 下载缓存。
+下载使用 Hugging Face 官方 CLI 的 hf download 命令，不会把模型权重提交到本 Git 仓库。共享模型由 Hugging Face CLI 根据本地目录缓存校验并避免重复下载；已安装到 minimaxh3 子目录的扩散模型会跳过。下载中断后重新运行即可继续使用 Hugging Face 下载缓存。
 
 如果当前网络无法访问 huggingface.co，可在运行前自行设置可用的 Hugging Face 镜像端点，例如：
 
