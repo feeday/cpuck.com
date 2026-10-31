@@ -129,82 +129,27 @@
             line-height: 1 !important; 
         }
         #delay a:hover { text-shadow: 0 0 5px var(--tech-blue); }
+    
+        .btv-home-link {
+            position: fixed; top: 10px; left: 10px; z-index: 2147483647;
+            display: inline-flex; align-items: center; padding: 7px 11px;
+            border: 1px solid rgba(0,240,255,.48); border-radius: 10px;
+            background: rgba(3,12,20,.94); color: #00f0ff;
+            text-decoration: none; font: 12px/1.4 'Share Tech Mono', monospace;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 24px rgba(0,0,0,.4);
+            transition: background .2s, border-color .2s, color .2s;
+        }
+        .btv-home-link:hover { background: #082b35; border-color: #00f0ff; color: #fff; }
+        .btv-home-link:focus-visible { outline: 2px solid #00f0ff; outline-offset: 3px; }
     </style>
 </head>
 <body class="flex flex-col h-[100dvh] overflow-hidden relative selection:bg-green-500 selection:text-black">
-<a href="/" aria-label="返回CPuck首页" style="position:fixed;top:8px;right:8px;z-index:2147483647;display:inline-flex;align-items:center;padding:7px 10px;border:1px solid #00ff41;border-radius:7px;background:rgba(0,0,0,.92);color:#00ff41;text-decoration:none;font:12px/1.4 monospace">← 首页</a>
+<a href="/" target="_top" rel="noopener" class="btv-home-link" aria-label="返回CPuck首页" title="返回CPuck首页">← 首页</a>
 
     <div class="scanlines"></div>
 
-    <header class="hidden lg:flex h-12 bg-black/80 border-b border-[#222] items-center justify-between px-6 z-20 shrink-0 backdrop-blur-sm">
-        <div class="flex items-center gap-3">
-            <i class="fas fa-biohazard text-green-500 animate-pulse text-lg"></i>
-            <span class="text-xl font-[Orbitron] font-black text-white tracking-widest">
-                ─=≡Σ<span class="text-green-500">((( つ•̀ω•́)つ</span>
-            </span>
-        </div>
-        
-        <div class="hidden md:flex gap-6 text-[10px] font-mono text-gray-500 tracking-wider">
-      
-          <!-- ==================== 1. 网络工具与基础空间 ==================== -->
-<!-- PING0：网络/IP/路由工具，使用终端命令行图标，极客感更强 -->
-
-
-<!-- Google Labs Flow：AI 实验室/灵感流，魔术棒（如支持 FA6 可改用 fa-wand-magic-sparkles） -->
-<a href="https://www.doubao.com/" target="_blank" class="nav-link transition"><i class="fas fa-microchip"></i>Doubao</a>
-
-<a href="https://chatgpt.com/" target="_blank" class="nav-link transition">
-    <i class="fas fa-code"></i> ChatGPT
-
-
-<a href="https://labs.google/fx/zh/tools/flow" target="_blank" class="nav-link transition"><i class="fas fa-magic"></i>Banana</a>    
-  
-  <!-- LLM Benchmark：大模型硬核跑分，使用微芯片图标，直击模型底层算力和架构跑分 -->
-<a href="https://huggingface.co/spaces/" target="_blank" class="nav-link transition"><i class="fas fa-terminal"></i>ZERO</a>  
-<!-- ==================== 2. 开发、算力与 Token 管理 ==================== -->
-<!-- Cloud Studio：云端代码空间 -->
-<a href="https://cloudstudio.net/" target="_blank" class="nav-link transition"><i class="fas fa-laptop-code"></i>STUDIO</a>
-<a href="https://colab.research.google.com/ " target="_blank" class="nav-link transition"><i class="fas fa-laptop-code"></i>Colab</a>
-
-
-<!-- Poixe：Token/密钥日志管理，使用密匙图标 -->
-<a href="http://cpu.jy6d.com/" target="_blank" class="nav-link transition"><i class="fas fa-key"></i>CPU</a>
-  
-  <a href="https://poorpaul.dev/leaderboard" target="_blank" class="nav-link transition" title="Gemini"><i class="fas fa-brain"></i>Tokens</a>
-  
-  <a href="https://www.photopea.com/" target="_blank" class="nav-link transition">
-    <i class="fas fa-image"></i> Photopea
-</a>
-
-
-<a href="https://translate.google.com/" target="_blank" class="nav-link transition">
-    <i class="fas fa-desktop"></i> Translate
-</a>        
-          
-
-<!-- Gemini AI：相比传统的旧版 robot，使用 brain (大脑) 更符合 AGI/大模型时代 -->
-<a href="https://aihot.news/" target="_blank" class="nav-link transition" title="Gemini"><i class="fas fa-brain"></i>AIHOT</a>
-
-<a href="https://ai-bot.cn/ai-tools/" target="_blank" class="nav-link transition" title="Gemini"><i class="fas fa-brain"></i>Tools</a>
-
-
-
-<!-- ==================== 4. AI 鉴伪、评测与数据榜单 ==================== -->
-<!-- 腾讯 Matrix AI 鉴伪：深度伪造/真伪检测，保留极具安全辨识度的指纹图标 -->
-<a href="https://matrix.tencent.com/ai-detect/" target="_blank" class="nav-link transition"><i class="fas fa-fingerprint"></i>AI-DETECT</a>
-
-
-
-
-          
-          
-        </div>
-
-        <div class="text-[10px] font-mono text-gray-500 flex items-center gap-2">
-            <span class="w-1.5 h-1.5 rounded-full bg-green-500 box-shadow-green"></span>
-            <span>SYSTEM: ONLINE</span>
-        </div>
-    </header>
+    
 
     <div class="flex-grow flex flex-col lg:flex-row overflow-hidden relative z-10 p-2 lg:p-4 gap-2 lg:gap-4 min-h-0">
         
