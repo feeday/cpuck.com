@@ -349,14 +349,19 @@
         .sitemap-xml-link:hover { color: var(--text-secondary); }
         #performance-result { font-family: monospace; }
         .fab-top {
-            position: fixed; bottom: 30px; right: 30px; width: 44px; height: 44px; border-radius: 12px;
-            background: rgba(30, 41, 59, 0.9); backdrop-filter: blur(10px);
-            border: 1px solid var(--border-light); color: var(--text-secondary); 
+            position: fixed; bottom: 24px; right: 18px; width: 44px; height: 44px; padding: 0; border-radius: 14px;
+            background: rgba(3, 12, 20, 0.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(0, 240, 255, 0.48); color: #00f0ff;
+            box-shadow: 0 8px 30px rgba(0,0,0,.45);
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; opacity: 0; transform: translateY(10px); transition: 0.3s; z-index: 1000;
+            cursor: pointer; opacity: 0; transform: translateY(10px);
+            transition: opacity .25s, transform .25s, background .2s, border-color .2s, color .2s; z-index: 1201;
         }
-        .fab-top:hover { border-color: var(--text-secondary); color: #fff; }
+        .fab-top svg { width: 18px; height: 18px; transition: transform .2s; }
+        .fab-top:hover { background: #082b35; border-color: rgba(0,240,255,.8); color: #fff; }
+        .fab-top:hover svg { transform: translateY(-2px); }
         .fab-top.visible { opacity: 1; transform: translateY(0); }
+        .fab-top:focus-visible { outline: 2px solid #00f0ff; outline-offset: 3px; }
         @media (max-width: 768px) {
             .sticky-header-wrapper { padding: 10px; top: 0; padding-top: 10px; padding-bottom: 20px; margin-bottom: 20px; }
             .sticky-inner { flex-direction: column; width: 100%; border-radius: 20px; padding: 12px 14px; gap: 10px; }
@@ -367,7 +372,7 @@
             .filter-bar::-webkit-scrollbar { display: none; }
             .tag-btn { padding: 6px 14px; font-size: 0.85rem; }
             .main-content { padding: 0 1rem; }
-            .fab-top { width: 40px; height: 40px; bottom: 20px; right: 20px; }
+            .fab-top { width: 40px; height: 40px; bottom: 18px; right: 16px; border-radius: 12px; }
             .copyright-bar { flex-direction: column; gap: 8px; }
             .copyright-divider { display: none; } 
             .hide-on-mobile { display: none !important; }
@@ -548,7 +553,9 @@
         </div>
     </footer>
 
-    <div class="fab-top" id="fabTop" onclick="scrollToTop()">↑</div>
+    <button type="button" class="fab-top" id="fabTop" onclick="scrollToTop()" aria-label="返回顶部" title="返回顶部">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+    </button>
 
     <script>
         // ================== 全局数据存储与分页配置 ==================
@@ -943,7 +950,7 @@
   <div class="btv-shade" id="btvDrawerShade"></div>
   <section class="btv-panel" id="btvDrawerPanel" aria-hidden="true">
     <div class="btv-panel-head"><span>CPUCK / BULLET VIDEO TERMINAL</span><button class="btv-panel-close" id="btvDrawerClose" type="button" aria-label="关闭 BTV 页面">×</button></div>
-    <iframe id="btvDrawerFrame" title="BTV 弹幕视频完整页面" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads"></iframe>
+    <iframe id="btvDrawerFrame" title="BTV 弹幕视频完整页面" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads allow-top-navigation-by-user-activation"></iframe>
   </section>
 </aside>
 <script id="desktop-quick-tools-script">
