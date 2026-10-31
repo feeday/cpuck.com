@@ -97,7 +97,7 @@
  {"cat":"image","title":"文生图","desc":"qwen-image-2-1-studio","url":"https://huggingface.co/spaces/feeday/qwen-image-2-1-studio","hideOnMobile":true},
 {"cat":"audio","title":"有声书","desc":"喜马拉雅有声故事。","url":"https://www.ximalaya.com/youshengshu/updates/","hideOnMobile":true},
 {"cat":"video","title":"LTX-2.3","desc":"在线图生视频带音效。","url":"https://huggingface.co/spaces/Lightricks/LTX-2-3"},
-{"cat":"audio","title":"Qwen-ASR","desc":"在线语音识别转换。","url":"https://huggingface.co/spaces/Qwen/Qwen3-ASR-Demo"},
+{"cat":"audio","title":"Qwen-ASR","desc":"在线语音识别转换。","url":"https://qwen-qwen3-asr-demo.hf.space/"},
 {"cat":"video","title":"央视新闻","desc":"央视频电视直播。","url":"https://www.yangshipin.cn/tv/home?pid=600001811","hideOnMobile":true},
 {"cat":"video","title":"虎牙直播","desc":"虎牙影视轮播。","url":"https://www.huya.com/g/2135"},
 {"cat":"video","title":"掌机游戏","desc":"最新掌机游戏筛选。","url":"https://www.gamer520.com/gameswitch"},
