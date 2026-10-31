@@ -107,11 +107,9 @@ if /I "%SOURCE_FULL%"=="%TARGET_FULL%" (
     exit /b 0
 )
 
-for %%F in ("%TARGET%") do (
-    if exist "%%~fF" if %%~zF GTR 0 (
-        echo [跳过] 已存在：%%~fF
-        exit /b 0
-    )
+if exist "%TARGET%" (
+    echo [跳过] 已存在：%TARGET%
+    exit /b 0
 )
 for %%D in ("%TARGET%") do if not exist "%%~dpD" mkdir "%%~dpD"
 echo [下载] %REPO_PATH%
