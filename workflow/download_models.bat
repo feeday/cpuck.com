@@ -92,6 +92,21 @@ goto :success
 :download
 set "REPO_PATH=%~1"
 set "TARGET=%~2"
+set "SOURCE=%MODEL_DIR%\%REPO_PATH:/=\%"
+for %%A in ("%SOURCE%") do set "SOURCE_FULL=%%~fA"
+for %%A in ("%TARGET%") do set "TARGET_FULL=%%~fA"
+
+if /I "%SOURCE_FULL%"=="%TARGET_FULL%" (
+    echo [校验/下载] %REPO_PATH%
+    hf download "%HF_REPO%" "%REPO_PATH%" --local-dir "%MODEL_DIR%"
+    if errorlevel 1 exit /b 1
+    if not exist "%TARGET%" (
+        echo [错误] 下载后未找到：%TARGET%
+        exit /b 1
+    )
+    exit /b 0
+)
+
 for %%F in ("%TARGET%") do (
     if exist "%%~fF" if %%~zF GTR 0 (
         echo [跳过] 已存在：%%~fF
@@ -102,14 +117,10 @@ for %%D in ("%TARGET%") do if not exist "%%~dpD" mkdir "%%~dpD"
 echo [下载] %REPO_PATH%
 hf download "%HF_REPO%" "%REPO_PATH%" --local-dir "%MODEL_DIR%"
 if errorlevel 1 exit /b 1
-set "SOURCE=%MODEL_DIR%\%REPO_PATH:/=\%"
 if not exist "%SOURCE%" (
     echo [错误] 下载后未找到：%SOURCE%
     exit /b 1
 )
-for %%A in ("%SOURCE%") do set "SOURCE_FULL=%%~fA"
-for %%A in ("%TARGET%") do set "TARGET_FULL=%%~fA"
-if /I "%SOURCE_FULL%"=="%TARGET_FULL%" exit /b 0
 move /Y "%SOURCE%" "%TARGET%" >nul
 if errorlevel 1 exit /b 1
 echo [完成] %TARGET%
