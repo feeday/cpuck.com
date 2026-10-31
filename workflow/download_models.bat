@@ -58,7 +58,7 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-hf --version
+hf version
 if errorlevel 1 goto :failed
 
 call :download "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors" "%MODEL_DIR%\text_encoders\qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
