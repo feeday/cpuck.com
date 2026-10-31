@@ -350,18 +350,18 @@
         #performance-result { font-family: monospace; }
         .fab-top {
             position: fixed; bottom: 24px; right: 18px; width: 44px; height: 44px; padding: 0; border-radius: 14px;
-            background: rgba(3, 12, 20, 0.96); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-            border: 1px solid rgba(0, 240, 255, 0.48); color: #00f0ff;
-            box-shadow: 0 8px 30px rgba(0,0,0,.45);
+            background: rgba(30, 41, 59, 0.78); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-light); color: var(--text-secondary);
+            box-shadow: 0 8px 26px rgba(2, 6, 23, 0.32);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; opacity: 0; transform: translateY(10px);
             transition: opacity .25s, transform .25s, background .2s, border-color .2s, color .2s; z-index: 1201;
         }
         .fab-top svg { width: 18px; height: 18px; transition: transform .2s; }
-        .fab-top:hover { background: #082b35; border-color: rgba(0,240,255,.8); color: #fff; }
+        .fab-top:hover { background: rgba(30, 41, 59, 0.96); border-color: var(--border-hover); color: var(--text-primary); }
         .fab-top:hover svg { transform: translateY(-2px); }
         .fab-top.visible { opacity: 1; transform: translateY(0); }
-        .fab-top:focus-visible { outline: 2px solid #00f0ff; outline-offset: 3px; }
+        .fab-top:focus-visible { outline: 2px solid rgba(148, 163, 184, 0.65); outline-offset: 3px; }
         @media (max-width: 768px) {
             .sticky-header-wrapper { padding: 10px; top: 0; padding-top: 10px; padding-bottom: 20px; margin-bottom: 20px; }
             .sticky-inner { flex-direction: column; width: 100%; border-radius: 20px; padding: 12px 14px; gap: 10px; }
@@ -927,8 +927,9 @@
 
 <style id="desktop-quick-tools-style">
 #desktopBtvDrawer{position:fixed;inset:0;z-index:2147483000;pointer-events:none;font-family:Inter,system-ui,-apple-system,sans-serif}
-#desktopBtvDrawer .btv-tab{pointer-events:auto;position:absolute;right:0;top:50%;transform:translateY(-50%);width:44px;height:116px;border:1px solid rgba(0,240,255,.48);border-right:0;border-radius:14px 0 0 14px;background:rgba(3,12,20,.96);color:#00f0ff;box-shadow:0 8px 30px rgba(0,0,0,.45);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;backdrop-filter:blur(14px);transition:background .2s,width .2s}
-#desktopBtvDrawer .btv-tab:hover{width:50px;background:#082b35}
+#desktopBtvDrawer .btv-tab{pointer-events:auto;position:absolute;right:0;top:50%;transform:translateY(-50%);width:44px;height:116px;border:1px solid var(--border-light);border-right:0;border-radius:14px 0 0 14px;background:rgba(30,41,59,.78);color:var(--text-secondary);box-shadow:0 8px 26px rgba(2,6,23,.32);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:background .2s,width .2s,border-color .2s,color .2s}
+#desktopBtvDrawer .btv-tab:hover{width:50px;background:rgba(30,41,59,.96);border-color:var(--border-hover);color:var(--text-primary)}
+#desktopBtvDrawer .btv-tab:focus-visible{outline:2px solid rgba(148,163,184,.65);outline-offset:3px}
 #desktopBtvDrawer .btv-tab svg{width:20px;height:20px}
 #desktopBtvDrawer .btv-tab span{writing-mode:vertical-rl;letter-spacing:2px;font-size:12px;font-weight:700}
 #desktopBtvDrawer .btv-shade{position:absolute;inset:0;background:rgba(0,0,0,.58);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;pointer-events:none}
