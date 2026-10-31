@@ -916,5 +916,68 @@
             }, 0);
         });
     </script>
+
+<style id="desktop-quick-tools-style">
+#desktopQuickTools{position:fixed;right:0;top:50%;z-index:1200;transform:translateY(-50%);font-family:Inter,system-ui,-apple-system,sans-serif}
+#desktopQuickTools .dqt-trigger{position:absolute;right:0;top:50%;transform:translateY(-50%);width:42px;height:112px;border:1px solid rgba(125,211,252,.35);border-right:0;border-radius:14px 0 0 14px;background:rgba(15,23,42,.94);color:#bae6fd;box-shadow:0 8px 30px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:background .2s,width .2s}
+#desktopQuickTools .dqt-trigger:hover{background:rgba(14,116,144,.95);width:48px}
+#desktopQuickTools .dqt-trigger svg{width:19px;height:19px;flex:none}
+#desktopQuickTools .dqt-trigger span{writing-mode:vertical-rl;letter-spacing:2px;font-size:12px;font-weight:600}
+#desktopQuickTools .dqt-panel{position:absolute;right:0;top:50%;width:0;max-height:calc(100vh - 48px);opacity:0;visibility:hidden;overflow:hidden;transform:translateY(-50%) translateX(12px);transition:width .28s cubic-bezier(.2,.8,.2,1),opacity .2s,transform .28s,visibility .28s;background:rgba(8,15,30,.97);border:1px solid rgba(148,163,184,.2);border-right:0;border-radius:18px 0 0 18px;box-shadow:0 20px 70px rgba(0,0,0,.48);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+#desktopQuickTools.is-open .dqt-panel{width:286px;opacity:1;visibility:visible;transform:translateY(-50%) translateX(0);padding:20px 18px 18px}
+#desktopQuickTools.is-open .dqt-trigger{right:286px;background:#0e7490}
+#desktopQuickTools .dqt-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:5px;white-space:nowrap}
+#desktopQuickTools .dqt-title{font-size:15px;font-weight:700;color:#f1f5f9}
+#desktopQuickTools .dqt-close{width:28px;height:28px;border:1px solid rgba(255,255,255,.12);border-radius:9px;background:rgba(255,255,255,.06);color:#cbd5e1;cursor:pointer;font-size:18px;line-height:1}
+#desktopQuickTools .dqt-subtitle{font-size:11px;color:#64748b;margin-bottom:16px;white-space:nowrap}
+#desktopQuickTools .dqt-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#desktopQuickTools .dqt-link{min-width:0;min-height:70px;padding:11px 10px;border:1px solid rgba(148,163,184,.13);border-radius:12px;background:rgba(30,41,59,.48);display:flex;flex-direction:column;justify-content:center;gap:5px;transition:transform .18s,border-color .18s,background .18s}
+#desktopQuickTools .dqt-link:hover{transform:translateY(-2px);border-color:rgba(56,189,248,.55);background:rgba(14,116,144,.2)}
+#desktopQuickTools .dqt-link strong{font-size:12px;color:#e2e8f0;font-weight:600;white-space:nowrap}
+#desktopQuickTools .dqt-link small{font-size:10px;color:#64748b;white-space:nowrap}
+#desktopQuickTools .dqt-footer{margin-top:14px;padding-top:12px;border-top:1px solid rgba(148,163,184,.12);font-size:10px;color:#64748b;white-space:nowrap}
+@media(max-width:768px),(hover:none) and (pointer:coarse){#desktopQuickTools{display:none!important}}
+@media(prefers-reduced-motion:reduce){#desktopQuickTools *{transition:none!important}}
+</style>
+<aside id="desktopQuickTools" aria-label="桌面快捷工具">
+  <button class="dqt-trigger" id="dqtToggle" type="button" aria-expanded="false" aria-controls="dqtPanel" aria-label="展开快捷工具">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+    <span>快捷工具</span>
+  </button>
+  <section class="dqt-panel" id="dqtPanel" aria-hidden="true">
+    <div class="dqt-head"><div class="dqt-title">快捷工具</div><button class="dqt-close" id="dqtClose" type="button" aria-label="关闭快捷工具">×</button></div>
+    <div class="dqt-subtitle">常用 AI 服务与实用入口</div>
+    <nav class="dqt-grid" aria-label="快捷工具链接">
+      <a class="dqt-link" href="/wxm/"><strong>模型测试</strong><small>文本处理 · Token 统计</small></a>
+      <a class="dqt-link" href="https://matrix.tencent.com/ai-detect/" target="_blank" rel="noopener noreferrer"><strong>朱雀鉴伪</strong><small>AI 内容检测</small></a>
+      <a class="dqt-link" href="https://pan.quark.cn/s/7d5d8cd6f065#/list/share/4e76c517a26349739cc863af6663c9b2" target="_blank" rel="noopener noreferrer"><strong>模型下载</strong><small>模型与相关资源</small></a>
+      <a class="dqt-link" href="https://link-ai.tech/console?share=9mepei" target="_blank" rel="noopener noreferrer"><strong>国内模型</strong><small>模型 API 服务</small></a>
+      <a class="dqt-link" href="https://poixe.com/pricing?i=token" target="_blank" rel="noopener noreferrer"><strong>词元代理</strong><small>模型 Token 服务</small></a>
+      <a class="dqt-link" href="https://apimart.ai/register?aff=token" target="_blank" rel="noopener noreferrer"><strong>生图代理</strong><small>图像模型服务</small></a>
+      <a class="dqt-link" href="https://pd.qq.com/g/pd54620835" target="_blank" rel="noopener noreferrer"><strong>免费密钥</strong><small>资源与密钥分享</small></a>
+      <a class="dqt-link" href="https://www.speedtest.cn/" target="_blank" rel="noopener noreferrer"><strong>测网速</strong><small>网络速度检测</small></a>
+    </nav>
+    <div class="dqt-footer">仅桌面端显示 · 点击右侧标签可随时收起</div>
+  </section>
+</aside>
+<script id="desktop-quick-tools-script">
+(function(){
+  const root=document.getElementById('desktopQuickTools');
+  if(!root)return;
+  const toggle=root.querySelector('#dqtToggle'),panel=root.querySelector('#dqtPanel'),close=root.querySelector('#dqtClose');
+  function setOpen(open){
+    root.classList.toggle('is-open',open);
+    toggle.setAttribute('aria-expanded',String(open));
+    toggle.setAttribute('aria-label',open?'收起快捷工具':'展开快捷工具');
+    panel.setAttribute('aria-hidden',String(!open));
+  }
+  toggle.addEventListener('click',function(){setOpen(!root.classList.contains('is-open'));});
+  close.addEventListener('click',function(){setOpen(false);toggle.focus();});
+  document.addEventListener('keydown',function(event){if(event.key==='Escape'&&root.classList.contains('is-open')){setOpen(false);toggle.focus();}});
+  document.addEventListener('click',function(event){if(root.classList.contains('is-open')&&!root.contains(event.target))setOpen(false);});
+  window.addEventListener('resize',function(){if(window.matchMedia('(max-width: 768px)').matches)setOpen(false);});
+})();
+</script>
+
 </body>
 </html>
