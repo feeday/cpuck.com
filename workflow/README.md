@@ -20,6 +20,7 @@ T2V 和首尾帧 I2V 共用 FL2VA；多参考工作流使用 REF2VA。
 3. 在独立 Python venv 中安装 Hugging Face CLI，不升级 ComfyUI 环境里的 huggingface_hub。
 4. 下载共用文本编码器、视频/音频 VAE，以及选择的 FL2VA / REF2VA 模型。
 5. 将扩散模型放入工作流 JSON 指定的 diffusion_models/minimaxh3/ 子目录，并检查大模型文件至少 18 GB，避免把未完成下载当成安装成功。
+6. 工作流模型子路径使用正斜杠（minimaxh3/文件名），兼容 Linux、Windows，避免 Linux 把反斜杠当成普通文件名字符。
 
 ### Windows
 
