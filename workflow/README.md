@@ -19,17 +19,21 @@ https://huggingface.co/Comfy-Org/MiniMax-H3
 
 ### Windows
 
-双击 download_models.bat，输入 ComfyUI 根目录（即包含 models 文件夹的目录），再选择下载范围。
+双击 download_models.bat，输入 ComfyUI 根目录（即包含 models 文件夹的目录），或直接输入 models 文件夹路径，再选择下载范围。
 
 ### Ubuntu
+
+在仓库根目录运行：
 
     chmod +x workflow/download_models.sh
     ./workflow/download_models.sh
 
-如果工作流目录不在 ComfyUI 根目录下，脚本会提示输入 ComfyUI 根目录。也可以提前设置：
+脚本也可以从其他目录通过绝对或相对路径调用。如果工作流目录不在 ComfyUI 根目录下，脚本会提示输入 ComfyUI 根目录或 models 目录。也可以提前设置：
 
     export COMFYUI_ROOT="/path/to/ComfyUI"
     ./workflow/download_models.sh
+
+Ubuntu 脚本会把 Hugging Face CLI 安装在用户缓存目录下的独立 Python venv（默认 ~/.cache/minimax-h3-hf-cli），不会升级或覆盖 ComfyUI 当前 Python 环境中的依赖。若需指定独立环境位置，可设置 HF_CLI_VENV。
 
 ### 下载范围
 
@@ -51,7 +55,7 @@ Windows CMD：
     set HF_ENDPOINT=https://hf-mirror.com
     workflow\download_models.bat
 
-镜像端点由使用者自行选择；默认仍使用 Hugging Face 官方站点。若仓库返回认证错误，可先安装 huggingface_hub 并执行 hf auth login。
+镜像端点由使用者自行选择；默认仍使用 Hugging Face 官方站点。若仓库返回认证错误，可使用脚本所调用的 hf 命令执行 hf auth login。
 
 ## 模型放置位置
 
