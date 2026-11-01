@@ -997,7 +997,8 @@
         -933.5160522460938,
         6051.6005859375
       ],
-      "size": [        274.080078125,
+      "size": [
+        274.080078125,
         136
       ],
       "flags": {},
@@ -1781,7 +1782,7 @@
         "widget_ue_connectable": {}
       },
       "widgets_values": [
-        "minimaxh3\\minimax_h3_ref2va_pruned_int8_convrot.safetensors",
+        "minimaxh3/minimax_h3_ref2va_pruned_int8_convrot.safetensors",
         "default",
         "default",
         false,
@@ -1996,7 +1997,8 @@
     ],
     [
       261,
-      132,      0,
+      132,
+      0,
       131,
       0,
       "FLOAT"
