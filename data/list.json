@@ -35,7 +35,7 @@
   "desc": "在线文档表格",
   "links": {
     "http": "https://cpuck.com/dB.html",
-    "hfCn": "/btv/",
+    "hfCn": "https://cpuck.com/xlsx.html",
     "hf": "https://docs.qq.com/desktop/"
   },
   "isTop": true,
@@ -84,8 +84,8 @@
   "desc": "模型测速检测",
   "links": {
     "http": "https://matrix.tencent.com/ai-detect/",
-    "hfCn": "https://cloud.tencent.com/act/cps/redirect?redirect=5333&cps_key=615609c54e8bcced8b02c202a43b5570&from=console",
-    "hf": "https://cloudstudio.net/"
+    "hfCn": "https://cloud.tencent.com/act/cps/redirect?redirect=1079&cps_key=615609c54e8bcced8b02c202a43b5570&from=console",
+    "hf": "https://cloudstudio.net/apps"
   },
   "isTop": true,
   "hideOnMobile": true
