@@ -1,49 +1,59 @@
 # MiniMax H3 ComfyUI 工作流
 
-本目录包含三个独立的 ComfyUI 工作流，以及 Windows / Ubuntu 模型下载脚本。
+本目录包含三个独立的 ComfyUI 工作流，以及 Windows / Ubuntu 一键安装和模型下载脚本。
 
 ## 工作流
 
 | 文件 | 用途 | 扩散模型 |
 |---|---|---|
-| minimax-h3-t2v-text-to-video.json | T2V 文生视频 | minimax_h3_fl2va_pruned_int8_convrot.safetensors |
-| minimax-h3-multi-reference-video.json | 多参考图/视频/音频生视频 | minimax_h3_ref2va_pruned_int8_convrot.safetensors |
-| minimax-h3-i2v-first-last-frame.json | I2V 首帧/尾帧图生视频 | minimax_h3_fl2va_pruned_int8_convrot.safetensors |
+| minimax-h3-t2v-text-to-video.json | T2V 文生视频 | FL2VA |
+| minimax-h3-multi-reference-video.json | 多参考图/视频/音频生视频 | REF2VA |
+| minimax-h3-i2v-first-last-frame.json | I2V 首帧/尾帧图生视频 | FL2VA |
 
-T2V 和首尾帧 I2V 共用 FL2VA 扩散模型；多参考工作流使用 REF2VA 扩散模型。
+T2V 和首尾帧 I2V 共用 FL2VA；多参考工作流使用 REF2VA。
 
-## 下载模型
+## 一键安装
 
-模型来源：Hugging Face 官方 ComfyUI 重打包仓库：
-https://huggingface.co/Comfy-Org/MiniMax-H3
+脚本会：
+1. 安装或更新 ComfyUI-KJNodes 和 rgthree-comfy。
+2. 使用 ComfyUI 当前 Python 安装 KJNodes 的 requirements.txt。
+3. 在独立 Python venv 中安装 Hugging Face CLI，不升级 ComfyUI 环境里的 huggingface_hub。
+4. 下载共用文本编码器、视频/音频 VAE，以及选择的 FL2VA / REF2VA 模型。
+5. 将扩散模型放入工作流 JSON 指定的 diffusion_models/minimaxh3/ 子目录，并检查大模型文件至少 18 GB，避免把未完成下载当成安装成功。
 
 ### Windows
 
-双击 download_models.bat，输入 ComfyUI 根目录（即包含 models 文件夹的目录），或直接输入 models 文件夹路径，再选择下载范围。
+双击 download_models.bat，输入 ComfyUI 根目录（包含 models 文件夹的目录）或 models 文件夹路径，再选择下载范围。
 
-### Ubuntu
+### Ubuntu / Gitpod
 
 在仓库根目录运行：
 
     chmod +x workflow/download_models.sh
     ./workflow/download_models.sh
 
-脚本也可以从其他目录通过绝对或相对路径调用。如果工作流目录不在 ComfyUI 根目录下，脚本会提示输入 ComfyUI 根目录或 models 目录。也可以提前设置：
+也可以设置 ComfyUI 路径：
 
-    export COMFYUI_ROOT="/path/to/ComfyUI"
+    export COMFYUI_ROOT="/workspace/ComfyUI"
     ./workflow/download_models.sh
 
-Ubuntu 脚本会把 Hugging Face CLI 安装在用户缓存目录下的独立 Python venv（默认 ~/.cache/minimax-h3-hf-cli），不会升级或覆盖 ComfyUI 当前 Python 环境中的依赖。若需指定独立环境位置，可设置 HF_CLI_VENV。
+如果 ComfyUI 使用非默认 Python：
+
+    PYTHON_EXE="/path/to/comfyui/python" ./workflow/download_models.sh
+
+Ubuntu 的 Hugging Face CLI 默认安装在 ~/.cache/minimax-h3-hf-cli，不会覆盖 ComfyUI 环境依赖。可通过 HF_CLI_VENV 自定义目录。
 
 ### 下载范围
 
-1. T2V + I2V：下载 FL2VA 扩散模型和所有共用模型。
-2. 多参考生视频：下载 REF2VA 扩散模型和所有共用模型。
-3. 全部工作流：下载两种扩散模型及所有共用模型。
+1. T2V + I2V：下载 FL2VA 和所有共用模型。
+2. 多参考生视频：下载 REF2VA 和所有共用模型。
+3. 全部工作流：下载 FL2VA、REF2VA 和所有共用模型。
 
-下载使用 Hugging Face 官方 CLI 的 hf download 命令，不会把模型权重提交到本 Git 仓库。共享模型由 Hugging Face CLI 根据本地目录缓存校验并避免重复下载；已安装到 minimaxh3 子目录的扩散模型会跳过。下载中断后重新运行即可继续使用 Hugging Face 下载缓存。
+模型仓库： https://huggingface.co/Comfy-Org/MiniMax-H3
 
-如果当前网络无法访问 huggingface.co，可在运行前自行设置可用的 Hugging Face 镜像端点，例如：
+FL2VA / REF2VA 的 INT8 ConvRot 模型文件约 21 GB。请确保磁盘空间充足。下载中断后重新运行脚本即可使用 Hugging Face CLI 缓存继续下载。
+
+如果无法访问 Hugging Face，可在运行前设置镜像端点，例如：
 
 Ubuntu：
 
@@ -55,11 +65,7 @@ Windows CMD：
     set HF_ENDPOINT=https://hf-mirror.com
     workflow\download_models.bat
 
-镜像端点由使用者自行选择；默认仍使用 Hugging Face 官方站点。若仓库返回认证错误，可使用脚本所调用的 hf 命令执行 hf auth login。
-
-## 模型放置位置
-
-脚本按工作流节点实际选择的文件名安装到以下目录：
+## 模型安装位置
 
     ComfyUI/
     └── models/
@@ -73,18 +79,10 @@ Windows CMD：
             ├── minimax_h3_video_vae_fp16.safetensors
             └── minimax_h3_audio_vae_fp32.safetensors
 
-## 工作流模型配置说明
-
-这三个原始 JSON 的节点配置和说明卡片存在两处文件名不一致：
-
-- CLIPLoader 节点当前实际选择的是 qwen3vl_32b_minimax_h3_int8_convrot.safetensors，但说明卡片及模型元数据列出的是 qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors。下载脚本按节点当前选择的 INT8 文件下载，避免导入后提示缺少模型。
-- 多参考工作流的扩散模型节点实际选择 minimax_h3_ref2va_pruned_int8_convrot.safetensors；其说明卡片列出的 FL2VA 文件不适用于该节点。下载脚本按节点当前选择的 REF2VA 文件下载。
-
-工作流 JSON 原样保存，没有改动节点参数。
-
 ## 注意
 
-- 请使用包含 MiniMax H3 原生节点的较新版本 ComfyUI。
-- DiffusionModelLoaderKJ 需要安装对应的 KJNodes 自定义节点包。
-- 多参考工作流中的 VHS_LoadVideo 需要 VideoHelperSuite；Label (rgthree) 需要 rgthree-comfy。
-- 模型文件体积较大，请预留足够磁盘空间。不同工作流共享文本编码器和 VAE，不需要重复下载。
+- DiffusionModelLoaderKJ 来自 ComfyUI-KJNodes。
+- Label (rgthree) 来自 rgthree-comfy。
+- 多参考工作流中的 VHS_LoadVideo 还需要 VideoHelperSuite；Label (rgthree) 不再需要手动安装多个节点。
+- 模型权重不会提交到 Git 仓库。
+- 安装完成后请完全重启 ComfyUI，再重新载入工作流。
