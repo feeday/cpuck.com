@@ -1259,7 +1259,7 @@
         "default",
         "default",
         false,
-        "auto",
+        "disabled",
         true
       ]
     },
