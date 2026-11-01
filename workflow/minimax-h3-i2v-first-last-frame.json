@@ -997,7 +997,8 @@
           "type": "FLOAT,INT,BOOLEAN",
           "link": 250
         },
-        {          "label": "b",
+        {
+          "label": "b",
           "name": "values.b",
           "shape": 7,
           "type": "FLOAT,INT,BOOLEAN"
@@ -1344,7 +1345,7 @@
         "widget_ue_connectable": {}
       },
       "widgets_values": [
-        "minimaxh3\\minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+        "minimaxh3/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
         "default",
         "default",
         false,
