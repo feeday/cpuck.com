@@ -6,7 +6,7 @@ for %%I in ("%SCRIPT_DIR%..") do set "DEFAULT_ROOT=%%~fI"
 
 if not defined COMFYUI_ROOT if exist "%DEFAULT_ROOT%\models\" set "COMFYUI_ROOT=%DEFAULT_ROOT%"
 if not defined COMFYUI_ROOT (
-    echo 请输入 ComfyUI 根目录（包含 models 文件夹的目录）。
+    echo 请输入 ComfyUI 根目录或 models 目录。
     set /p "COMFYUI_ROOT=ComfyUI 路径: "
 )
 if not exist "%COMFYUI_ROOT%\" (
@@ -15,7 +15,16 @@ if not exist "%COMFYUI_ROOT%\" (
     exit /b 1
 )
 
-set "MODEL_DIR=%COMFYUI_ROOT%\models"
+rem 同时接受 ComfyUI 根目录和直接指向 models 的目录。
+for %%I in ("%COMFYUI_ROOT%") do (
+    if /I "%%~nxI"=="models" (
+        set "MODEL_DIR=%%~fI"
+        set "COMFYUI_ROOT=%%~dpI"
+    ) else (
+        set "COMFYUI_ROOT=%%~fI"
+        set "MODEL_DIR=%%~fI\models"
+    )
+)
 if not exist "%MODEL_DIR%\" mkdir "%MODEL_DIR%"
 
 echo.
@@ -36,29 +45,36 @@ set "HF_REPO=Comfy-Org/MiniMax-H3"
 set "HF_HUB_DOWNLOAD_TIMEOUT=60"
 if defined HF_ENDPOINT (echo [信息] HF_ENDPOINT=%HF_ENDPOINT%) else (echo [信息] 使用 Hugging Face 官方端点)
 
-rem 优先使用 ComfyUI Windows 便携版自带 Python。
+rem 优先使用已安装的 hf；若不存在，则安装到独立 venv。
+set "HF_BIN=hf"
+where hf >nul 2>&1
+if not errorlevel 1 goto :hf_ready
+
 if not defined PYTHON_EXE if exist "%COMFYUI_ROOT%\python_embeded\python.exe" set "PYTHON_EXE=%COMFYUI_ROOT%\python_embeded\python.exe"
 if not defined PYTHON_EXE set "PYTHON_EXE=python"
-where hf >nul 2>&1
+"%PYTHON_EXE%" --version >nul 2>&1
 if errorlevel 1 (
-    "%PYTHON_EXE%" --version >nul 2>&1
-    if errorlevel 1 (
-        echo [错误] 未找到 hf 或可用的 Python 3。
-        pause
-        exit /b 1
-    )
-    echo [准备] 安装 Hugging Face CLI...
-    "%PYTHON_EXE%" -m pip install --upgrade huggingface_hub
-    if errorlevel 1 goto :failed
-    for /f "delims=" %%S in ('"%PYTHON_EXE%" -c "import sysconfig; print(sysconfig.get_path('scripts'))"') do set "PATH=%%S;%PATH%"
-)
-where hf >nul 2>&1
-if errorlevel 1 (
-    echo [错误] 找不到 hf 命令，请检查 Python Scripts 目录是否加入 PATH。
+    echo [错误] 未找到 hf 或可用的 Python 3。
     pause
     exit /b 1
 )
-hf version
+if not defined LOCALAPPDATA set "LOCALAPPDATA=%USERPROFILE%\AppData\Local"
+set "HF_VENV=%LOCALAPPDATA%\MiniMaxH3\hf-cli"
+if not exist "%HF_VENV%\Scripts\hf.exe" (
+    echo [准备] 创建独立 Hugging Face CLI 环境：%HF_VENV%
+    "%PYTHON_EXE%" -m venv "%HF_VENV%"
+    if errorlevel 1 (
+        echo [错误] 创建 Python venv 失败。请安装标准版 Python 3，或先单独安装 hf CLI。
+        pause
+        exit /b 1
+    )
+    "%HF_VENV%\Scripts\python.exe" -m pip install --upgrade pip huggingface_hub
+    if errorlevel 1 goto :failed
+)
+set "HF_BIN=%HF_VENV%\Scripts\hf.exe"
+
+:hf_ready
+"%HF_BIN%" version
 if errorlevel 1 goto :failed
 
 call :download "text_encoders/qwen3vl_32b_minimax_h3_int8_convrot.safetensors" "%MODEL_DIR%\text_encoders\qwen3vl_32b_minimax_h3_int8_convrot.safetensors"
@@ -98,7 +114,7 @@ for %%A in ("%TARGET%") do set "TARGET_FULL=%%~fA"
 
 if /I "%SOURCE_FULL%"=="%TARGET_FULL%" (
     echo [校验/下载] %REPO_PATH%
-    hf download "%HF_REPO%" "%REPO_PATH%" --local-dir "%MODEL_DIR%"
+    "%HF_BIN%" download "%HF_REPO%" "%REPO_PATH%" --local-dir "%MODEL_DIR%"
     if errorlevel 1 exit /b 1
     if not exist "%TARGET%" (
         echo [错误] 下载后未找到：%TARGET%
@@ -113,7 +129,7 @@ if exist "%TARGET%" (
 )
 for %%D in ("%TARGET%") do if not exist "%%~dpD" mkdir "%%~dpD"
 echo [下载] %REPO_PATH%
-hf download "%HF_REPO%" "%REPO_PATH%" --local-dir "%MODEL_DIR%"
+"%HF_BIN%" download "%HF_REPO%" "%REPO_PATH%" --local-dir "%MODEL_DIR%"
 if errorlevel 1 exit /b 1
 if not exist "%SOURCE%" (
     echo [错误] 下载后未找到：%SOURCE%
@@ -137,6 +153,6 @@ exit /b 0
 :failed
 echo.
 echo [失败] 模型下载未完成。检查网络或 HF_ENDPOINT 后重新运行即可。
-echo 如仓库要求认证，请先执行 hf auth login。
+echo 如仓库要求认证，请执行 "%HF_BIN%" auth login。
 pause
 exit /b 1
