@@ -1,6 +1,6 @@
 # MiniMax H3 ComfyUI 工作流
 
-本目录包含三个独立的 ComfyUI 工作流，以及 Windows / Ubuntu 一键安装和模型下载脚本。
+本目录包含三个独立的 ComfyUI 工作流，以及 Windows / Ubuntu 一键安装和模型下载脚本。`fix_attention_compat.py` 是两个安装脚本共用的 Attention 兼容检查程序，请与脚本和工作流 JSON 放在同一目录。
 
 ## 工作流
 
@@ -21,6 +21,7 @@ T2V 和首尾帧 I2V 共用 FL2VA；多参考工作流使用 REF2VA。
 4. 下载共用文本编码器、视频/音频 VAE，以及选择的 FL2VA / REF2VA 模型。
 5. 将扩散模型放入工作流 JSON 指定的 diffusion_models/minimaxh3/ 子目录，并检查大模型文件至少 18 GB，避免把未完成下载当成安装成功。
 6. 工作流模型子路径使用正斜杠（minimaxh3/文件名），兼容 Linux、Windows，避免 Linux 把反斜杠当成普通文件名字符。
+7. 自动检测 GPU 架构与 sageattention 是否安装；Tesla T4（SM75）或缺少 SageAttention 时，将 DiffusionModelLoaderKJ 的 sage_attention 设为 disabled，使用 ComfyUI 原生 PyTorch Attention，避免执行时因缺少 sageattention 而报错。
 
 ### Windows
 
@@ -53,6 +54,10 @@ Ubuntu 的 Hugging Face CLI 默认安装在 ~/.cache/minimax-h3-hf-cli，不会�
 模型仓库： https://huggingface.co/Comfy-Org/MiniMax-H3
 
 FL2VA / REF2VA 的 INT8 ConvRot 模型文件约 21 GB。请确保磁盘空间充足。下载中断后重新运行脚本即可使用 Hugging Face CLI 缓存继续下载。
+
+### SageAttention 与 Tesla T4
+
+Tesla T4 是 Turing 架构（SM75），安装脚本会自动把三个工作流中 `DiffusionModelLoaderKJ` 的 `sage_attention` 设置为 `disabled`，不安装 SageAttention，也不强制调用 SageAttention 2；模型加载后使用 ComfyUI 原生 PyTorch Attention。其他 GPU 只有在 CUDA 架构为 SM80 或更新且 `sageattention` 已安装时，才保留工作流原有 Attention 设置。
 
 如果无法访问 Hugging Face，可在运行前设置镜像端点，例如：
 
