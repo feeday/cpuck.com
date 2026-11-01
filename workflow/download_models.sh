@@ -6,12 +6,17 @@ DEFAULT_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 COMFYUI_ROOT="${COMFYUI_ROOT:-}"
 if [[ -z "$COMFYUI_ROOT" && -d "$DEFAULT_ROOT/models" ]]; then COMFYUI_ROOT="$DEFAULT_ROOT"; fi
 if [[ -z "$COMFYUI_ROOT" ]]; then
-  read -r -p "请输入 ComfyUI 根目录（包含 models/ 的目录）: " COMFYUI_ROOT
+  read -r -p "请输入 ComfyUI 根目录或 models 目录: " COMFYUI_ROOT
 fi
 if [[ ! -d "$COMFYUI_ROOT" ]]; then echo "[错误] 目录不存在：$COMFYUI_ROOT" >&2; exit 1; fi
 
-COMFYUI_ROOT="$(cd -- "$COMFYUI_ROOT" && pwd)"
-MODEL_DIR="$COMFYUI_ROOT/models"
+COMFYUI_ROOT="$(cd -- "$COMFYUI_ROOT" && pwd -P)"
+if [[ "$(basename -- "$COMFYUI_ROOT")" == "models" ]]; then
+  MODEL_DIR="$COMFYUI_ROOT"
+  COMFYUI_ROOT="$(dirname -- "$MODEL_DIR")"
+else
+  MODEL_DIR="$COMFYUI_ROOT/models"
+fi
 mkdir -p "$MODEL_DIR"
 
 echo
@@ -25,19 +30,20 @@ case "$MODE" in 1|2|3) ;; *) echo "[错误] 请输入 1、2 或 3。" >&2; exit 
 
 HF_REPO="Comfy-Org/MiniMax-H3"
 export HF_HUB_DOWNLOAD_TIMEOUT="${HF_HUB_DOWNLOAD_TIMEOUT:-60}"
-if command -v hf >/dev/null 2>&1; then
-  HF_BIN="$(command -v hf)"
-else
-  PYTHON_BIN="${PYTHON_EXE:-python3}"
-  command -v "$PYTHON_BIN" >/dev/null 2>&1 || { echo "[错误] 未找到 hf 或 python3。" >&2; exit 1; }
-  HF_VENV="${XDG_CACHE_HOME:-$HOME/.cache}/minimax-h3-hf-cli"
-  if [[ ! -x "$HF_VENV/bin/hf" ]]; then
-    echo "[准备] 创建 Hugging Face CLI 环境：$HF_VENV"
-    "$PYTHON_BIN" -m venv "$HF_VENV" || { echo "[错误] 请先安装 python3-venv。" >&2; exit 1; }
-    "$HF_VENV/bin/python" -m pip install --upgrade pip huggingface_hub
-  fi
-  HF_BIN="$HF_VENV/bin/hf"
+
+# Hugging Face CLI 使用独立 venv，避免修改 ComfyUI/Python 环境中的依赖。
+PYTHON_BIN="${PYTHON_EXE:-python3}"
+command -v "$PYTHON_BIN" >/dev/null 2>&1 || { echo "[错误] 未找到 $PYTHON_BIN。" >&2; exit 1; }
+HF_VENV="${HF_CLI_VENV:-${XDG_CACHE_HOME:-$HOME/.cache}/minimax-h3-hf-cli}"
+if [[ ! -x "$HF_VENV/bin/hf" ]]; then
+  echo "[准备] 创建独立 Hugging Face CLI 环境：$HF_VENV"
+  "$PYTHON_BIN" -m venv "$HF_VENV" || {
+    echo "[错误] 创建 Python venv 失败。Debian/Ubuntu 可执行：sudo apt install python3-venv" >&2
+    exit 1
+  }
+  "$HF_VENV/bin/python" -m pip install --upgrade pip huggingface_hub
 fi
+HF_BIN="$HF_VENV/bin/hf"
 
 if [[ -n "${HF_ENDPOINT:-}" ]]; then
   echo "[信息] HF_ENDPOINT=$HF_ENDPOINT"
@@ -47,9 +53,15 @@ fi
 "$HF_BIN" version
 
 download_file() {
-  local repo_path="$1" target_path="$2" source_path="$MODEL_DIR/$repo_path"
+  local repo_path="$1"
+  local target_path="$2"
+  local source_path="$MODEL_DIR/$repo_path"
+
   mkdir -p "$(dirname -- "$target_path")"
-  if [[ "$source_path" != "$target_path" && -s "$target_path" ]]; then echo "[跳过] 已存在：$target_path"; return 0; fi
+  if [[ "$source_path" != "$target_path" && -s "$target_path" ]]; then
+    echo "[跳过] 已存在：$target_path"
+    return 0
+  fi
   echo "[下载] $repo_path"
   "$HF_BIN" download "$HF_REPO" "$repo_path" --local-dir "$MODEL_DIR"
   [[ -s "$source_path" ]] || { echo "[错误] 下载后未找到：$source_path" >&2; return 1; }
