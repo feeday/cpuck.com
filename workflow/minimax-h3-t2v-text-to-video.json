@@ -997,7 +997,8 @@
             265
           ]
         }
-      ],      "title": "Input Text (Prompt) 提示词",
+      ],
+      "title": "Input Text (Prompt) 提示词",
       "properties": {
         "Node name for S&R": "PrimitiveStringMultiline",
         "widget_ue_connectable": {}
@@ -1254,7 +1255,7 @@
         "widget_ue_connectable": {}
       },
       "widgets_values": [
-        "minimaxh3\\minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+        "minimaxh3/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
         "default",
         "default",
         false,
