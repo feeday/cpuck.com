@@ -71,6 +71,14 @@ echo "[依赖] 使用 ComfyUI Python 安装 KJNodes requirements"
 "$PYTHON_BIN" -m pip install -r "$CUSTOM_NODES/ComfyUI-KJNodes/requirements.txt"
 
 echo
+echo "[兼容] 检查 GPU 架构并自动关闭不兼容的 SageAttention"
+if [[ ! -f "$SCRIPT_DIR/fix_attention_compat.py" ]]; then
+  echo "[错误] 缺少 workflow/fix_attention_compat.py，请从 GitHub workflow 目录一并下载。" >&2
+  exit 1
+fi
+"$PYTHON_BIN" "$SCRIPT_DIR/fix_attention_compat.py" "$SCRIPT_DIR"
+
+echo
 echo "[2/3] 准备独立 Hugging Face CLI（不会升级 ComfyUI 的 huggingface_hub）"
 HF_REPO="Comfy-Org/MiniMax-H3"
 export HF_HUB_DOWNLOAD_TIMEOUT="${HF_HUB_DOWNLOAD_TIMEOUT:-120}"
