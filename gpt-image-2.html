@@ -25,6 +25,91 @@ button,input,textarea,select{font:inherit}a{color:inherit;text-decoration:none}.
 .stage{position:relative;flex:1;min-height:510px;display:grid;place-items:center;margin-top:13px;padding:16px;overflow:hidden;border:1px solid rgba(148,163,184,.12);border-radius:16px;background-color:#070c18;background-image:linear-gradient(45deg,rgba(148,163,184,.045) 25%,transparent 25%),linear-gradient(-45deg,rgba(148,163,184,.045) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(148,163,184,.045) 75%),linear-gradient(-45deg,transparent 75%,rgba(148,163,184,.045) 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}.empty{text-align:center;max-width:350px;padding:18px}.empty-icon{width:72px;height:72px;margin:0 auto 16px;display:grid;place-items:center;border:1px solid rgba(56,189,248,.22);border-radius:22px;background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(167,139,250,.12));color:#7dd3fc;font-size:30px}.empty b{font-size:14px}.empty p{margin:8px 0 0;color:#718096;font-size:11px;line-height:1.8}#resultImage{display:none;max-width:100%;max-height:calc(100vh - 230px);object-fit:contain;border-radius:8px;box-shadow:0 16px 60px rgba(0,0,0,.45)}#resultImage.show{display:block}.meta{display:none;justify-content:space-between;gap:10px;padding:12px 4px 2px;color:#94a3b8;font-size:10px}.meta.show{display:flex}.footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:17px;padding:0 3px;color:#64748b;font-size:10px;line-height:1.8}.footer a{color:#7dd3fc}
 @media(max-width:980px){.workspace{grid-template-columns:1fr}.preview{order:2;min-height:560px}.controls{order:1}.stage{min-height:420px}}
 @media(max-width:600px){.shell{padding:12px 10px 24px}.topbar{margin-bottom:17px}.mark{width:37px;height:37px;border-radius:12px}.brand b{font-size:12px}.brand small{font-size:9px}.toplink{min-height:34px;padding:0 9px;font-size:10px}.hero{margin-bottom:14px}.hero p{font-size:12px}.workspace{gap:12px}.panel{border-radius:16px}.controls{padding:13px;gap:13px}.model b{font-size:11px}.row{gap:7px}.prompt{min-height:112px;font-size:14px}.preview{padding:11px;min-height:460px}.preview-head{align-items:flex-start;flex-direction:column}.actions{width:100%;justify-content:flex-start}.stage{min-height:320px;padding:8px}.empty-icon{width:60px;height:60px;font-size:25px}#resultImage{max-height:68vh}.footer{font-size:9px}}
+/* Desktop: lock the page to the viewport; let the workspace absorb the remaining height. */
+@media(min-width:981px){
+  html,body{height:100%;overflow:hidden}
+  body{height:100dvh;min-height:0}
+  .shell{height:100vh;height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:12px clamp(12px,2.5vw,34px) 10px}
+  .topbar{flex:0 0 auto;margin-bottom:10px}
+  .hero{flex:0 0 auto;margin:0 0 12px;padding:2px}
+  .hero h1{font-size:clamp(28px,3.1vw,40px);margin:7px 0}
+  .workspace{flex:1 1 auto;min-height:0}
+  .panel{min-height:0}
+  .controls{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+  .controls::-webkit-scrollbar{display:none}
+  .preview{height:100%;min-height:0;overflow:hidden}
+  .stage{min-height:0}
+  #resultImage{max-width:100%;max-height:100%}
+  .footer{flex:0 0 auto;margin-top:8px;padding-bottom:0}
+}
+/* Compact controls on shorter desktop screens, without shrinking the result panel. */
+@media(min-width:981px) and (max-height:960px){
+  .controls{padding:12px;gap:9px}
+  .settings{padding:9px;gap:8px}
+  .field{gap:5px}
+  .model{min-height:42px}
+  .input,.select,.tiny{height:35px}
+  .key-link{min-height:28px}
+  .prompt{min-height:86px}
+  .upload{min-height:60px}
+  .run{min-height:42px}
+  .status{min-height:32px}
+  .micro{font-size:9px;line-height:1.4}
+}
+@media(min-width:981px) and (max-height:820px){
+  .controls{padding:9px;gap:6px}
+  .settings{padding:8px;gap:6px}
+  .field{gap:4px}
+  .model{min-height:38px;padding:6px 8px}
+  .input,.select,.tiny{height:32px}
+  .key-link{min-height:26px}
+  .prompt{min-height:60px;padding:9px}
+  .upload{min-height:50px;padding:8px}
+  .upload-icon{width:31px;height:31px}
+  .run{min-height:38px}
+  .status{min-height:28px;padding:7px 9px}
+  .preview{padding:12px}
+  .preview-head{padding-bottom:9px}
+  .stage{margin-top:9px}
+  .micro{font-size:8.5px;line-height:1.35}
+}
+@media(min-width:981px) and (max-height:700px){
+  .hero h1{font-size:26px;margin:4px 0}
+  .hero{margin-bottom:7px}
+  .topbar{margin-bottom:6px}
+  .shell{padding-top:7px;padding-bottom:6px}
+  .controls{padding:7px;gap:5px}
+  .settings{padding:6px;gap:5px}
+  .prompt{min-height:48px}
+  .upload{min-height:44px}
+  .upload-icon{width:27px;height:27px}
+  .run{min-height:34px}
+}
+/* Tablet and mobile: return to natural document flow and a single column. */
+@media(max-width:980px){
+  html,body{height:auto;overflow-x:hidden}
+  body{min-height:100vh}
+  .shell{height:auto;min-height:100svh;display:block;overflow:visible;padding:16px clamp(12px,3vw,24px) 24px}
+  .topbar{margin-bottom:17px}
+  .hero{margin:0 0 14px;padding:4px 2px}
+  .workspace{flex:none;min-height:0;grid-template-columns:1fr;gap:12px}
+  .controls{overflow:visible}
+  .preview{min-height:500px;overflow:hidden}
+  .stage{min-height:360px}
+  #resultImage{max-width:100%;max-height:68svh}
+  .footer{margin-top:14px}
+}
+@media(max-width:600px){
+  .shell{padding:12px 10px 22px}
+  .topbar{margin-bottom:14px}
+  .hero{margin-bottom:12px}
+  .hero h1{font-size:clamp(27px,8vw,36px)}
+  .preview{min-height:430px}
+  .stage{min-height:300px}
+  .preview-head{align-items:flex-start;flex-direction:column}
+  .actions{width:100%;justify-content:flex-start}
+  #resultImage{max-height:62svh}
+}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
