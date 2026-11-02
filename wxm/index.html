@@ -88,7 +88,7 @@ async function runHf(prompt,src){
  const modeSet=$('hfGenerationMode').value,mode=modeSet==='auto'?(src?'Edit an image':'Create an image'):modeSet;
  let input=null;if(mode==='Edit an image'){if(!src)throw Error('请先选择参考图片');input=mod.handle_file(await imageBlob(src))}
  const ratios={'1:1':'Square · 1:1','16:9':'Landscape · 16:9','9:16':'Portrait · 9:16','4:3':'Landscape · 4:3','3:4':'Portrait · 3:4'};
- const job=client.submit('/generate',[prompt,mode,input,ratios[$('imgSize').value]||'Square · 1:1',40,42,true]);
+ const job=client.submit('/generate',[prompt,mode,input,ratios[$('imgSize').value]||'Square · 1:1',40,42,true,[]]);
  let result,lastStatus=null;
  for await(const item of job){
   if(!item)continue;
