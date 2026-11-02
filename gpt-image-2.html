@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="CPuck AI 图像工作台：GPT Image 2 与 Qwen Image 2.1，支持文生图、图像编辑和图片下载。">
+<link rel="icon" href="/favicon.png">
+<link rel="canonical" href="https://cpuck.com/gpt-image-2.html">
+<title>GPT Image 2 · AI 生图改图工作台 | CPuck</title>
+<style>
+:root{color-scheme:dark;--bg:#050816;--panel:rgba(15,23,42,.84);--line:rgba(148,163,184,.17);--muted:#94a3b8;--text:#f8fafc;--blue:#38bdf8;--violet:#a78bfa;--green:#34d399;--red:#fb7185}
+*{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(circle at 10% -10%,rgba(56,189,248,.18),transparent 34%),radial-gradient(circle at 90% 0,rgba(167,139,250,.16),transparent 32%),linear-gradient(145deg,#080d1c,#030611 65%);overflow-x:hidden}
+button,input,textarea,select{font:inherit}a{color:inherit;text-decoration:none}.shell{width:min(1480px,100%);margin:auto;padding:22px clamp(12px,2.5vw,34px) 36px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px}.brand{display:flex;align-items:center;gap:12px;min-width:0}.mark{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(135deg,#38bdf8,#a78bfa 65%,#34d399);color:#06101b;font-weight:950;font-size:18px}.brand b{display:block;font-size:14px;letter-spacing:.11em}.brand small{display:block;color:var(--muted);font-size:10px;margin-top:3px;letter-spacing:.05em}.toplinks{display:flex;gap:8px}.toplink{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 13px;border:1px solid var(--line);border-radius:11px;color:#cbd5e1;background:rgba(15,23,42,.55);font-size:12px}.toplink:hover{border-color:rgba(56,189,248,.5);color:white}
+.hero{margin:0 0 22px;padding:8px 2px}.eyebrow{color:#7dd3fc;font-size:10px;font-weight:800;letter-spacing:.18em}.hero h1{font-size:clamp(28px,4vw,45px);line-height:1.1;letter-spacing:-.045em;margin:10px 0}.hero p{max-width:760px;margin:0;color:var(--muted);font-size:13px;line-height:1.8}
+.workspace{display:grid;grid-template-columns:minmax(320px,390px) minmax(0,1fr);gap:18px;align-items:stretch}.panel{min-width:0;border:1px solid var(--line);border-radius:21px;background:var(--panel);box-shadow:0 22px 70px rgba(0,0,0,.28);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.controls{padding:19px;display:flex;flex-direction:column;gap:15px}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.title{font-size:13px;font-weight:850}.kicker{color:#64748b;font-size:10px;letter-spacing:.13em}
+.models{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:5px;border:1px solid var(--line);border-radius:14px;background:rgba(2,6,23,.65)}.model{min-height:48px;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:#94a3b8;text-align:left;cursor:pointer}.model b{display:block;font-size:12px}.model small{display:block;margin-top:3px;color:#64748b;font-size:10px}.model.active{color:white;border-color:rgba(56,189,248,.35);background:linear-gradient(135deg,rgba(56,189,248,.18),rgba(167,139,250,.13))}
+.settings{display:flex;flex-direction:column;gap:11px;padding:12px;border:1px solid rgba(148,163,184,.13);border-radius:13px;background:rgba(2,6,23,.28)}.settings[hidden]{display:none!important}.field{display:flex;flex-direction:column;gap:7px;min-width:0}.field label{font-size:11px;color:#cbd5e1;font-weight:700}.hint{font-size:10px;color:#64748b;font-weight:400}.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.input,.select,.prompt{width:100%;min-width:0;border:1px solid rgba(148,163,184,.2);border-radius:10px;background:rgba(2,6,23,.72);color:#f8fafc;outline:none}.input,.select{height:41px;padding:0 11px;font-size:12px}.prompt{min-height:126px;padding:12px;resize:vertical;line-height:1.7;font-size:13px}.input:focus,.select:focus,.prompt:focus{border-color:rgba(56,189,248,.7);box-shadow:0 0 0 3px rgba(56,189,248,.1)}.input::placeholder,.prompt::placeholder{color:#526176}.keyrow{display:flex;gap:7px}.keyrow .input{flex:1}.tiny{height:41px;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:rgba(148,163,184,.07);color:#aab8ca;font-size:10px;cursor:pointer}.remember{display:flex;align-items:center;gap:7px;color:#94a3b8;font-size:10px}.remember input{accent-color:#38bdf8}
+.upload{position:relative;display:flex;align-items:center;gap:11px;min-height:76px;padding:12px;border:1px dashed rgba(56,189,248,.4);border-radius:13px;background:rgba(56,189,248,.045);cursor:pointer}.upload:hover,.upload.drag{border-color:#38bdf8;background:rgba(56,189,248,.1)}.upload-icon{width:37px;height:37px;display:grid;place-items:center;border-radius:11px;background:rgba(56,189,248,.13);color:#7dd3fc;font-size:20px}.upload b{display:block;font-size:11px}.upload small{display:block;margin-top:4px;color:#718096;font-size:10px;line-height:1.5}.upload input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.source{display:none;align-items:center;gap:9px;padding:8px;border:1px solid var(--line);border-radius:11px;background:rgba(2,6,23,.38)}.source.show{display:flex}.source img{width:55px;height:55px;object-fit:cover;border-radius:8px}.source-info{flex:1;min-width:0}.source-info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px}.source-info small{display:block;margin-top:4px;color:#64748b;font-size:10px}.remove{width:29px;height:29px;border:1px solid var(--line);border-radius:8px;background:transparent;color:#94a3b8;cursor:pointer}
+.run{min-height:48px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;background:linear-gradient(110deg,#38bdf8,#818cf8 58%,#a78bfa);color:#07111e;font-size:13px;font-weight:950;cursor:pointer;box-shadow:0 12px 30px rgba(56,189,248,.17)}.run:disabled{opacity:.55;cursor:wait}.status{min-height:38px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:rgba(2,6,23,.45);color:#94a3b8;font-size:10px;line-height:1.6;overflow-wrap:anywhere}.status.running{color:#7dd3fc;border-color:rgba(56,189,248,.25)}.status.success{color:#6ee7b7;border-color:rgba(52,211,153,.25)}.status.error{color:#fda4af;border-color:rgba(251,113,133,.28)}.micro{color:#64748b;font-size:10px;line-height:1.65}
+.preview{padding:16px;display:flex;flex-direction:column;min-height:690px}.preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:2px 2px 13px;border-bottom:1px solid var(--line)}.preview-head b{font-size:13px}.preview-head small{display:block;margin-top:4px;color:#64748b;font-size:10px}.actions{display:flex;gap:7px;flex-wrap:wrap}.action{min-height:33px;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:rgba(148,163,184,.06);color:#cbd5e1;font-size:10px;cursor:pointer}.action:hover{border-color:rgba(56,189,248,.45);color:white}.action:disabled{opacity:.35;cursor:not-allowed}
+.stage{position:relative;flex:1;min-height:510px;display:grid;place-items:center;margin-top:13px;padding:16px;overflow:hidden;border:1px solid rgba(148,163,184,.12);border-radius:16px;background-color:#070c18;background-image:linear-gradient(45deg,rgba(148,163,184,.045) 25%,transparent 25%),linear-gradient(-45deg,rgba(148,163,184,.045) 25%,transparent 25%),linear-gradient(45deg,transparent 75%,rgba(148,163,184,.045) 75%),linear-gradient(-45deg,transparent 75%,rgba(148,163,184,.045) 75%);background-size:24px 24px;background-position:0 0,0 12px,12px -12px,-12px 0}.empty{text-align:center;max-width:350px;padding:18px}.empty-icon{width:72px;height:72px;margin:0 auto 16px;display:grid;place-items:center;border:1px solid rgba(56,189,248,.22);border-radius:22px;background:linear-gradient(135deg,rgba(56,189,248,.12),rgba(167,139,250,.12));color:#7dd3fc;font-size:30px}.empty b{font-size:14px}.empty p{margin:8px 0 0;color:#718096;font-size:11px;line-height:1.8}#resultImage{display:none;max-width:100%;max-height:calc(100vh - 230px);object-fit:contain;border-radius:8px;box-shadow:0 16px 60px rgba(0,0,0,.45)}#resultImage.show{display:block}.meta{display:none;justify-content:space-between;gap:10px;padding:12px 4px 2px;color:#94a3b8;font-size:10px}.meta.show{display:flex}.fallback{display:none;margin-top:13px;padding:11px;border:1px solid var(--line);border-radius:12px;background:rgba(2,6,23,.35)}.fallback.show{display:block}.fallback p{margin:0 0 9px;color:#94a3b8;font-size:10px;line-height:1.6}.fallback iframe{display:block;width:100%;height:650px;border:0;border-radius:9px;margin-top:10px;background:white}.footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:17px;padding:0 3px;color:#64748b;font-size:10px;line-height:1.8}.footer a{color:#7dd3fc}
+@media(max-width:980px){.workspace{grid-template-columns:1fr}.preview{order:2;min-height:560px}.controls{order:1}.stage{min-height:420px}}
+@media(max-width:600px){.shell{padding:12px 10px 24px}.topbar{margin-bottom:17px}.mark{width:37px;height:37px;border-radius:12px}.brand b{font-size:12px}.brand small{font-size:9px}.toplink{min-height:34px;padding:0 9px;font-size:10px}.hero{margin-bottom:14px}.hero p{font-size:12px}.workspace{gap:12px}.panel{border-radius:16px}.controls{padding:13px;gap:13px}.model b{font-size:11px}.row{gap:7px}.prompt{min-height:112px;font-size:14px}.preview{padding:11px;min-height:460px}.preview-head{align-items:flex-start;flex-direction:column}.actions{width:100%;justify-content:flex-start}.stage{min-height:320px;padding:8px}.empty-icon{width:60px;height:60px;font-size:25px}#resultImage{max-height:68vh}.fallback iframe{height:600px}.footer{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+<a class="brand" href="/"><span class="mark">C</span><span><b>CPUCK / IMAGE LAB</b><small>AI 图像创作与编辑工作台</small></span></a>
+<nav class="toplinks"><a class="toplink" href="/">← 返回首页</a><a class="toplink" href="https://huggingface.co/spaces/feeday/qwen-image-2-1-studio" target="_blank" rel="noopener noreferrer">Qwen Space ↗</a></nav>
+</header>
+<section class="hero"><div class="eyebrow">IMAGE GENERATION / EDITING</div><h1>把想法变成图像。</h1><p>GPT Image 2 与 Qwen Image 2.1 集成在同一个工作台。输入提示词即可生成图片，也可以上传参考图进行编辑；生成结果支持预览、下载和继续编辑。</p></section>
+<div class="workspace">
+<aside class="panel controls">
+<div class="head"><span class="title">01 / 选择模型</span><span class="kicker">MODEL</span></div>
+<div class="models" role="tablist"><button class="model active" type="button" data-model="gpt" aria-selected="true"><b>GPT Image 2</b><small>APIMart API</small></button><button class="model" type="button" data-model="qwen" aria-selected="false"><b>Qwen Image 2.1</b><small>Hugging Face Space</small></button></div>
+<section class="settings" id="gptSettings">
+<div class="head"><b class="title">GPT Image 2 接口设置</b><span class="hint">密钥由你提供</span></div>
+<div class="field"><label for="apiBase">API Base URL</label><input class="input" id="apiBase" type="url" value="https://api.apimart.ai" autocomplete="url"></div>
+<div class="field"><label for="gptKey">APIMart API Key</label><div class="keyrow"><input class="input" id="gptKey" type="password" placeholder="粘贴你的 API Key" autocomplete="off"><button class="tiny" id="toggleGptKey" type="button">显示</button></div><label class="remember"><input type="checkbox" id="rememberKeys"> 在此浏览器记住密钥</label></div>
+<div class="row"><div class="field"><label for="resolution">生成分辨率</label><select class="select" id="resolution"><option value="1k">1K 标准</option><option value="2k">2K 高清</option><option value="4k">4K 超清</option></select></div><div class="field"><label for="aspect">画面比例</label><select class="select" id="aspect"><option value="1:1">1:1 正方形</option><option value="3:2">3:2 横图</option><option value="2:3">2:3 竖图</option><option value="4:3">4:3 横图</option><option value="3:4">3:4 竖图</option><option value="16:9">16:9 横屏</option><option value="9:16">9:16 竖屏</option><option value="21:9">21:9 宽屏</option></select></div></div>
+<div class="micro">密钥只在当前浏览器中使用。默认不保存；勾选后才写入本机 localStorage。</div>
+</section>
+<section class="settings" id="qwenSettings" hidden>
+<div class="head"><b class="title">Qwen Image 2.1 Space</b><span class="hint">Gradio API</span></div>
+<div class="field"><label for="hfToken">Hugging Face Token <span class="hint">公开 Space 通常可留空</span></label><div class="keyrow"><input class="input" id="hfToken" type="password" placeholder="可选：hf_..." autocomplete="off"><button class="tiny" id="toggleHfToken" type="button">显示</button></div></div>
+<div class="row"><div class="field"><label for="qwenSteps">推理步数</label><select class="select" id="qwenSteps"><option value="28">28 · 快速预览</option><option value="40" selected>40 · 推荐质量</option></select></div><div class="field"><label for="qwenSeed">随机种子</label><input class="input" id="qwenSeed" type="number" min="0" max="2147483647" value="42"></div></div>
+<label class="remember"><input type="checkbox" id="randomSeed" checked> 每次使用新随机种子</label><label class="remember"><input type="checkbox" id="rememberHfToken"> 在此浏览器记住 HF Token</label>
+<div class="micro">调用 Space：feeday/qwen-image-2-1-studio。若接口不可用，可在右侧展开原始 Space 页面。</div>
+</section>
+<div class="head"><span class="title">02 / 创作内容</span><span class="kicker">PROMPT</span></div>
+<div class="field"><label for="taskMode">任务模式 <span class="hint">上传图片后可编辑</span></label><select class="select" id="taskMode"><option value="auto">自动判断（推荐）</option><option value="create">文生图</option><option value="edit">图像编辑</option><option value="transparent" id="transparentOption">透明 PNG（Qwen）</option></select></div>
+<div class="field"><label for="prompt">提示词 / 编辑指令 <span class="hint" id="promptCount">0 字</span></label><textarea class="prompt" id="prompt" placeholder="描述你想生成的画面，或说明要如何修改上传的图片。&#10;&#10;例如：保留人物五官和姿势，将背景改成雨夜的东京街头，电影级真实摄影风格。"></textarea></div>
+<div class="head"><span class="title">03 / 参考图片</span><span class="kicker">OPTIONAL</span></div>
+<label class="upload" id="uploadZone"><span class="upload-icon">＋</span><span><b>上传图片 / 拖放到这里</b><small>支持 JPG、PNG、WebP；用于图像编辑，也可留空直接文生图</small></span><input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+<div class="source" id="sourcePreview"><img id="sourceImage" alt="参考图片预览"><div class="source-info"><b id="sourceName">已选择图片</b><small id="sourceSize">准备就绪</small></div><button class="remove" id="removeSource" type="button" aria-label="移除参考图片">×</button></div>
+<button class="run" id="runButton" type="button">✦ <span id="runButtonText">生成图片</span></button>
+<div class="status" id="status" role="status" aria-live="polite">准备就绪。选择模型、输入提示词后即可开始。</div>
+<div class="micro">GPT Image 2 使用你自己的 APIMart API Key，费用按服务商规则结算；Qwen Space 使用 Hugging Face 的运行配额。请下载保存需要保留的结果。</div>
+</aside>
+<main class="panel preview">
+<div class="preview-head"><div><b>生成结果</b><small id="previewSub">等待生成 · 输出将在这里显示</small></div><div class="actions"><button class="action" id="downloadButton" type="button" disabled>↓ 下载图片</button><button class="action" id="useResultButton" type="button" disabled>继续编辑此图</button><button class="action" id="openResultButton" type="button" disabled>新窗口打开</button></div></div>
+<div class="stage"><div class="empty" id="emptyState"><div class="empty-icon">✧</div><b>你的下一张图片，从这里开始</b><p>输入提示词，选择 GPT Image 2 或 Qwen Image 2.1。生成完成后，图片会显示在此区域。</p></div><img id="resultImage" alt="AI 生成结果"></div>
+<div class="meta" id="resultMeta"><span><b id="resultModel">模型</b> · <span id="resultTime">刚刚生成</span></span><span id="resultDimensions"></span></div>
+<section class="fallback" id="qwenFallback"><p>如果浏览器无法连接 Gradio API，可以展开 Hugging Face 原始工作台继续使用。原始 Space 的队列、登录状态和配额由 Hugging Face 管理。</p><div class="actions"><a class="action" href="https://huggingface.co/spaces/feeday/qwen-image-2-1-studio" target="_blank" rel="noopener noreferrer">打开原始 Space ↗</a><button class="action" type="button" id="toggleEmbed">在本页展开</button></div><iframe id="qwenFrame" title="Qwen Image 2.1 Studio" loading="lazy" hidden></iframe></section>
+</main>
+</div>
+<footer class="footer"><span>© CPuck · AI Image Lab</span><span>GPT Image 2 API · <a href="https://huggingface.co/spaces/feeday/qwen-image-2-1-studio" target="_blank" rel="noopener noreferrer">Qwen Image 2.1 Studio</a></span></footer>
+</div>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id),SPACE_ID="feeday/qwen-image-2-1-studio",SPACE_URL="https://huggingface.co/spaces/feeday/qwen-image-2-1-studio",API_DEFAULT="https://api.apimart.ai";
+let activeModel="gpt",sourceBlob=null,sourceObjectUrl="",resultUrl="",running=false;
+function safeGet(k){try{return localStorage.getItem(k)||""}catch(e){return ""}}
+function safeSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function status(msg,type){$("status").textContent=msg;$("status").className="status"+(type?" "+type:"")}
+function updateCount(){$("promptCount").textContent=$("prompt").value.length+" 字"}
+function baseUrl(v){let s=(v||API_DEFAULT).trim().replace(/\/+$/,"");if(s.endsWith("/v1"))s=s.slice(0,-3);return s||API_DEFAULT}
+function mode(){let m=$("taskMode").value;return m==="auto"?(sourceBlob?"edit":"create"):m}
+function updateLabel(){$("runButtonText").textContent=mode()==="edit"?"开始改图":mode()==="transparent"?"生成透明 PNG":"生成图片"}
+function updateModel(){
+ document.querySelectorAll(".model").forEach(b=>{let on=b.dataset.model===activeModel;b.classList.toggle("active",on);b.setAttribute("aria-selected",String(on))});
+ $("gptSettings").hidden=activeModel!=="gpt";$("qwenSettings").hidden=activeModel!=="qwen";$("qwenFallback").classList.toggle("show",activeModel==="qwen");$("transparentOption").hidden=activeModel!=="qwen";
+ if(activeModel==="gpt"&&$("taskMode").value==="transparent")$("taskMode").value="auto";
+ updateLabel();
+}
+function clearSource(){if(sourceObjectUrl)URL.revokeObjectURL(sourceObjectUrl);sourceObjectUrl="";sourceBlob=null;$("imageInput").value="";$("sourcePreview").classList.remove("show");$("sourceImage").removeAttribute("src");updateLabel()}
+function setSource(blob,name){if(!blob)return;if(sourceObjectUrl)URL.revokeObjectURL(sourceObjectUrl);sourceBlob=blob;sourceObjectUrl=URL.createObjectURL(blob);$("sourceImage").src=sourceObjectUrl;$("sourceName").textContent=name||"参考图片";$("sourceSize").textContent=(blob.size/1048576).toFixed(2)+" MB · "+(blob.type||"image");$("sourcePreview").classList.add("show");updateLabel()}
+function ratioLabel(v){return ({"1:1":"Square · 1:1","16:9":"Landscape · 16:9","9:16":"Portrait · 9:16","4:3":"Landscape · 4:3","3:4":"Portrait · 3:4","3:2":"Landscape · 3:2","2:3":"Portrait · 2:3","21:9":"Ultrawide · 21:9"})[v]||"Square · 1:1"}
+async function jpegData(blob){if(!blob)throw Error("请先上传参考图片");let u=URL.createObjectURL(blob);try{let im=new Image();await new Promise((ok,bad)=>{im.onload=ok;im.onerror=()=>bad(Error("图片无法读取"));im.src=u});let r=Math.min(1,1536/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.naturalWidth*r));c.height=Math.max(1,Math.round(im.naturalHeight*r));let x=c.getContext("2d");if(!x)throw Error("无法创建图片画布");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.85)}finally{URL.revokeObjectURL(u)}}
+async function apiJson(url,opts){let r;try{r=await fetch(url,opts)}catch(e){throw Error("网络或跨域访问失败："+e.message+"。如 API 不允许浏览器跨域，请填写支持 CORS 的代理地址。")}let raw=await r.text(),d;try{d=JSON.parse(raw)}catch(e){throw Error("接口返回非 JSON（HTTP "+r.status+"）："+raw.slice(0,220))}if(!r.ok){let er=d.error;throw Error("HTTP "+r.status+"："+(typeof er==="string"?er:er&&er.message||d.message||raw.slice(0,250)))}return d}
+function imageUrl(d){let x=Array.isArray(d&&d.data)?d.data[0]:(d&&d.data)||d||{},vals=[x.url,x.image_url,x.b64_json,x.result&&x.result.url,x.result&&x.result.image_url,x.result&&x.result.images&&x.result.images[0]&&x.result.images[0].url,x.images&&x.images[0]&&x.images[0].url,d&&d.url,d&&d.image_url];for(let v of vals){if(typeof v==="string"&&/^https?:\/\//i.test(v))return v;if(typeof v==="string"&&v.length>100&&/^[A-Za-z0-9+/=]+$/.test(v))return "data:image/png;base64,"+v}return ""}
+function taskId(d){let x=Array.isArray(d&&d.data)?d.data[0]:(d&&d.data)||d||{};return x.task_id||x.id||d.task_id||d.id||""}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function pollTask(base,key,id){for(let i=0;i<45;i++){await sleep(i?4000:2500);let d=await apiJson(base+"/v1/tasks/"+encodeURIComponent(id),{headers:{Authorization:"Bearer "+key}}),x=Array.isArray(d.data)?d.data[0]:d.data||d,s=String(x.status||d.status||"").toLowerCase(),url=imageUrl(d);status("GPT Image 2 任务处理中 · "+(s||"排队中")+" · "+(i+1)+"/45","running");if(url&&(!s||["completed","success","succeeded","finished"].includes(s)))return url;if(["error","failed","cancelled","canceled"].includes(s))throw Error(JSON.stringify(x.error||d.error||s))}throw Error("任务等待超时，任务 ID："+id)}
+async function runGpt(){
+ let key=$("gptKey").value.trim(),p=$("prompt").value.trim(),m=mode();if(!key)throw Error("请填写 APIMart API Key。");if(!p)throw Error("请先输入提示词或编辑指令。");if(m==="edit"&&!sourceBlob)throw Error("图像编辑模式需要先上传参考图片。");
+ let base=baseUrl($("apiBase").value),body={model:"gpt-image-2",prompt:p,n:1,resolution:$("resolution").value,size:$("aspect").value,official_fallback:true};
+ if(m==="edit")body.image_urls=[await jpegData(sourceBlob)];
+ if($("rememberKeys").checked){safeSet("cpuck_image_api_key",key);safeSet("cpuck_image_api_base",base)}
+ let d=await apiJson(base+"/v1/images/generations",{method:"POST",headers:{Authorization:"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify(body)}),url=imageUrl(d);
+ if(!url){let id=taskId(d);if(!id)throw Error("接口没有返回图片链接或任务 ID："+JSON.stringify(d).slice(0,350));url=await pollTask(base,key,id)}
+ showResult(url,"GPT Image 2");
+}
+function findGradioImage(value){let q=[value],seen=new Set();while(q.length){let v=q.shift();if(!v)continue;if(typeof v==="string"){if(/^https?:\/\//i.test(v)||/^data:image\//i.test(v))return v;continue}if(typeof v!=="object"||seen.has(v))continue;seen.add(v);if(!Array.isArray(v)){if(typeof v.url==="string"&&/^https?:\/\//i.test(v.url))return v.url;if(v.image&&typeof v.image.url==="string")return v.image.url;["data","image","images","value","output","files","gallery"].forEach(k=>{if(v[k])q.push(v[k])})}else v.forEach(x=>q.push(x))}return ""}
+function qwenInputs(params,p,m,ref,ratio,steps,seed,random){let fallback=[p,m,ref,ratio,steps,seed,random];if(!Array.isArray(params)||!params.length)return fallback;return params.map(a=>{let n=String(a.parameter_name||a.label||a.name||a.component||"").toLowerCase();if(/prompt|instruction/.test(n))return p;if(/mode|task/.test(n))return m;if(/reference|image|photo|upload/.test(n))return ref;if(/aspect|ratio|size/.test(n))return ratio;if(/steps|step/.test(n))return steps;if(/seed/.test(n))return seed;if(/random|new.seed/.test(n))return random;return a.parameter_has_default?a.parameter_default:null})}
+async function runQwen(){
+ let p=$("prompt").value.trim(),m=mode();if(!p)throw Error("请先输入提示词或编辑指令。");let modeText=m==="edit"?"Edit an image":m==="transparent"?"Transparent PNG":"Create an image";if(modeText==="Edit an image"&&!sourceBlob)throw Error("Qwen 图像编辑模式需要先上传参考图片。");
+ let token=$("hfToken").value.trim();if(token&&$("rememberHfToken").checked)safeSet("cpuck_image_hf_token",token);
+ status("正在连接 Hugging Face Space…","running");
+ let mod=await import("https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js"),client=await mod.Client.connect(SPACE_ID,token?{hf_token:token}:{}),info={};
+ try{info=await client.view_api()}catch(e){}
+ let endpoints=info.named_endpoints||{},key=Object.keys(endpoints).find(k=>/generate/i.test(k))||"/generate",endpoint=key.charAt(0)==="/" ? key : "/"+key,params=endpoints[key]&&endpoints[key].parameters;
+ let ref=modeText==="Edit an image"?mod.handle_file(sourceBlob):null,steps=Number($("qwenSteps").value)||40,seed=Math.max(0,Math.min(2147483647,Number($("qwenSeed").value)||42)),random=$("randomSeed").checked;
+ let inputs=qwenInputs(params,p,modeText,ref,ratioLabel($("aspect").value),steps,seed,random);
+ status("已连接 Qwen Space，正在提交任务…","running");
+ let job=client.submit(endpoint,inputs);
+ for await(const update of job){if(update&&update.type==="status")status("Qwen Image 2.1 · "+(update.stage||update.status||"排队 / 推理中"),"running")}
+ let response=await job.result(),data=response&&response.data!==undefined?response.data:response,url=findGradioImage(data);
+ if(!url)throw Error("Space 已返回结果，但未识别到图片文件。可展开原始 Space 查看。");
+ showResult(url,"Qwen Image 2.1");
+}
+function showResult(url,name){resultUrl=url;$("resultImage").src=url;$("resultImage").classList.add("show");$("emptyState").style.display="none";["downloadButton","useResultButton","openResultButton"].forEach(id=>$(id).disabled=false);$("resultMeta").classList.add("show");$("resultModel").textContent=name;$("resultTime").textContent=new Date().toLocaleString("zh-CN");$("previewSub").textContent="生成完成 · "+name;$("resultImage").onload=function(){$("resultDimensions").textContent=this.naturalWidth+" × "+this.naturalHeight+" px"};status("图片生成完成。可以下载图片，或将结果作为下一次编辑的参考图。","success")}
+async function download(){if(!resultUrl)return;try{let r=await fetch(resultUrl);if(!r.ok)throw Error("HTTP "+r.status);let b=await r.blob(),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="cpuck-image-"+Date.now()+".png";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500)}catch(e){window.open(resultUrl,"_blank","noopener,noreferrer");status("浏览器未允许跨域直接下载，已在新窗口打开图片；可在图片页面保存。","success")}}
+async function useResult(){if(!resultUrl)return;try{let r=await fetch(resultUrl);if(!r.ok)throw Error("HTTP "+r.status);setSource(await r.blob(),"上一次生成的图片");$("taskMode").value="edit";updateLabel();$("prompt").focus();status("已将生成结果设为参考图。输入新的编辑指令即可继续修改。","success")}catch(e){status("无法读取结果图片（可能受跨域限制）。请先下载结果，再重新上传进行编辑。","error")}}
+async function run(){if(running)return;running=true;$("runButton").disabled=true;$("runButton").textContent="◌ 正在生成…";status("正在准备请求…","running");let t=performance.now();try{if(activeModel==="gpt")await runGpt();else await runQwen();$("previewSub").textContent="耗时 "+((performance.now()-t)/1000).toFixed(1)+" 秒 · 生成完成"}catch(e){status(e.message||String(e),"error");if(activeModel==="qwen")$("qwenFallback").classList.add("show")}finally{running=false;$("runButton").disabled=false;$("runButton").innerHTML="✦ <span id='runButtonText'>生成图片</span>";updateLabel()}}
+document.querySelectorAll(".model").forEach(b=>b.addEventListener("click",()=>{activeModel=b.dataset.model;updateModel()}));
+$("taskMode").addEventListener("change",updateLabel);$("prompt").addEventListener("input",updateCount);$("runButton").addEventListener("click",run);
+$("imageInput").addEventListener("change",e=>{let f=e.target.files&&e.target.files[0];if(f){if(!f.type.startsWith("image/")){status("请选择图片文件。","error");return}setSource(f,f.name);status("参考图片已载入。可以选择图像编辑，或保持自动判断。","")}});$("removeSource").addEventListener("click",clearSource);
+$("downloadButton").addEventListener("click",download);$("useResultButton").addEventListener("click",useResult);$("openResultButton").addEventListener("click",()=>{if(resultUrl)window.open(resultUrl,"_blank","noopener,noreferrer")});
+$("toggleGptKey").addEventListener("click",function(){let x=$("gptKey");x.type=x.type==="password"?"text":"password";this.textContent=x.type==="password"?"显示":"隐藏"});
+$("toggleHfToken").addEventListener("click",function(){let x=$("hfToken");x.type=x.type==="password"?"text":"password";this.textContent=x.type==="password"?"显示":"隐藏"});
+$("toggleEmbed").addEventListener("click",function(){let f=$("qwenFrame");if(f.hidden){f.src=SPACE_URL;f.hidden=false;this.textContent="收起嵌入页面"}else{f.hidden=true;f.removeAttribute("src");this.textContent="在本页展开"}});
+let drop=$("uploadZone");["dragenter","dragover"].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.add("drag")}));["dragleave","drop"].forEach(n=>drop.addEventListener(n,e=>{e.preventDefault();drop.classList.remove("drag")}));drop.addEventListener("drop",e=>{let f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f&&f.type.startsWith("image/")){setSource(f,f.name);status("参考图片已载入。","")}});
+$("apiBase").value=safeGet("cpuck_image_api_base")||safeGet("tcq_html_apiProxy")||API_DEFAULT;$("gptKey").value=safeGet("cpuck_image_api_key")||safeGet("tcq_html_imageApiKey");$("hfToken").value=safeGet("cpuck_image_hf_token")||safeGet("tcq_html_hfApiKey");
+$("apiBase").addEventListener("change",function(){if($("rememberKeys").checked)safeSet("cpuck_image_api_base",baseUrl(this.value))});$("gptKey").addEventListener("change",function(){if($("rememberKeys").checked)safeSet("cpuck_image_api_key",this.value.trim())});$("hfToken").addEventListener("change",function(){if($("rememberHfToken").checked)safeSet("cpuck_image_hf_token",this.value.trim())});
+updateCount();updateModel();
+})();
+</script>
+</body>
+</html>
