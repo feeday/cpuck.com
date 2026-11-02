@@ -159,16 +159,28 @@ async function runQwen(){
  let p=$("prompt").value.trim(),m=mode();if(!p)throw Error("请先输入提示词或编辑指令。");let modeText=m==="edit"?"Edit an image":m==="transparent"?"Transparent PNG":"Create an image";if(modeText==="Edit an image"&&!sourceBlob)throw Error("Qwen 图像编辑模式需要先上传参考图片。");
  let token=$("hfToken").value.trim();if(token&&$("rememberHfToken").checked)safeSet("cpuck_image_hf_token",token);
  status("正在连接 Hugging Face Space…","running");
- let mod=await import("https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js"),client=await mod.Client.connect(SPACE_ID,token?{hf_token:token}:{}),info={};
+ let mod=await import("https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js");
+ let client=await mod.Client.connect(SPACE_ID,{...(token?{token}:{}),events:["status","data"]}),info={};
  try{info=await client.view_api()}catch(e){}
  let endpoints=info.named_endpoints||{},key=Object.keys(endpoints).find(k=>/generate/i.test(k))||"/generate",endpoint=key.charAt(0)==="/" ? key : "/"+key,params=endpoints[key]&&endpoints[key].parameters;
  let ref=modeText==="Edit an image"?mod.handle_file(sourceBlob):null,steps=Number($("qwenSteps").value)||40,seed=Math.max(0,Math.min(2147483647,Number($("qwenSeed").value)||42)),random=$("randomSeed").checked;
  let inputs=qwenInputs(params,p,modeText,ref,ratioLabel($("aspect").value),steps,seed,random);
  status("已连接 Qwen Space，正在提交任务…","running");
- let job=client.submit(endpoint,inputs);
- for await(const update of job){if(update&&update.type==="status")status("Qwen Image 2.1 · "+(update.stage||update.status||"排队 / 推理中"),"running")}
- let response=await job.result(),data=response&&response.data!==undefined?response.data:response,url=findGradioImage(data);
- if(!url)throw Error("Space 已返回结果，但未识别到图片文件。可展开原始 Space 查看。");
+ let job=client.submit(endpoint,inputs),finalData,lastStatus=null,dataEvents=0;
+ for await(const update of job){
+  if(!update)continue;
+  if(update.type==="status"){
+   lastStatus=update;
+   status("Qwen Image 2.1 · "+(update.stage||update.status||"排队 / 推理中")+(update.position!=null?" · 队列 "+update.position:""),"running");
+   if(update.stage==="error"||update.status==="error"||update.success===false)throw Error("Qwen Space 任务失败："+(update.message||update.code||"未提供错误详情"));
+  }else if(update.type==="data"){
+   finalData=update.data;dataEvents++;
+   status("Qwen Image 2.1 · 已收到生成结果，正在解析图片…","running");
+  }
+ }
+ if(finalData===undefined)throw Error("Gradio 任务结束，但没有收到 data 结果事件。状态："+JSON.stringify(lastStatus||{})+"。请检查 Space 是否正常运行及 API 参数。");
+ let url=findGradioImage(finalData);
+ if(!url)throw Error("Space 已返回 data 结果，但未识别到图片文件："+JSON.stringify(finalData).slice(0,500));
  showResult(url,"Qwen Image 2.1");
 }
 function showResult(url,name){resultUrl=url;$("resultImage").src=url;$("resultImage").classList.add("show");$("emptyState").style.display="none";["downloadButton","useResultButton","openResultButton"].forEach(id=>$(id).disabled=false);$("resultMeta").classList.add("show");$("resultModel").textContent=name;$("resultTime").textContent=new Date().toLocaleString("zh-CN");$("previewSub").textContent="生成完成 · "+name;$("resultImage").onload=function(){$("resultDimensions").textContent=this.naturalWidth+" × "+this.naturalHeight+" px"};status("图片生成完成。可以下载图片，或将结果作为下一次编辑的参考图。","success")}
