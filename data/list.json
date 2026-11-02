@@ -1,107 +1,184 @@
 [
- {
-  "cat": "tool",
-  "title": "AI News",
-  "desc": "模型资讯排行榜",
-  "links": {
-    "http": "https://artificialanalysis.ai/zh/leaderboards/models",
-    "hfCn": "https://aihot.news/",
-    "hf": "https://arxiv.org/list/cs.AI/recent"
-  },
-  "isTop": true,
-  "hideOnMobile": true
-},
-
-
-
-
-
   {
-  "cat": "tool",
-  "title": "Network",
-  "desc": "网络地址测速",
-  "links": {
-    "http": "http://cs1.bbn.com.cn:8800/gzweb/",
-    "hfCn": "https://hf-mirror.com/datasets/datxy/demo/blob/main/test/eso1242a.psb",
-    "hf": "http://ping0.cc/"
+    "cat": "tool",
+    "title": "AI News",
+    "desc": "模型资讯排行榜",
+    "links": {
+      "http": "https://artificialanalysis.ai/zh/leaderboards/models",
+      "hfCn": "https://aihot.news/",
+      "hf": "https://arxiv.org/list/cs.AI/recent"
+    },
+    "isTop": true,
+    "hideOnMobile": true
   },
-  "isTop": true,
-  "hideOnMobile": true
-},
-
-   {
-  "cat": "tool",
-  "title": "Office Web",
-  "desc": "在线文档表格",
-  "links": {
-    "http": "https://cpuck.com/dB.html",
-    "hfCn": "https://cpuck.com/xlsx.html",
-    "hf": "https://docs.qq.com/desktop/"
-  },
-  "isTop": true,
-  "hideOnMobile": true
-},
- 
   {
-  "cat": "tool",
-  "title": "Aigx",
-  "desc": "模型测试编辑器",
-  "links": {
-    "http": "/aigx-x.html",
-    "hfCn": "https://labs.google/fx/zh/tools/flow",
-    "hf": "https://chat.openai.com/"
+    "cat": "tool",
+    "title": "Network",
+    "desc": "网络地址测速",
+    "links": {
+      "http": "http://cs1.bbn.com.cn:8800/gzweb/",
+      "hfCn": "https://hf-mirror.com/datasets/datxy/demo/blob/main/test/eso1242a.psb",
+      "hf": "http://ping0.cc/"
+    },
+    "isTop": true,
+    "hideOnMobile": true
   },
-  "isTop": true,
-  "hideOnMobile": true
-},
- {
-  "cat": "tool",
-  "title": "OpenCut",
-  "desc": "视频图像编辑",
-  "links": {
-    "http": "https://opencut.app/projects",
-    "hfCn": "https://www.photopea.com/",
-    "hf": "https://video.cpuck.com"
+  {
+    "cat": "tool",
+    "title": "Office Web",
+    "desc": "在线文档表格",
+    "links": {
+      "http": "https://cpuck.com/dB.html",
+      "hfCn": "https://cpuck.com/xlsx.html",
+      "hf": "https://docs.qq.com/desktop/"
+    },
+    "isTop": true,
+    "hideOnMobile": true
   },
-  "isTop": true,
-  "hideOnMobile": true
-},
- {
-  "cat": "tool",
-  "title": "CPU Test",
-  "desc": "终端性能测试",
-  "links": {
-    "http": "https://llm-bench.io/benchmarks",
-    "hfCn": "http://gpu.jy6d.com/",
-    "hf": "http://cpu.jy6d.com/"
+  {
+    "cat": "tool",
+    "title": "Aigx",
+    "desc": "模型测试编辑器",
+    "links": {
+      "http": "/aigx-x.html",
+      "hfCn": "https://labs.google/fx/zh/tools/flow",
+      "hf": "https://chat.openai.com/"
+    },
+    "isTop": true,
+    "hideOnMobile": true
   },
-  "isTop": true,
-  "hideOnMobile": true
-},
- {
-  "cat": "tool",
-  "title": "Tencent",
-  "desc": "T4 100min/Day Free ",
-  "links": {
-    "http": "https://matrix.tencent.com/ai-detect/",
-    "hfCn": "https://cloud.tencent.com/act/cps/redirect?redirect=1079&cps_key=615609c54e8bcced8b02c202a43b5570&from=console",
-    "hf": "https://cloudstudio.net/apps"
+  {
+    "cat": "tool",
+    "title": "OpenCut",
+    "desc": "视频图像编辑",
+    "links": {
+      "http": "https://opencut.app/projects",
+      "hfCn": "https://www.photopea.com/",
+      "hf": "https://video.cpuck.com"
+    },
+    "isTop": true,
+    "hideOnMobile": true
   },
-  "isTop": true,
-  "hideOnMobile": true
-},
-{"cat":"text","title":"Doubao","desc":"豆包视频生成。","url":"https://doubao.com/"},
-{"cat":"text","title":"Translate","desc":"谷歌文档文字在线翻译。","url":"https://translate.google.com/"},
-{"cat":"audio","title":"云听","desc":"中央广播电台。","url":"https://www.radio.cn/pc-portal/erji/radioStation.html","hideOnMobile":true},
-{"cat":"audio","title":"Suno","desc":"合成音乐。","url":"https://www.suno.com","hideOnMobile":true},
- {"cat":"image","title":"文生图","desc":"qwen-image-2-1-studio","url":"https://huggingface.co/spaces/feeday/qwen-image-2-1-studio","hideOnMobile":true},
-  {"cat":"image","title":"生图改图","desc":"gpt-image-2 低每张3分","url":"https://apimart.ai/zh/register?aff=token","hideOnMobile":true},
-{"cat":"audio","title":"有声书","desc":"喜马拉雅有声故事。","url":"https://www.ximalaya.com/youshengshu/updates/","hideOnMobile":true},
-{"cat":"video","title":"LTX-2.3","desc":"在线图生视频带音效。","url":"https://x2v.light-ai.top/generate/video/image-to-audio-video?model=LTX-2.3"},
-{"cat":"audio","title":"Qwen-ASR","desc":"在线语音识别转换。","url":"https://qwen-qwen3-asr-demo.hf.space/"},
-{"cat":"video","title":"央视新闻","desc":"央视频电视直播。","url":"https://www.yangshipin.cn/tv/home?pid=600001811","hideOnMobile":true},
-{"cat":"video","title":"虎牙直播","desc":"虎牙影视轮播。","url":"https://www.huya.com/g/2135"},
-{"cat":"video","title":"掌机游戏","desc":"最新掌机游戏筛选。","url":"https://www.gamer520.com/gameswitch"},
-{"cat":"video","title":"抖音短剧","desc":"抖音短剧视频。","url":"https://www.douyin.com/series"},
-{"cat":"video","title":"哔哩哔哩","desc":"动画凡人修仙传","url":"https://www.bilibili.com/bangumi/media/md28223043","hideOnMobile":true}
+  {
+    "cat": "tool",
+    "title": "CPU Test",
+    "desc": "终端性能测试",
+    "links": {
+      "http": "https://llm-bench.io/benchmarks",
+      "hfCn": "http://gpu.jy6d.com/",
+      "hf": "http://cpu.jy6d.com/"
+    },
+    "isTop": true,
+    "hideOnMobile": true
+  },
+  {
+    "cat": "tool",
+    "title": "Tencent",
+    "desc": "T4 100min/Day Free ",
+    "links": {
+      "http": "https://matrix.tencent.com/ai-detect/",
+      "hfCn": "https://cloud.tencent.com/act/cps/redirect?redirect=1079&cps_key=615609c54e8bcced8b02c202a43b5570&from=console",
+      "hf": "https://cloudstudio.net/apps"
+    },
+    "isTop": true,
+    "hideOnMobile": true
+  },
+  {
+    "cat": "text",
+    "title": "Doubao",
+    "desc": "豆包视频生成。",
+    "url": "https://doubao.com/"
+  },
+  {
+    "cat": "text",
+    "title": "Translate",
+    "desc": "谷歌文档文字在线翻译。",
+    "url": "https://translate.google.com/"
+  },
+  {
+    "cat": "audio",
+    "title": "云听",
+    "desc": "中央广播电台。",
+    "url": "https://www.radio.cn/pc-portal/erji/radioStation.html",
+    "hideOnMobile": true
+  },
+  {
+    "cat": "audio",
+    "title": "Suno",
+    "desc": "合成音乐。",
+    "url": "https://www.suno.com",
+    "hideOnMobile": true
+  },
+  {
+    "cat": "image",
+    "title": "GPT Image 2",
+    "desc": "GPT Image 2 生图改图 · Qwen Image 2.1 工作台",
+    "url": "/gpt-image-2.html",
+    "isTop": true
+  },
+  {
+    "cat": "image",
+    "title": "文生图",
+    "desc": "qwen-image-2-1-studio",
+    "url": "https://huggingface.co/spaces/feeday/qwen-image-2-1-studio",
+    "hideOnMobile": true
+  },
+  {
+    "cat": "image",
+    "title": "生图改图",
+    "desc": "gpt-image-2 低每张3分",
+    "url": "https://apimart.ai/zh/register?aff=token",
+    "hideOnMobile": true
+  },
+  {
+    "cat": "audio",
+    "title": "有声书",
+    "desc": "喜马拉雅有声故事。",
+    "url": "https://www.ximalaya.com/youshengshu/updates/",
+    "hideOnMobile": true
+  },
+  {
+    "cat": "video",
+    "title": "LTX-2.3",
+    "desc": "在线图生视频带音效。",
+    "url": "https://x2v.light-ai.top/generate/video/image-to-audio-video?model=LTX-2.3"
+  },
+  {
+    "cat": "audio",
+    "title": "Qwen-ASR",
+    "desc": "在线语音识别转换。",
+    "url": "https://qwen-qwen3-asr-demo.hf.space/"
+  },
+  {
+    "cat": "video",
+    "title": "央视新闻",
+    "desc": "央视频电视直播。",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001811",
+    "hideOnMobile": true
+  },
+  {
+    "cat": "video",
+    "title": "虎牙直播",
+    "desc": "虎牙影视轮播。",
+    "url": "https://www.huya.com/g/2135"
+  },
+  {
+    "cat": "video",
+    "title": "掌机游戏",
+    "desc": "最新掌机游戏筛选。",
+    "url": "https://www.gamer520.com/gameswitch"
+  },
+  {
+    "cat": "video",
+    "title": "抖音短剧",
+    "desc": "抖音短剧视频。",
+    "url": "https://www.douyin.com/series"
+  },
+  {
+    "cat": "video",
+    "title": "哔哩哔哩",
+    "desc": "动画凡人修仙传",
+    "url": "https://www.bilibili.com/bangumi/media/md28223043",
+    "hideOnMobile": true
+  }
 ]
