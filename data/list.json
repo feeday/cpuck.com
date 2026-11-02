@@ -116,20 +116,7 @@
     "url": "/gpt-image-2.html",
     "isTop": true
   },
-  {
-    "cat": "image",
-    "title": "文生图",
-    "desc": "qwen-image-2-1-studio",
-    "url": "https://huggingface.co/spaces/feeday/qwen-image-2-1-studio",
-    "hideOnMobile": true
-  },
-  {
-    "cat": "image",
-    "title": "生图改图",
-    "desc": "gpt-image-2 低每张3分",
-    "url": "https://apimart.ai/zh/register?aff=token",
-    "hideOnMobile": true
-  },
+
   {
     "cat": "audio",
     "title": "有声书",
