@@ -95,6 +95,7 @@
 {"cat":"audio","title":"云听","desc":"中央广播电台。","url":"https://www.radio.cn/pc-portal/erji/radioStation.html","hideOnMobile":true},
 {"cat":"audio","title":"Suno","desc":"合成音乐。","url":"https://www.suno.com","hideOnMobile":true},
  {"cat":"image","title":"文生图","desc":"qwen-image-2-1-studio","url":"https://huggingface.co/spaces/feeday/qwen-image-2-1-studio","hideOnMobile":true},
+  {"cat":"image","title":"生图改图","desc":"gpt-image-2 低每张3分","url":"https://apimart.ai/zh/register?aff=token","hideOnMobile":true},
 {"cat":"audio","title":"有声书","desc":"喜马拉雅有声故事。","url":"https://www.ximalaya.com/youshengshu/updates/","hideOnMobile":true},
 {"cat":"video","title":"LTX-2.3","desc":"在线图生视频带音效。","url":"https://x2v.light-ai.top/generate/video/image-to-audio-video?model=LTX-2.3"},
 {"cat":"audio","title":"Qwen-ASR","desc":"在线语音识别转换。","url":"https://qwen-qwen3-asr-demo.hf.space/"},
