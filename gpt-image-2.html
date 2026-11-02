@@ -34,7 +34,7 @@ button,input,textarea,select{font:inherit}a{color:inherit;text-decoration:none}.
 <a class="brand" href="/"><span class="mark">C</span><span><b>CPUCK / IMAGE LAB</b><small>AI 图像创作与编辑工作台</small></span></a>
 <nav class="toplinks"><a class="toplink" href="/">← 返回首页</a></nav>
 </header>
-<section class="hero"><div class="eyebrow">IMAGE GENERATION / EDITING</div><h1>把想法变成图像。</h1><p>GPT Image 2 与 Qwen Image 2.1 集成在同一个工作台。输入提示词即可生成图片，也可以上传参考图进行编辑；生成结果支持预览、下载和继续编辑。</p></section>
+<section class="hero"><div class="eyebrow">IMAGE GENERATION / EDITING</div><h1>把想法变成图像。</h1></section>
 <div class="workspace">
 <aside class="panel controls">
 <div class="head"><span class="title">01 / 选择模型</span><span class="kicker">MODEL</span></div>
@@ -48,7 +48,7 @@ button,input,textarea,select{font:inherit}a{color:inherit;text-decoration:none}.
 </section>
 <section class="settings" id="qwenSettings" hidden>
 <div class="head"><b class="title">Qwen Image 2.1 Space</b><span class="hint">Gradio API</span></div>
-<div class="field"><label for="hfToken">Hugging Face Token <span class="hint">公开 Space 通常可留空</span></label><div class="keyrow"><input class="input" id="hfToken" type="password" placeholder="可选：hf_..." autocomplete="off"><button class="tiny" id="toggleHfToken" type="button">显示</button></div><div class="key-links"><a class="key-link" href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer">获取 Hugging Face Token ↗</a></div></div>
+<div class="field"><label for="hfToken">Hugging Face Token <span class="hint">公开 Space 通常可留空</span></label><div class="keyrow"><input class="input" id="hfToken" type="password" placeholder="可选：hf_..." autocomplete="off"><button class="tiny" id="toggleHfToken" type="button">显示</button></div><div class="key-links"><a class="key-link" href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer">获取 Qwen 密钥 ↗</a></div></div>
 <div class="row"><div class="field"><label for="qwenSteps">推理步数</label><select class="select" id="qwenSteps"><option value="28">28 · 快速预览</option><option value="40" selected>40 · 推荐质量</option></select></div><div class="field"><label for="qwenSeed">随机种子</label><input class="input" id="qwenSeed" type="number" min="0" max="2147483647" value="42"></div></div>
 <label class="remember"><input type="checkbox" id="randomSeed" checked> 每次使用新随机种子</label><label class="remember"><input type="checkbox" id="rememberHfToken"> 在此浏览器记住 HF Token</label>
 <div class="micro">通过 Gradio API 调用 Qwen Image 2.1：assembledchaos/qwen-image-2-1-studio。</div>
@@ -70,7 +70,7 @@ button,input,textarea,select{font:inherit}a{color:inherit;text-decoration:none}.
 
 </main>
 </div>
-<footer class="footer"><span>© CPuck · AI Image Lab</span><span>GPT Image 2 API · Qwen Image 2.1</span></footer>
+<footer class="footer"><span>© CPuck · AI Image Lab</span><span>GPT Image 2 API · Qwen Image 2.1 HF</span></footer>
 </div>
 <script>
 (function(){
@@ -97,7 +97,7 @@ function clearSource(){if(sourceObjectUrl)URL.revokeObjectURL(sourceObjectUrl);s
 function setSource(blob,name){if(!blob)return;if(sourceObjectUrl)URL.revokeObjectURL(sourceObjectUrl);sourceBlob=blob;sourceObjectUrl=URL.createObjectURL(blob);$("sourceImage").src=sourceObjectUrl;$("sourceName").textContent=name||"参考图片";$("sourceSize").textContent=(blob.size/1048576).toFixed(2)+" MB · "+(blob.type||"image");$("sourcePreview").classList.add("show");updateLabel()}
 function ratioLabel(v){return ({"1:1":"Square · 1:1","16:9":"Landscape · 16:9","9:16":"Portrait · 9:16","4:3":"Landscape · 4:3","3:4":"Portrait · 3:4","3:2":"Landscape · 3:2","2:3":"Portrait · 2:3","21:9":"Ultrawide · 21:9"})[v]||"Square · 1:1"}
 async function jpegData(blob){if(!blob)throw Error("请先上传参考图片");let u=URL.createObjectURL(blob);try{let im=new Image();await new Promise((ok,bad)=>{im.onload=ok;im.onerror=()=>bad(Error("图片无法读取"));im.src=u});let r=Math.min(1,1536/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.naturalWidth*r));c.height=Math.max(1,Math.round(im.naturalHeight*r));let x=c.getContext("2d");if(!x)throw Error("无法创建图片画布");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.85)}finally{URL.revokeObjectURL(u)}}
-async function apiJson(url,opts){let r;try{r=await fetch(url,opts)}catch(e){throw Error("网络或跨域访问失败："+e.message+"。如 API 不允许浏览器跨域，请填写支持 CORS 的代理地址。")}let raw=await r.text(),d;try{d=JSON.parse(raw)}catch(e){throw Error("接口返回非 JSON（HTTP "+r.status+"）："+raw.slice(0,220))}if(!r.ok){let er=d.error;throw Error("HTTP "+r.status+"："+(typeof er==="string"?er:er&&er.message||d.message||raw.slice(0,250)))}return d}
+async function apiJson(url,opts){let r;try{r=await fetch(url,opts)}catch(e){throw Error("网络或跨域访问失败："+e.message+"。请检查网络连接。")}let raw=await r.text(),d;try{d=JSON.parse(raw)}catch(e){throw Error("接口返回非 JSON（HTTP "+r.status+"）："+raw.slice(0,220))}if(!r.ok){let er=d.error,msg=typeof er==="string"?er:er&&er.message||d.message||raw.slice(0,250);if(r.status===403&&/quota is not enough|token quota|insufficient.*(balance|quota)|quota.*(balance|insufficient)/i.test(String(msg)))throw Error("APIMart 返回 HTTP 403：当前 API Key 的 Token 额度或账户余额不足。请检查 APIMart 账户余额/套餐，或更换有可用额度的 API Key；这不是图片上传失败。");throw Error("HTTP "+r.status+"："+msg)}return d}
 function imageUrl(d){
  let x=Array.isArray(d&&d.data)?d.data[0]:(d&&d.data)||d||{};
  let vals=[
