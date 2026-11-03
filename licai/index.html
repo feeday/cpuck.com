@@ -49,6 +49,9 @@ main{max-width:680px;margin:0 auto;padding:20px 16px 40px}
 .metric.focus .metric-value{color:var(--accent)}
 .panel{border:1px solid #e8eeee;border-radius:19px;background:var(--white);padding:17px 16px;box-shadow:var(--shadow)}
 .simulation{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sim-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.sim-reset{font-size:11px;color:#84959a;padding:2px 3px;background:transparent;border:0;text-decoration:underline;text-underline-offset:3px}
+.sim-reset:active{color:#147d73}
 .simulation strong{font-size:23px;font-weight:780;font-variant-numeric:tabular-nums;color:var(--accent);word-break:break-all}
 .simulation small{color:var(--sub);font-size:12px;display:block}
 .mini-tag{font-size:11px;color:#16766e;background:#e7f6f1;padding:5px 8px;border-radius:8px;white-space:nowrap}
@@ -129,8 +132,8 @@ input[type=number]{font-variant-numeric:tabular-nums}
 
 <div class="section-title">收益模拟 <small>打开页面后开始计时</small></div>
 <section class="panel">
-  <div class="simulation"><div><small>本次打开页面后，模拟累计增长</small><strong id="live-counter" aria-live="off">¥0.000000</strong></div><span class="mini-tag" id="elapsed">00:00:00</span></div>
-  <p class="note">计时器只是把当前预估年收益均摊到每秒，不会读取银行账户，也不代表真实计息、结算或已到账金额。调整资产后，按新配置重新开始模拟。</p>
+  <div class="simulation"><div><small>模拟累计收益 · 刷新页面不清零</small><strong id="live-counter" aria-live="off">¥0.000000</strong></div><div class="sim-right"><span class="mini-tag" id="elapsed">00:00:00</span><button type="button" class="sim-reset" id="sim-reset">清零模拟累计</button></div></div>
+  <p class="note">浏览器本地保存累计收益和起始时间；关闭页面期间按上次记录的利率补算，修改产品后只对后续时间使用新利率。仅为模拟，不代表银行真实计息或到账收益。</p>
 </section>
 
 <div class="section-title">汇率设置 <small>手动 / 联网自动获取</small></div>
@@ -167,6 +170,8 @@ input[type=number]{font-variant-numeric:tabular-nums}
 (function(){
 'use strict';
 var KEY='cpuck-finance-calculator-v1';
+var SIM_KEY='cpuck-finance-simulation-v1';
+var YEAR_MS=365*24*60*60*1000;
 var COLORS=['#188c7c','#568ac2','#ecaa5e','#9a86ca','#d77b86','#62afab','#70899d','#ca9b73'];
 var defaults={
  fx:6.67,
@@ -204,7 +209,6 @@ function normalize(src){
 }
 var state=clone(defaults);
 try{var saved=localStorage.getItem(KEY);if(saved)state=normalize(JSON.parse(saved))}catch(e){}
-var startedAt=Date.now();
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}}
 function el(id){return document.getElementById(id)}
 function escapeHtml(v){return String(v).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]})}
@@ -222,6 +226,50 @@ function calc(){
   return {principalCny:principalCny,annualCny:annualCny};
  });
  return {total:total,annual:annual,cny:cny,usd:usd,items:items};
+}
+// 用各产品的原始币种记录模拟累计值，汇率变化仅影响显示时的折算。
+function nativeAnnual(){
+ var cny=0,usd=0;
+ state.products.forEach(function(p){
+  var value=p.amount*p.rate/100*(p.period==='month'?12:1);
+  if(p.currency==='USD')usd+=value;else cny+=value;
+ });
+ return {cny:cny,usd:usd};
+}
+function loadSimulation(){
+ var now=Date.now(),rate=nativeAnnual(),saved=null;
+ try{saved=JSON.parse(localStorage.getItem(SIM_KEY)||'null')}catch(err){}
+ if(!saved||typeof saved!=='object')return {startedAt:now,updatedAt:now,cny:0,usd:0,rateCny:rate.cny,rateUsd:rate.usd};
+ var start=validNumber(saved.startedAt,now),updated=validNumber(saved.updatedAt,now);
+ if(start<0||start>now)start=now;
+ if(updated<start||updated>now)updated=now;
+ return {
+  startedAt:start,updatedAt:updated,
+  cny:Math.max(-1e14,Math.min(1e14,validNumber(saved.cny,0))),
+  usd:Math.max(-1e14,Math.min(1e14,validNumber(saved.usd,0))),
+  rateCny:validNumber(saved.rateCny,rate.cny),
+  rateUsd:validNumber(saved.rateUsd,rate.usd)
+ };
+}
+var simulation=loadSimulation();
+function accrueSimulation(){
+ var now=Date.now();
+ var delta=Math.max(0,now-simulation.updatedAt);
+ // 用旧利率补算刷新、关闭网页及系统休眠期间的收益。
+ simulation.cny+=simulation.rateCny*delta/YEAR_MS;
+ simulation.usd+=simulation.rateUsd*delta/YEAR_MS;
+ simulation.updatedAt=now;
+}
+function persistSimulation(){
+ try{localStorage.setItem(SIM_KEY,JSON.stringify(simulation))}catch(err){}
+}
+function syncSimulationRate(){
+ // 产品可能已修改，先以旧收益率结算到这一刻，再记录新的收益速度。
+ accrueSimulation();
+ var rate=nativeAnnual();
+ simulation.rateCny=rate.cny;
+ simulation.rateUsd=rate.usd;
+ persistSimulation();
 }
 function renderSummary(){
  var c=calc(),num=convert(c.annual),weighted=c.total?c.annual/c.total*100:0;
@@ -246,12 +294,14 @@ function renderSummary(){
  updateCounter();
 }
 function updateCounter(){
- var sec=Math.max(0,(Date.now()-startedAt)/1000),annual=convert(calc().annual),gain=annual*sec/(365*24*3600);
+ accrueSimulation();
+ var gain=convert(simulation.cny+simulation.usd*state.fx);
  el('live-counter').textContent=money(gain,6);
- var s=Math.floor(sec),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
+ var s=Math.floor(Math.max(0,Date.now()-simulation.startedAt)/1000);
+ var h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60;
  el('elapsed').textContent=[h,m,ss].map(function(x){return String(x).padStart(2,'0')}).join(':');
 }
-function saveAndRefresh(){persist();startedAt=Date.now();renderSummary()}
+function saveAndRefresh(){syncSimulationRate();persist();renderSummary()}
 var fxToken=0;
 function setFxStatus(msg,error){el('fx-status').textContent=msg;el('fx-status').classList.toggle('error',!!error)}
 function renderFxMode(){
@@ -290,7 +340,7 @@ function setFxMode(mode){
  if(state.fxMode===mode)return;
  ++fxToken;state.fxMode=mode;
  if(mode==='manual')state.fx=state.manualFx;else if(state.autoFx!==null)state.fx=state.autoFx;
- persist();startedAt=Date.now();renderFxMode();renderSummary();
+ saveAndRefresh();renderFxMode();
  if(mode==='auto')updateFxOnline(false);
 }
 function renderProducts(){
@@ -338,12 +388,12 @@ el('products').addEventListener('click',function(e){
  var btn=e.target.closest('[data-action="remove"]');if(!btn)return;
  var card=btn.closest('[data-id]');if(!card)return;
  state.products=state.products.filter(function(x){return x.id!==card.getAttribute('data-id')});
- persist();startedAt=Date.now();renderProducts();
+ syncSimulationRate();persist();renderProducts();
 });
 el('add').addEventListener('click',function(){
  var id='p-'+Date.now()+'-'+Math.random().toString(36).slice(2);
  state.products.push({id:id,name:'新理财产品',currency:'CNY',amount:1000,rate:2,period:'year'});
- persist();startedAt=Date.now();renderProducts();
+ syncSimulationRate();persist();renderProducts();
  var input=el('products').lastElementChild.querySelector('.name');if(input){input.focus();input.select()}
 });
 el('fx').value=state.fx;
@@ -363,7 +413,7 @@ el('show-cny').addEventListener('click',function(){state.display='CNY';persist()
 el('show-usd').addEventListener('click',function(){state.display='USD';persist();renderProducts()});
 el('reset').addEventListener('click',function(){
  if(!confirm('确定恢复四笔示例？当前已保存的配置会被覆盖。'))return;
- ++fxToken;state=clone(defaults);persist();startedAt=Date.now();renderFxMode();renderProducts();updateFxOnline(false);
+ ++fxToken;state=clone(defaults);syncSimulationRate();persist();renderFxMode();renderProducts();updateFxOnline(false);
 });
 el('export').addEventListener('click',function(){
  var blob=new Blob([JSON.stringify({version:2,fx:state.fx,fxMode:state.fxMode,manualFx:state.manualFx,autoFx:state.autoFx,fxRateDate:state.fxRateDate,fxFetchedAt:state.fxFetchedAt,display:state.display,products:state.products},null,2)],{type:'application/json'});
@@ -376,16 +426,28 @@ el('import-file').addEventListener('change',function(e){
  var reader=new FileReader();
  reader.onload=function(){
   try{var parsed=JSON.parse(reader.result);if(!parsed||!Array.isArray(parsed.products)||parsed.products.length>150)throw new Error('文件格式不正确');
-  ++fxToken;state=normalize(parsed);persist();startedAt=Date.now();renderFxMode();renderProducts();if(state.fxMode==='auto')updateFxOnline(false);alert('配置导入成功');
+  ++fxToken;state=normalize(parsed);syncSimulationRate();persist();renderFxMode();renderProducts();if(state.fxMode==='auto')updateFxOnline(false);alert('配置导入成功');
   }catch(err){alert('导入失败：请选择本工具导出的 JSON 配置文件')}
   e.target.value='';
  };
  reader.readAsText(file,'utf-8');
 });
+el('sim-reset').addEventListener('click',function(){
+ if(!confirm('确定清空模拟累计收益并重新开始计时吗？不会删除理财产品配置。'))return;
+ var now=Date.now(),rate=nativeAnnual();
+ simulation={startedAt:now,updatedAt:now,cny:0,usd:0,rateCny:rate.cny,rateUsd:rate.usd};
+ persistSimulation();updateCounter();
+});
+window.addEventListener('pagehide',function(){accrueSimulation();persistSimulation()});
+document.addEventListener('visibilitychange',function(){
+ if(document.hidden){accrueSimulation();persistSimulation()}
+ else updateCounter();
+});
 renderFxMode();
 renderProducts();
 if(state.fxMode==='auto')updateFxOnline(false);
 setInterval(updateCounter,1000);
+setInterval(persistSimulation,10000);
 
 // 与 wxm 页面复用同一 AdSense 广告单元；接近广告位置后再加载，避免阻塞首屏计算。
 (function initLazyAd(){
