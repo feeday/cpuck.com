@@ -252,12 +252,13 @@ function renderFxMode(){
  el('fx-manual').classList.toggle('active',!auto);
  el('fx-auto-btn').setAttribute('aria-pressed',String(auto));
  el('fx-manual').setAttribute('aria-pressed',String(!auto));
- el('fx').readOnly=auto;el('fx').value=state.fx;el('fx-auto-area').hidden=!auto;
+ el('fx').readOnly=auto;el('fx').value=state.fx;el('fx-auto-area').hidden=!auto;el('fx-refresh').disabled=false;
  if(auto)setFxStatus(state.fxRateDate?'参考汇率日期：'+state.fxRateDate:'等待联网更新',false);
 }
 async function updateFxOnline(force){
  if(state.fxMode!=='auto')return;
  if(!force&&state.fxFetchedAt&&Date.now()-state.fxFetchedAt<21600000){
+  el('fx-refresh').disabled=false;
   setFxStatus('缓存汇率 · 数据日期 '+(state.fxRateDate||'未知'),false);return;
  }
  var token=++fxToken,controller=new AbortController();
