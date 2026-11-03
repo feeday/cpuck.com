@@ -98,6 +98,9 @@ input[type=number]{font-variant-numeric:tabular-nums}
 .add{width:100%;padding:14px;background:var(--accent-soft);color:var(--accent);border:1px dashed #6bbcaf;border-radius:15px;font-weight:740;margin-top:12px}
 .actions{display:flex;gap:9px;flex-wrap:wrap}
 .actions button{flex:1;min-width:110px;background:white;color:#546670;border:1px solid var(--line);padding:11px 8px;border-radius:11px;font-size:12px}
+.ad-section{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;margin:25px -16px 6px;min-height:77px}
+.ad-label{font-size:10px;letter-spacing:.1em;color:#99a6aa;line-height:1.2}
+.ad-section .adsbygoogle{display:inline-block;width:300px;height:50px;max-width:100%}
 .footer{text-align:center;color:#88979c;font-size:11px;margin-top:25px}
 @media(min-width:600px){.metrics{grid-template-columns:repeat(3,minmax(0,1fr))}main{padding-top:25px}.fields{grid-template-columns:1.5fr 1fr 1fr}.fields .wide{grid-column:span 1}}
 @media(max-width:370px){.fx-row{grid-template-columns:1fr 118px}.hero{padding:19px 17px}.product{padding:14px}.total{font-size:29px}}
@@ -145,6 +148,11 @@ input[type=number]{font-variant-numeric:tabular-nums}
 <section class="products" id="products" aria-label="理财产品列表"></section>
 <button type="button" class="add" id="add">＋ 添加理财产品</button>
 <p class="note">年利率按本金 × 年利率计算；月利率按 12 个月简单年化。七日年化属于历史指标，未来收益可能变化。负利率可用于模拟亏损，不计算复利、手续费、税费、买卖价差或汇率未来变动。</p>
+
+<section class="ad-section" aria-label="广告">
+  <span class="ad-label">广告</span>
+  <ins class="adsbygoogle" style="display:inline-block;width:300px;height:50px" data-ad-client="ca-pub-1964437526797765" data-ad-slot="2282084339"></ins>
+</section>
 
 <div class="section-title">配置管理</div>
 <div class="actions">
@@ -378,6 +386,27 @@ renderFxMode();
 renderProducts();
 if(state.fxMode==='auto')updateFxOnline(false);
 setInterval(updateCounter,1000);
+
+// 与 wxm 页面复用同一 AdSense 广告单元；接近广告位置后再加载，避免阻塞首屏计算。
+(function initLazyAd(){
+ var target=document.querySelector('.ad-section'),started=false;
+ if(!target)return;
+ function load(){
+  if(started)return;started=true;
+  var script=document.createElement('script');
+  script.async=true;script.crossOrigin='anonymous';
+  script.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964437526797765';
+  document.head.appendChild(script);
+  try{(window.adsbygoogle=window.adsbygoogle||[]).push({})}catch(err){}
+ }
+ if('IntersectionObserver' in window){
+  var observer=new IntersectionObserver(function(entries){
+   if(entries.some(function(entry){return entry.isIntersecting})){observer.disconnect();load()}
+  },{rootMargin:'400px 0px'});
+  observer.observe(target);
+ }else{load()}
+})();
+
 })();
 </script>
 </body>
