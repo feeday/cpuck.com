@@ -53,7 +53,20 @@ main{max-width:680px;margin:0 auto;padding:20px 16px 40px}
 .simulation small{color:var(--sub);font-size:12px;display:block}
 .mini-tag{font-size:11px;color:#16766e;background:#e7f6f1;padding:5px 8px;border-radius:8px;white-space:nowrap}
 .note{font-size:12px;color:var(--sub);line-height:1.7;margin:10px 1px 0}
+
+.fx-modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#f1f6f5;padding:5px;border-radius:13px;margin-bottom:15px}
+.fx-modes button{background:transparent;border:0;color:#677b80;border-radius:10px;padding:10px 8px;font-size:13px;font-weight:700}
+.fx-modes button.active{background:#fff;color:var(--accent);box-shadow:0 2px 9px rgba(32,73,77,.09)}
 .fx-row{display:grid;grid-template-columns:1fr 142px;align-items:center;gap:12px}
+.input[readonly]{color:#39766e;background:#edf7f3}
+.fx-auto{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.fx-auto[hidden]{display:none}
+.fx-auto button{border:1px solid #9fd9c9;background:#ecf8f4;color:#137d73;border-radius:9px;padding:7px 10px;font-size:12px;font-weight:700}
+.fx-auto button:disabled{opacity:.5;cursor:wait}
+.fx-status{font-size:12px;color:#607b80;flex:1;min-width:185px}
+.fx-status.error{color:#b75c61}
+.fx-source{font-size:11px;color:#899ba0;margin:9px 0 0}
+.fx-source a{color:#137d73;text-decoration:underline}
 .fx-title{font-weight:700;font-size:14px}
 .fx-title small{font-size:12px;color:var(--sub);display:block;font-weight:400}
 .input{width:100%;background:#f8fafb;border:1px solid #dfe7e8;border-radius:12px;color:var(--ink);padding:11px 12px;min-width:0;outline:none;font-size:16px}
@@ -117,10 +130,13 @@ input[type=number]{font-variant-numeric:tabular-nums}
   <p class="note">计时器只是把当前预估年收益均摊到每秒，不会读取银行账户，也不代表真实计息、结算或已到账金额。调整资产后，按新配置重新开始模拟。</p>
 </section>
 
-<div class="section-title">汇率设置 <small>自主输入，无联网取价</small></div>
+<div class="section-title">汇率设置 <small>手动 / 联网自动获取</small></div>
 <section class="panel">
-  <div class="fx-row"><div class="fx-title">美元兑人民币<small>1 USD = ? CNY</small></div><input id="fx" class="input" type="number" inputmode="decimal" step="0.0001" min="0.0001" aria-label="每美元折合人民币" value="6.67"></div>
-  <div class="fx-help"><span>汇率仅用于折算，不代表实时银行牌价</span><strong id="fx-preview">3,000美元 ≈ ¥20,010</strong></div>
+  <div class="fx-modes" role="group" aria-label="汇率获取方式"><button id="fx-manual" type="button">手动填写</button><button id="fx-auto-btn" type="button">自动获取</button></div>
+  <div class="fx-row"><div class="fx-title">美元兑人民币<small>1 USD = ? CNY · 参考汇率</small></div><input id="fx" class="input" type="number" inputmode="decimal" step="0.0001" min="0.0001" aria-label="每美元折合人民币" value="6.67"></div>
+  <div class="fx-auto" id="fx-auto-area"><button id="fx-refresh" type="button">立即联网更新</button><span class="fx-status" id="fx-status" role="status" aria-live="polite">尚未获取在线汇率</span></div>
+  <p class="fx-source">在线数据来源：<a href="https://frankfurter.dev/" target="_blank" rel="noopener noreferrer">Frankfurter</a>（公开汇率，通常按日更新）。不是银行实时结售汇报价。</p>
+  <div class="fx-help"><span>汇率只用于估算，手动值不会被自动覆盖</span><strong id="fx-preview">3,000美元 ≈ ¥20,010</strong></div>
   <div class="allocation" id="allocation" aria-label="币种资产分布"></div>
   <div class="legend" id="legend"></div>
 </section>
@@ -146,6 +162,7 @@ var KEY='cpuck-finance-calculator-v1';
 var COLORS=['#188c7c','#568ac2','#ecaa5e','#9a86ca','#d77b86','#62afab','#70899d','#ca9b73'];
 var defaults={
  fx:6.67,
+ fxMode:'auto',manualFx:6.67,autoFx:null,fxRateDate:'',fxFetchedAt:0,
  display:'CNY',
  products:[
  {id:'example-a',name:'聚宝盆13号',currency:'CNY',amount:5000,rate:1.63,period:'year'},
@@ -169,7 +186,13 @@ function normalize(src){
    period:p.period==='month'?'month':'year'
   };
  });
- return {fx:fx,display:src.display==='USD'?'USD':'CNY',products:ps};
+ var mode=src.fxMode==='auto'?'auto':'manual'; // 兼容旧版手动输入
+ var manual=validNumber(src.manualFx,fx);if(manual<=0||manual>100000)manual=fx;
+ var auto=validNumber(src.autoFx,0);if(auto<=0||auto>100000)auto=null;
+ var date=String(src.fxRateDate||'');if(!/^\d{4}-\d{2}-\d{2}$/.test(date))date='';
+ var fetched=validNumber(src.fxFetchedAt,0);if(fetched<0||fetched>Date.now())fetched=0;
+ fx=mode==='manual'?manual:(auto===null?fx:auto);
+ return {fx:fx,fxMode:mode,manualFx:manual,autoFx:auto,fxRateDate:date,fxFetchedAt:fetched,display:src.display==='USD'?'USD':'CNY',products:ps};
 }
 var state=clone(defaults);
 try{var saved=localStorage.getItem(KEY);if(saved)state=normalize(JSON.parse(saved))}catch(e){}
@@ -221,6 +244,46 @@ function updateCounter(){
  el('elapsed').textContent=[h,m,ss].map(function(x){return String(x).padStart(2,'0')}).join(':');
 }
 function saveAndRefresh(){persist();startedAt=Date.now();renderSummary()}
+var fxToken=0;
+function setFxStatus(msg,error){el('fx-status').textContent=msg;el('fx-status').classList.toggle('error',!!error)}
+function renderFxMode(){
+ var auto=state.fxMode==='auto';
+ el('fx-auto-btn').classList.toggle('active',auto);
+ el('fx-manual').classList.toggle('active',!auto);
+ el('fx-auto-btn').setAttribute('aria-pressed',String(auto));
+ el('fx-manual').setAttribute('aria-pressed',String(!auto));
+ el('fx').readOnly=auto;el('fx').value=state.fx;el('fx-auto-area').hidden=!auto;
+ if(auto)setFxStatus(state.fxRateDate?'参考汇率日期：'+state.fxRateDate:'等待联网更新',false);
+}
+async function updateFxOnline(force){
+ if(state.fxMode!=='auto')return;
+ if(!force&&state.fxFetchedAt&&Date.now()-state.fxFetchedAt<21600000){
+  setFxStatus('缓存汇率 · 数据日期 '+(state.fxRateDate||'未知'),false);return;
+ }
+ var token=++fxToken,controller=new AbortController();
+ el('fx-refresh').disabled=true;setFxStatus('正在联网获取美元汇率…',false);
+ var timeout=setTimeout(function(){controller.abort()},9000);
+ try{
+  var response=await fetch('https://api.frankfurter.dev/v2/rate/usd/cny',{signal:controller.signal,cache:'no-store'});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  var data=await response.json(),rate=Number(data.rate),date=String(data.date||'');
+  if(!Number.isFinite(rate)||rate<=0||rate>100000||data.base!=='USD'||data.quote!=='CNY'||!/^\d{4}-\d{2}-\d{2}$/.test(date))throw Error('无效汇率响应');
+  if(token!==fxToken||state.fxMode!=='auto')return;
+  state.autoFx=rate;state.fx=rate;state.fxRateDate=date;state.fxFetchedAt=Date.now();
+  el('fx').value=rate;saveAndRefresh();
+  setFxStatus('已更新 · '+date+' · 1美元 = '+nf(rate,4)+'元',false);
+ }catch(err){
+  if(token!==fxToken||state.fxMode!=='auto')return;
+  setFxStatus(state.autoFx!==null?'联网失败，沿用 '+(state.fxRateDate||'未知日期')+' 的缓存汇率':'联网失败，暂用已有汇率，可切换手动填写',true);
+ }finally{clearTimeout(timeout);if(token===fxToken)el('fx-refresh').disabled=false}
+}
+function setFxMode(mode){
+ if(state.fxMode===mode)return;
+ ++fxToken;state.fxMode=mode;
+ if(mode==='manual')state.fx=state.manualFx;else if(state.autoFx!==null)state.fx=state.autoFx;
+ persist();startedAt=Date.now();renderFxMode();renderSummary();
+ if(mode==='auto')updateFxOnline(false);
+}
 function renderProducts(){
  var holder=el('products');
  if(!state.products.length){holder.innerHTML='<div class="panel note">暂无理财产品，点击下方按钮添加。</div>';renderSummary();return}
@@ -275,19 +338,26 @@ el('add').addEventListener('click',function(){
  var input=el('products').lastElementChild.querySelector('.name');if(input){input.focus();input.select()}
 });
 el('fx').value=state.fx;
+el('fx-manual').addEventListener('click',function(){setFxMode('manual')});
+el('fx-auto-btn').addEventListener('click',function(){setFxMode('auto')});
+el('fx-refresh').addEventListener('click',function(){updateFxOnline(true)});
 el('fx').addEventListener('input',function(e){
+ if(state.fxMode!=='manual')return;
  var n=Number(e.target.value);if(!Number.isFinite(n)||n<=0||n>100000)return;
- state.fx=n;saveAndRefresh();
+ state.fx=n;state.manualFx=n;saveAndRefresh();
 });
 el('fx').addEventListener('change',function(e){e.target.value=state.fx});
+document.addEventListener('visibilitychange',function(){
+ if(!document.hidden&&state.fxMode==='auto')updateFxOnline(false);
+});
 el('show-cny').addEventListener('click',function(){state.display='CNY';persist();renderProducts()});
 el('show-usd').addEventListener('click',function(){state.display='USD';persist();renderProducts()});
 el('reset').addEventListener('click',function(){
  if(!confirm('确定恢复四笔示例？当前已保存的配置会被覆盖。'))return;
- state=clone(defaults);el('fx').value=state.fx;persist();startedAt=Date.now();renderProducts();
+ ++fxToken;state=clone(defaults);persist();startedAt=Date.now();renderFxMode();renderProducts();updateFxOnline(false);
 });
 el('export').addEventListener('click',function(){
- var blob=new Blob([JSON.stringify({version:1,fx:state.fx,display:state.display,products:state.products},null,2)],{type:'application/json'});
+ var blob=new Blob([JSON.stringify({version:2,fx:state.fx,fxMode:state.fxMode,manualFx:state.manualFx,autoFx:state.autoFx,fxRateDate:state.fxRateDate,fxFetchedAt:state.fxFetchedAt,display:state.display,products:state.products},null,2)],{type:'application/json'});
  var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='理财计算器配置.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1500);
 });
 el('import-btn').addEventListener('click',function(){el('import-file').click()});
@@ -297,13 +367,15 @@ el('import-file').addEventListener('change',function(e){
  var reader=new FileReader();
  reader.onload=function(){
   try{var parsed=JSON.parse(reader.result);if(!parsed||!Array.isArray(parsed.products)||parsed.products.length>150)throw new Error('文件格式不正确');
-  state=normalize(parsed);el('fx').value=state.fx;persist();startedAt=Date.now();renderProducts();alert('配置导入成功');
+  ++fxToken;state=normalize(parsed);persist();startedAt=Date.now();renderFxMode();renderProducts();if(state.fxMode==='auto')updateFxOnline(false);alert('配置导入成功');
   }catch(err){alert('导入失败：请选择本工具导出的 JSON 配置文件')}
   e.target.value='';
  };
  reader.readAsText(file,'utf-8');
 });
+renderFxMode();
 renderProducts();
+if(state.fxMode==='auto')updateFxOnline(false);
 setInterval(updateCounter,1000);
 })();
 </script>
