@@ -649,6 +649,13 @@
             .btn-action { padding: 0 12px; font-size: 0.85rem; }
         }
     
+.quick-mode-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+.quick-mode-btn{min-width:0;padding:10px 4px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(255,255,255,.035);color:var(--text-secondary);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;transition:.18s ease;}
+.quick-mode-btn:hover{background:rgba(56,189,248,.09);color:#fff;border-color:rgba(56,189,248,.3);}
+.quick-mode-btn.active{background:linear-gradient(135deg,rgba(56,189,248,.24),rgba(167,139,250,.18));border-color:rgba(56,189,248,.55);color:#e0f2fe;box-shadow:0 5px 18px rgba(56,189,248,.09);}
+#quickModePanel{gap:9px;}#quickModelGroup,#visionTaskGroup{margin:0;}
+@media(max-width:430px){.quick-mode-tabs{grid-template-columns:repeat(2,minmax(0,1fr));}.quick-mode-btn{padding:11px 6px;}}
+
 /* AIGX 嵌入工具：保留原有布局，仅扩展左侧表单及右侧工作区 */
 .sidebar-details{border:1px solid var(--border-light);background:rgba(2,6,23,.36);border-radius:10px;padding:11px;}
 .sidebar-details summary{cursor:pointer;font-size:.84rem;font-weight:700;color:#cbd5e1;}
@@ -716,9 +723,46 @@
                 </details>
             </div>
 
-            <div class="form-group">
-                <label for="unifiedModel">🤖 AI 引擎 / 功能选择</label>
-                <select id="unifiedModel" class="glass-input" onchange="onModelChange()">
+            <div class="form-group" id="quickModePanel">
+                <label>🤖 工作模式</label>
+                <div class="quick-mode-tabs" id="quickModeTabs" role="group" aria-label="AI 工作模式">
+                    <button type="button" class="quick-mode-btn" data-mode="chat">💬 对话</button>
+                    <button type="button" class="quick-mode-btn active" data-mode="vision">🖼️ 图像对话</button>
+                    <button type="button" class="quick-mode-btn" data-mode="generate">✨ 生图</button>
+                    <button type="button" class="quick-mode-btn" data-mode="edit">🪄 改图</button>
+                </div>
+                <div class="form-group" id="quickModelGroup">
+                    <label for="quickModel">模型</label>
+                    <select id="quickModel" class="glass-input"></select>
+                </div>
+                <div class="form-group" id="visionTaskGroup">
+                    <label for="visionTask">图像任务</label>
+                    <select id="visionTask" class="glass-input">
+                        <option value="image">普通图像提问</option>
+                        <option value="reverse" selected>图像反推 / 描述词</option>
+                        <option value="forgery">图像真伪鉴定</option>
+                    </select>
+                </div>
+                <p class="sidebar-note" id="quickModeHint">上传图片后可连续提问，也可使用反推和真伪鉴定预设。</p>
+                <details class="sidebar-details" id="quickAdvancedSettings">
+                    <summary>高级设置 · 自定义模型</summary>
+                    <div class="sidebar-settings">
+                        <label for="customModel">自定义模型名（可选）</label>
+                        <input type="text" id="customModel" class="glass-input" placeholder="输入自定义模型名以覆盖上方选择（图像模式会沿用当前任务类型）" style="margin-top: 8px;">
+                    </div>
+                </details>
+                <details class="sidebar-details" id="extraToolsSettings">
+                    <summary>更多工具 · 音频</summary>
+                    <div class="sidebar-settings">
+                        <label for="extraToolSelect">选择工具</label>
+                        <select id="extraToolSelect" class="glass-input">
+                            <option value="">选择音频工具…</option>
+                            <option value="audio-edit">音频编辑 · 波形裁剪 / 导出</option>
+                            <option value="audio-extract">视频提取音频</option>
+                        </select>
+                    </div>
+                </details>
+                <div style="display:none!important" aria-hidden="true"><select id="unifiedModel" class="glass-input" onchange="onModelChange()" aria-hidden="true" tabindex="-1">
                     <optgroup label="图像反推">
                         <option value="reverse:gpt-4o" selected>GPT-4o · 图像反推</option>
                         <option value="reverse:grok-3">Grok-3 · 图像反推</option>
@@ -751,8 +795,7 @@
                         <option value="tool:audio-edit">音频编辑 · 波形裁剪 / 导出</option>
                         <option value="tool:audio-extract">视频提取音频</option>
                     </optgroup>
-</select>
-                <input type="text" id="customModel" class="glass-input" placeholder="输入自定义模型名以覆盖上方选择（图像模式会沿用当前任务类型）" style="margin-top: 8px;">
+</select></div>
             </div>
 
             <!-- 图片上传区域：图像反推、伪造分析与自定义图像提问模式显示 -->
@@ -1684,6 +1727,19 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
         await executeChatTask(apiKey, text, text, chatInput, false, null, selectedModel);
     }
 
+    function estimateOutputTokens(text) {
+        const value = String(text || '');
+        const cjk = (value.match(/[\u3400-\u9fff\uf900-\ufaff]/g) || []).length;
+        const rest = value.replace(/[\u3400-\u9fff\uf900-\ufaff]/g, ' ');
+        const parts = rest.match(/[A-Za-z]+(?:'[A-Za-z]+)?|\d+(?:[.,]\d+)*|[^\s]/g) || [];
+        const other = parts.reduce((sum, part) => {
+            if (/^[A-Za-z]/.test(part)) return sum + Math.max(1, Math.ceil(part.length / 4));
+            if (/^\d/.test(part)) return sum + Math.max(1, Math.ceil(part.length / 3));
+            return sum + 1;
+        }, 0);
+        return Math.max(1, cjk + other);
+    }
+
     async function executeChatTask(apiKey, displayText, messageContent, inputEl, isResend = false, imagePreviews = null, overrideApiModel = null, forceSingleTurnImage = false) {
         const indicator = document.getElementById('typingIndicator');
         const baseUrl = getBaseUrl();
@@ -1730,6 +1786,9 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
             let requestMessages = apiMessages;
             let aiReply = "";
             let totalTokens = 0;
+            let totalOutputTokens = 0;
+            let outputUsageComplete = true;
+            let apiRequestDurationMs = 0;
             let finishReason = null;
             let continuationRounds = 0;
 
@@ -1738,6 +1797,7 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
                     ? '正在思考...'
                     : `回复较长，正在自动续写第 ${continuationRounds} 次...`;
 
+                const requestStartedAt = Date.now();
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
@@ -1758,9 +1818,19 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
                 }
 
                 const data = await response.json();
+                apiRequestDurationMs += Math.max(1, Date.now() - requestStartedAt);
                 const chunk = data.choices?.[0]?.message?.content || "";
                 finishReason = data.choices?.[0]?.finish_reason || null;
-                totalTokens += Number(data.usage?.total_tokens || 0);
+                const usage = data.usage || {};
+                totalTokens += Number(usage.total_tokens || 0);
+                let outputCount = Number(usage.completion_tokens ?? usage.output_tokens ?? usage.completionTokens);
+                if (!(outputCount > 0)) {
+                    const totalCount = Number(usage.total_tokens);
+                    const inputCount = Number(usage.prompt_tokens ?? usage.input_tokens);
+                    if (totalCount > 0 && Number.isFinite(inputCount) && totalCount >= inputCount) outputCount = totalCount - inputCount;
+                }
+                if (outputCount > 0 && Number.isFinite(outputCount)) totalOutputTokens += outputCount;
+                else outputUsageComplete = false;
 
                 if (!chunk) break;
 
@@ -1778,7 +1848,10 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
 
             const endTime = Date.now();
             const duration = ((endTime - startTime) / 1000).toFixed(2);
-            const tokenText = totalTokens > 0 ? totalTokens : "未知";
+            const outputTokenCount = outputUsageComplete && totalOutputTokens > 0 ? totalOutputTokens : estimateOutputTokens(aiReply);
+            const tokenMark = outputUsageComplete && totalOutputTokens > 0 ? "" : "≈";
+            const speed = apiRequestDurationMs > 0 ? (outputTokenCount / (apiRequestDurationMs / 1000)).toFixed(1) : "—";
+            const tokenText = tokenMark + outputTokenCount.toLocaleString();
 
             if (aiReply) {
                 const aiMsgId = genId();
@@ -1786,7 +1859,7 @@ ${text || '(使用内置提示词)'}`, messageContent, chatInput, false, imagePr
                     textChatContext.push({ id: aiMsgId, role: "assistant", content: aiReply });
                 }
                 const lengthHint = finishReason === 'length' ? ' | ⚠️ 仍可能达到长度上限' : '';
-                const statsHtml = `| ⏱️ ${duration}s | 🪙 ${tokenText} Tokens | ↩️ 自动续写 ${continuationRounds} 次${lengthHint}`;
+                const statsHtml = `| ⏱️ ${duration}s | ⚡ ${speed} TK/s | 📤 ${tokenText} 输出 Tokens | ↩️ 自动续写 ${continuationRounds} 次${lengthHint}`;
                 appendTextBubble('ai', aiReply, false, true, statsHtml, aiMsgId, null);
             } else {
                 throw new Error("API 未返回有效文本内容");
@@ -1978,6 +2051,50 @@ $('toolRun').addEventListener('click',runTask);
 [['toolTrim','audioLabKeep'],['toolUndo','audioLabUndo'],['toolPreview','audioLabPreview'],['toolExport','audioLabExport'],['toolAsrCancel','audioAsrCancel'],['toolAsrTxt','audioAsrTxt'],['toolAsrSrt','audioAsrSrt'],['toolAsrVtt','audioAsrVtt']].forEach(([a,b])=>$(a).addEventListener('click',()=>{syncAudio(true);press(b);}));
 // Responsive waveform remains interactive even though transport controls have moved left.
 onModelChange();
+})();
+<\/script>
+<script id="aigxQuickModes">
+(()=>{
+ const $=id=>document.getElementById(id);
+ const sets={
+  chat:[['gemini-3.1-pro-preview','Gemini 3.1 Pro Preview'],['claude-opus-4-8','Claude Opus 4.8'],['deepseek-v4-flash','DeepSeek V4 Flash']],
+  vision:[['gpt-4o','GPT-4o'],['grok-3','Grok 3'],['gemini-3.1-flash-lite','Gemini 3.1 Flash Lite']],
+  generate:[['gpt','GPT Image 2'],['gemini','Gemini Flash Image'],['hf','Qwen Image (HF)']],
+  edit:[['gpt','GPT Image 2'],['gemini','Gemini Flash Image'],['hf','Qwen Image (HF)']]
+ };
+ const hints={chat:'普通文字对话，支持连续上下文。',vision:'上传图片后可连续提问，也可使用反推和真伪鉴定预设。',generate:'在任务参数中输入提示词并设置尺寸。',edit:'上传需要修改的图片，用自然语言描述修改要求。'};
+ let active='vision';
+ function apply(){
+  const model=$('quickModel').value;
+  let value=model;
+  if(active==='vision')value=$('visionTask').value+':'+model;
+  if(active==='generate')value='tool:gen-'+model;
+  if(active==='edit')value='tool:edit-'+model;
+  $('unifiedModel').value=value;
+  if(typeof onModelChange==='function')onModelChange();
+ }
+ function setMode(mode){
+  if(!sets[mode])return;
+  active=mode;$('extraToolSelect').value='';
+  $('quickModelGroup').style.display='flex';
+  $('visionTaskGroup').style.display=mode==='vision'?'flex':'none';
+  $('quickModeTabs').querySelectorAll('[data-mode]').forEach(b=>{b.classList.toggle('active',b.dataset.mode===mode);b.setAttribute('aria-pressed',String(b.dataset.mode===mode));});
+  const select=$('quickModel');select.replaceChildren();
+  sets[mode].forEach(([value,label])=>{const o=document.createElement('option');o.value=value;o.textContent=label;select.appendChild(o);});
+  select.value=mode==='chat'?'gemini-3.1-pro-preview':mode==='vision'?'gpt-4o':'gpt';
+  $('quickModeHint').textContent=hints[mode];apply();
+ }
+ $('quickModeTabs').addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(b)setMode(b.dataset.mode);});
+ $('quickModel').addEventListener('change',apply);
+ $('visionTask').addEventListener('change',apply);
+ $('extraToolSelect').addEventListener('change',()=>{
+  const value=$('extraToolSelect').value;if(!value){setMode(active);return;}
+  $('quickModeTabs').querySelectorAll('[data-mode]').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
+  $('quickModelGroup').style.display='none';$('visionTaskGroup').style.display='none';
+  $('quickModeHint').textContent=value==='audio-edit'?'本地音频剪辑、试听与导出。':'从视频中提取音轨。';
+  $('unifiedModel').value='tool:'+value;if(typeof onModelChange==='function')onModelChange();
+ });
+ setMode('vision');
 })();
 <\/script>
 </body>
@@ -3745,6 +3862,15 @@ async function pollGptTask(taskId) {
     throw new Error('任务查询超时，请保留任务号：'+taskId+'。最后状态：'+JSON.stringify(lastData).slice(0,500));
 }
 
+function estimateToolOutputTokens(text) {
+    const value=String(text||'');
+    const cjk=(value.match(/[\u3400-\u9fff\uf900-\ufaff]/g)||[]).length;
+    const rest=value.replace(/[\u3400-\u9fff\uf900-\ufaff]/g,' ');
+    const parts=rest.match(/[A-Za-z]+(?:'[A-Za-z]+)?|\d+(?:[.,]\d+)*|[^\s]/g)||[];
+    const other=parts.reduce((sum,part)=>sum+(/^[A-Za-z]/.test(part)?Math.max(1,Math.ceil(part.length/4)):/^\d/.test(part)?Math.max(1,Math.ceil(part.length/3)):1),0);
+    return Math.max(1,cjk+other);
+}
+
 if(btnCombinedAction) {
     btnCombinedAction.onclick = async () => {
         const content = universalText.value.trim();
@@ -3807,12 +3933,22 @@ if(btnCombinedAction) {
                 const duration = ((Date.now() - startTime) / 1000).toFixed(2);
                 const tokens = data.usage?.total_tokens || "未知";
                 const aiReply = data.choices?.[0]?.message?.content || "无有效返回内容";
+                const usage = data.usage || {};
+                let outputTokens = Number(usage.completion_tokens ?? usage.output_tokens ?? usage.completionTokens);
+                if (!(outputTokens > 0)) {
+                    const totalCount = Number(usage.total_tokens);
+                    const inputCount = Number(usage.prompt_tokens ?? usage.input_tokens);
+                    if (totalCount > 0 && Number.isFinite(inputCount) && totalCount >= inputCount) outputTokens = totalCount - inputCount;
+                }
+                const estimatedTokens = !(outputTokens > 0);
+                if (estimatedTokens) outputTokens = estimateToolOutputTokens(aiReply);
+                const tps = (outputTokens / Math.max(0.001, (Date.now() - startTime) / 1000)).toFixed(1);
 
                 respStatus.textContent = "✅ UPLINK SECURED"; respStatus.style.color = "#00ff41";
                 
                 if (isImageMode) requestPayload.messages[0].content[1].image_url.url = "[Base64 Data Truncated]";
                 
-                const logHeader = "| ⏱️ " + duration + "s | 🪙 " + tokens + " Tokens |\n";
+                const logHeader = "| ⏱️ " + duration + "s | ⚡ " + tps + " TK/s | 📤 " + (estimatedTokens ? "≈" : "") + outputTokens.toLocaleString() + " 输出 Tokens | 🪙 " + tokens + " Tokens |\n";
                 const logBody = "[" + getCurrentTimeStr() + "] RESPONSE_LOG:\n📦 Payload:\n" + JSON.stringify(requestPayload) + "\n✅ Result:\n" + JSON.stringify(data);
                 response.textContent = logHeader + logBody;
                 
@@ -3873,7 +4009,7 @@ if(btnCombinedAction) {
                     }
                     const duration = ((Date.now() - startTime) / 1000).toFixed(2);
                     setupGeneratedImage(finalImageUrl, "RENDER_COMPLETE", isImageMode);
-                    response.textContent = "| ⏱️ " + duration + "s |\n[" + getCurrentTimeStr() + "] APIMart_LOG:\n" + JSON.stringify(queryData);
+                    response.textContent = "| ⏱️ " + duration + "s | ⚡ TK/s 不适用（图像生成） |\n[" + getCurrentTimeStr() + "] APIMart_LOG:\n" + JSON.stringify(queryData);
                 } else {
                     const requestParts = [];
                     if (isImageMode) requestParts.push({ inlineData: { mimeType: mimeType, data: base64Data } });
@@ -3902,7 +4038,7 @@ if(btnCombinedAction) {
                     setupGeneratedImage(imageUrl, "RENDER_COMPLETE", isImageMode);
                     
                     if(isImageMode) requestBody.contents[0].parts[0].inlineData.data = "[Base64 Data Truncated]";
-                    response.textContent = "| ⏱️ " + duration + "s |\n📦 Payload:\n" + JSON.stringify(requestBody) + "\n-- SYS_SUCCESS";
+                    response.textContent = "| ⏱️ " + duration + "s | ⚡ TK/s 不适用（图像生成） |\n📦 Payload:\n" + JSON.stringify(requestBody) + "\n-- SYS_SUCCESS";
                 }
             } catch (e) {
                 respStatus.textContent = "❌ ERROR"; respStatus.style.color = "#ff2a2a";
