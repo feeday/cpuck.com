@@ -926,20 +926,20 @@
 
 
 <style id="desktop-quick-tools-style">
-#desktopBtvDrawer{position:fixed;inset:0;z-index:2147483000;pointer-events:none;font-family:Inter,system-ui,-apple-system,sans-serif}
-#desktopBtvDrawer .btv-tab{pointer-events:auto;position:absolute;right:0;top:50%;transform:translateY(-50%);width:44px;height:116px;border:1px solid var(--border-light);border-right:0;border-radius:14px 0 0 14px;background:rgba(30,41,59,.78);color:var(--text-secondary);box-shadow:0 8px 26px rgba(2,6,23,.32);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:background .2s,width .2s,border-color .2s,color .2s}
-#desktopBtvDrawer .btv-tab:hover{width:50px;background:rgba(30,41,59,.96);border-color:var(--border-hover);color:var(--text-primary)}
+#desktopBtvDrawer{position:fixed;inset:0;z-index:2147483000;pointer-events:none;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#desktopBtvDrawer .btv-tab{pointer-events:auto;position:absolute;right:0;top:50%;transform:translateY(-50%);width:42px;height:104px;border:1px solid rgba(148,163,184,.2);border-right:0;border-radius:14px 0 0 14px;background:rgba(15,23,42,.94);color:#cbd5e1;box-shadow:0 8px 24px rgba(0,0,0,.24);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:background .2s,width .2s,border-color .2s,color .2s}
+#desktopBtvDrawer .btv-tab:hover{width:46px;background:rgba(30,41,59,.98);border-color:rgba(148,163,184,.38);color:#f8fafc}
 #desktopBtvDrawer .btv-tab:focus-visible{outline:2px solid rgba(148,163,184,.65);outline-offset:3px}
-#desktopBtvDrawer .btv-tab svg{width:20px;height:20px}
-#desktopBtvDrawer .btv-tab span{writing-mode:vertical-rl;letter-spacing:2px;font-size:12px;font-weight:700}
-#desktopBtvDrawer .btv-shade{position:absolute;inset:0;background:rgba(0,0,0,.58);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s;pointer-events:none}
-#desktopBtvDrawer .btv-panel{position:absolute;top:14px;right:58px;bottom:14px;left:auto;width:min(600px,calc(100vw - 86px));max-width:600px;box-sizing:border-box;border:1px solid rgba(0,240,255,.35);border-radius:14px;background:#030303;box-shadow:0 18px 70px rgba(0,0,0,.65);overflow:hidden;opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .25s,transform .28s,visibility .25s;pointer-events:none;display:flex;flex-direction:column}
+#desktopBtvDrawer .btv-tab svg{width:19px;height:19px}
+#desktopBtvDrawer .btv-tab span{writing-mode:vertical-rl;letter-spacing:1.5px;font-size:11px;font-weight:650}
+#desktopBtvDrawer .btv-shade{position:absolute;inset:0;background:rgba(2,6,23,.22);backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s;pointer-events:none}
+#desktopBtvDrawer .btv-panel{position:absolute;top:18px;right:58px;bottom:18px;left:auto;width:min(460px,calc(100vw - 84px));max-width:460px;box-sizing:border-box;border:1px solid rgba(148,163,184,.2);border-radius:18px;background:#080c12;box-shadow:0 24px 80px rgba(0,0,0,.48),0 4px 18px rgba(0,0,0,.22);overflow:hidden;opacity:0;visibility:hidden;transform:translateX(16px);transition:opacity .22s,transform .25s,visibility .22s;pointer-events:none;display:flex;flex-direction:column}
 #desktopBtvDrawer.is-open .btv-shade{opacity:1;visibility:visible;pointer-events:auto}
-#desktopBtvDrawer.is-open .btv-panel{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
-#desktopBtvDrawer .btv-panel-head{height:38px;flex:0 0 38px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#050505;border-bottom:1px solid #17343a;color:#00f0ff;font-size:11px;letter-spacing:1px}
-#desktopBtvDrawer .btv-panel-close{width:28px;height:27px;border:1px solid #34464a;border-radius:6px;background:#101719;color:#d4d4d4;font-size:19px;line-height:1;cursor:pointer}
-#desktopBtvDrawer .btv-panel-close:hover{border-color:#ff2a2a;color:#ff6b6b}
-#desktopBtvDrawer iframe{display:block;flex:1;width:100%;height:calc(100% - 38px);border:0;background:#030303}
+#desktopBtvDrawer.is-open .btv-panel{opacity:1;visibility:visible;transform:translateX(0);pointer-events:auto}
+#desktopBtvDrawer .btv-panel-head{height:46px;flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 16px;background:linear-gradient(180deg,#111925,#0c121b);border-bottom:1px solid rgba(148,163,184,.14);color:#e2e8f0;font-size:13px;font-weight:650;letter-spacing:.2px}
+#desktopBtvDrawer .btv-panel-close{width:30px;height:30px;display:grid;place-items:center;border:1px solid rgba(148,163,184,.2);border-radius:9px;background:rgba(255,255,255,.045);color:#cbd5e1;font-size:19px;line-height:1;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
+#desktopBtvDrawer .btv-panel-close:hover{border-color:rgba(248,113,113,.38);background:rgba(248,113,113,.1);color:#fecaca}
+#desktopBtvDrawer iframe{display:block;flex:1;width:100%;height:calc(100% - 46px);min-height:0;border:0;background:#030303}
 @media(max-width:768px),(hover:none) and (pointer:coarse){#desktopBtvDrawer{display:none!important}}
 @media(prefers-reduced-motion:reduce){#desktopBtvDrawer *{transition:none!important}}
 </style>
@@ -950,7 +950,7 @@
   </button>
   <div class="btv-shade" id="btvDrawerShade"></div>
   <section class="btv-panel" id="btvDrawerPanel" aria-hidden="true">
-    <div class="btv-panel-head"><span>CPUCK / WXM TOOLBOX</span><button class="btv-panel-close" id="btvDrawerClose" type="button" aria-label="关闭工具箱">×</button></div>
+    <div class="btv-panel-head"><span>CPUCK · 工具箱</span><button class="btv-panel-close" id="btvDrawerClose" type="button" aria-label="关闭工具箱">×</button></div>
     <iframe id="btvDrawerFrame" title="WXM 工具箱页面" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads allow-top-navigation-by-user-activation"></iframe>
   </section>
 </aside>
