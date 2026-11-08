@@ -1,6 +1,28 @@
 [
   {
     "source": "github-issue",
+    "issue": 20,
+    "isArticle": true,
+    "cat": "log",
+    "title": "文档导出图像",
+    "desc": "通过脚本批量导出文档中的图像。\nfrom docx import Document\nimport os\nimport re\nimport shutil\n \n# pip install python-docx\n# pip install lxml  # 通常不必需，除非在安装 python-docx 后出现问题\n \n \ndef get_picture(docu",
+    "content": "通过脚本批量导出文档中的图像。\nfrom docx import Document\nimport os\nimport re\nimport shutil\n \n# pip install python-docx\n# pip install lxml  # 通常不必需，除非在安装 python-docx 后出现问题\n \n \ndef get_picture(document, paragraph):\n    \"\"\"\n    从段落中获取图片\n    \"\"\"\n    img = paragraph._element.xpath('.//pic:pic')\n    if not img:\n        return None\n    img = img[0]\n    embed = img.xpath('.//a:blip/@r:embed')[0]\n    related_part = document.part.related_parts[embed]\n    image = related_part.image\n    return image\n \ndef extract_content(docx_path, output_dir):\n    try:\n        doc = Document(docx_path)\n        base_filename = os.path.splitext(os.path.basename(docx_path))[0]\n        doc_output_dir = os.path.join(output_dir, base_filename)\n        os.makedirs(doc_output_dir, exist_ok=True)\n        shutil.copy(docx_path, doc_output_dir)\n \n        extracted_text = []\n        extracted_images = []\n \n        for para in doc.paragraphs:\n            match = re.search(r'图片简介：(.*)', para.text)\n            if match:\n                violation_text = match.group(1).strip() if match.group(1).strip() else \"XXX\"\n                extracted_text.append(violation_text)\n \n            image = get_picture(doc, para)\n            if image:\n                blob = image.blob\n                image_index = len(extracted_images) + 1\n                formatted_index = f\"{image_index:06d}\"\n                img_path = os.path.join(doc_output_dir, f\"{base_filename}_{formatted_index}.png\")\n                extracted_images.append(img_path)\n                with open(img_path, \"wb\") as f:\n                    f.write(blob)\n \n        if extracted_text:\n            text_filename = f\"{base_filename}.txt\"\n            text_path = os.path.join(doc_output_dir, text_filename)\n            with open(text_path, 'w', encoding='utf-8') as text_file:\n                text_file.write('\\n'.join(extracted_text))\n            rename_images_based_on_text(doc_output_dir, text_path, extracted_images)\n \n    except Exception as e:\n        print(f\"Error processing {docx_path}: {e}\")\n \ndef rename_images_based_on_text(output_dir, text_file_path, extracted_images):\n    with open(text_file_path, 'r', encoding='utf-8') as file:\n        lines = file.readlines()\n \n    if len(extracted_images) != len(lines):\n        print(f\"Error: The number of images ({len(extracted_images)}) and text lines ({len(lines)}) do not match in {output_dir}.\")\n        return\n \n    for image_path, line in zip(extracted_images, lines):\n        new_image_name = f\"{os.path.splitext(image_path)[0]}_{line.strip()}{os.path.splitext(image_path)[1]}\"\n        os.rename(image_path, new_image_name)\n        print(f\"Renamed '{image_path}' to '{new_image_name}'\")\n \ndef process_documents(folder_path, output_folder):\n    if not os.path.exists(output_folder):\n        os.makedirs(output_folder)\n    for filename in os.listdir(folder_path):\n        if filename.endswith(\".docx\") or filename.endswith(\".doc\"):\n            docx_path = os.path.join(folder_path, filename)\n            extract_content(docx_path, output_folder)\n \n# 示例用法\nfolder_path = \"f:/doc\"\noutput_folder = \"f:/doc/png\"\nprocess_documents(folder_path, output_folder)",
+    "tag": [
+      "python"
+    ],
+    "date": "2026-11-08",
+    "updated_at": "2026-11-08T14:22:24Z",
+    "url": "/20.html",
+    "aliases": [
+      "/20",
+      "/blog/20.html",
+      "/blog/posts/issue-20.html"
+    ],
+    "markdown": "/data/md/20.md",
+    "issue_url": "https://github.com/feeday/cpuck.com/issues/20"
+  },
+  {
+    "source": "github-issue",
     "issue": 19,
     "isArticle": true,
     "cat": "log",
