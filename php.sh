@@ -452,7 +452,9 @@ if ! curl --noproxy '*' -fsS http://127.0.0.1/php-test.php | grep -q 'PHP 运行
 fi
 
 log "防火墙状态"
-if [[ "$DISTRO" == "ubuntu" ]]; then
+if [[ "$SYSTEMD_AVAILABLE" != "1" ]]; then
+    echo "容器模式：未在容器内修改宿主机防火墙"
+elif [[ "$DISTRO" == "ubuntu" ]]; then
     ufw status verbose
 else
     firewall-cmd --get-active-zones
