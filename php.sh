@@ -139,22 +139,29 @@ elif [[ "$DISTRO" == "centos" ]]; then
 
     [[ -f "$FPM_POOL" ]] || error "找不到 PHP-FPM 配置：$FPM_POOL"
 
-    log "配置 PHP-FPM Socket 权限，允许 Nginx 访问"
-    sed -ri \
-        -e 's|^[;[:space:]]*listen[[:space:]]*=.*|listen = /run/php-fpm/www.sock|' \
-        -e 's|^[;[:space:]]*listen\.owner[[:space:]]*=.*|listen.owner = nginx|' \
-        -e 's|^[;[:space:]]*listen\.group[[:space:]]*=.*|listen.group = nginx|' \
-        -e 's|^[;[:space:]]*listen\.mode[[:space:]]*=.*|listen.mode = 0660|' \
-        -e 's|^[[:space:]]*listen\.acl_users[[:space:]]*=.*|;listen.acl_users = apache,nginx|' \
-        -e 's|^[[:space:]]*listen\.acl_groups[[:space:]]*=.*|;listen.acl_groups =|' \
-        "$FPM_POOL"
+    # CentOS Stream 10 官方配置通常已通过 ACL 授权 nginx 访问 FPM Socket。
+    # 优先保留系统默认 ACL，只有未授权 nginx 时才调整 Socket 权限。
+    if ! grep -Eq '^[[:space:]]*listen\.acl_users[[:space:]]*=.*nginx' "$FPM_POOL" && \
+       ! grep -Eq '^[[:space:]]*listen\.owner[[:space:]]*=[[:space:]]*nginx' "$FPM_POOL"; then
+        log "当前 PHP-FPM 未授权 Nginx，补充 Socket 权限"
+        sed -ri \
+            -e 's|^[;[:space:]]*listen[[:space:]]*=.*|listen = /run/php-fpm/www.sock|' \
+            -e 's|^[;[:space:]]*listen\.owner[[:space:]]*=.*|listen.owner = nginx|' \
+            -e 's|^[;[:space:]]*listen\.group[[:space:]]*=.*|listen.group = nginx|' \
+            -e 's|^[;[:space:]]*listen\.mode[[:space:]]*=.*|listen.mode = 0660|' \
+            -e 's|^[[:space:]]*listen\.acl_users[[:space:]]*=.*|;listen.acl_users = apache,nginx|' \
+            -e 's|^[[:space:]]*listen\.acl_groups[[:space:]]*=.*|;listen.acl_groups =|' \
+            "$FPM_POOL"
 
-    grep -Eq '^[[:space:]]*listen\.owner[[:space:]]*=' "$FPM_POOL" || echo 'listen.owner = nginx' >> "$FPM_POOL"
-    grep -Eq '^[[:space:]]*listen\.group[[:space:]]*=' "$FPM_POOL" || echo 'listen.group = nginx' >> "$FPM_POOL"
-    grep -Eq '^[[:space:]]*listen\.mode[[:space:]]*=' "$FPM_POOL" || echo 'listen.mode = 0660' >> "$FPM_POOL"
+        grep -Eq '^[[:space:]]*listen\.owner[[:space:]]*=' "$FPM_POOL" || echo 'listen.owner = nginx' >> "$FPM_POOL"
+        grep -Eq '^[[:space:]]*listen\.group[[:space:]]*=' "$FPM_POOL" || echo 'listen.group = nginx' >> "$FPM_POOL"
+        grep -Eq '^[[:space:]]*listen\.mode[[:space:]]*=' "$FPM_POOL" || echo 'listen.mode = 0660' >> "$FPM_POOL"
+    fi
 
+    php-fpm -t
     systemctl enable --now "$FPM_SERVICE"
     systemctl restart "$FPM_SERVICE"
+    [[ -S "$FPM_SOCKET" ]] || error "PHP-FPM Socket 未生成：$FPM_SOCKET"
 fi
 
 systemctl is-active --quiet "$FPM_SERVICE" || error "PHP-FPM 启动失败：$FPM_SERVICE"
