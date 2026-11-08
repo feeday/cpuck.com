@@ -1,4 +1,4 @@
-"""Publish owner-authored documentation Issues; store articles only in data; Git preserves revisions."""
+"""Publish all owner-authored Issues except those marked no-publish; store articles only in data."""
 from datetime import datetime, timezone, timedelta
 import hashlib
 import base64
@@ -9,6 +9,9 @@ import re
 from pathlib import Path
 import subprocess
 import urllib.request
+
+
+PUBLISH_EXCLUSION_LABEL = "no-publish"
 
 
 def api(path):
@@ -255,29 +258,73 @@ def publish(root, issues, owner):
     root = Path(root)
     index = root / "data/posts.json"
     existing = json.loads(index.read_text(encoding="utf-8")) if index.exists() else []
-    # Preserve manually maintained entries, rebuild only our Issue entries.
+    # Preserve manually maintained entries; rebuild only our Issue entries.
     posts = [p for p in existing if p.get("source") != "github-issue"]
-    eligible = [i for i in issues if not i.get("pull_request")
-                and i["user"]["login"].lower() == owner.lower()
-                and "documentation" in {label["name"] for label in i.get("labels", [])}]
+
+    owner_login = owner.strip().casefold()
+    owner_issues = [
+        issue for issue in issues
+        if not issue.get("pull_request")
+        and issue.get("user", {}).get("login", "").strip().casefold() == owner_login
+    ]
+
+    # Every owner-authored Issue is published by default. The no-publish label is
+    # the single manual opt-out; matching is case-insensitive.
+    eligible = []
+    excluded_numbers = set()
+    for issue in owner_issues:
+        labels = {
+            str(label.get("name", "")).strip().casefold()
+            for label in issue.get("labels", [])
+        }
+        number = str(int(issue["number"]))
+        if PUBLISH_EXCLUSION_LABEL in labels:
+            excluded_numbers.add(number)
+        else:
+            eligible.append(issue)
+
     manifest = root / "data/article-routes.json"
     plans = json.loads(manifest.read_text(encoding="utf-8")) if manifest.exists() else {}
+
+    # Unpublish an Issue immediately when no-publish is added: remove its route
+    # aliases and generated article files. Removing the label republishes it on
+    # the next Issues event, using the permalink in the Issue body if present.
+    for number in excluded_numbers:
+        old = plans.pop(number, None)
+        if not old:
+            continue
+        for field, expected_parent, suffix in (
+            ("file", root / "data" / "html", ".html"),
+            ("markdown", root / "data" / "md", ".md"),
+        ):
+            relative = old.get(field)
+            if not relative:
+                continue
+            generated = root / relative
+            if generated.parent == expected_parent and generated.suffix == suffix:
+                generated.unlink(missing_ok=True)
+
     for issue in eligible:
         number = int(issue["number"])
         url = article_path(issue)
         old = plans.get(str(number), {})
-        aliases = set(old.get("aliases", [])) | {f"/{number}.html", f"/{number}",
-                    f"/blog/{number}.html", f"/blog/posts/issue-{number}.html"}
+        aliases = set(old.get("aliases", [])) | {
+            f"/{number}.html", f"/{number}",
+            f"/blog/{number}.html", f"/blog/posts/issue-{number}.html"
+        }
         if old.get("url"):
             aliases.add(old["url"])
-        plans[str(number)] = {"url": url, "aliases": sorted(set(aliases) - {url}),
-                              "file": f"data/html/{number}.html", "markdown": f"data/md/{number}.md"}
+        plans[str(number)] = {
+            "url": url,
+            "aliases": sorted(set(aliases) - {url}),
+            "file": f"data/html/{number}.html",
+            "markdown": f"data/md/{number}.md",
+        }
+
     validate_routes(root, plans)
+
     for issue in eligible:
         labels = {label["name"] for label in issue.get("labels", [])}
-        if (issue.get("pull_request") or issue["user"]["login"].lower() != owner.lower()
-                or "documentation" not in labels):
-            continue
         number = int(issue["number"])
         issue = {**issue, "number": number}
         md = "# " + issue["title"] + "\n\n" + (issue.get("body") or "") + "\n"
@@ -292,13 +339,13 @@ def publish(root, issues, owner):
             "tag": sorted(labels), "date": issue["created_at"][:10],
             "updated_at": issue["updated_at"], "url": url, "aliases": sorted(set(aliases) - {url}),
             "markdown": f"/data/md/{number}.md", "issue_url": issue["html_url"]})
+
     posts.sort(key=lambda p: p.get("updated_at", p.get("date", "")), reverse=True)
     for path in ["data/posts.json", "data/search.json"]:
         write(root / path, json.dumps(posts, ensure_ascii=False, indent=2) + "\n")
     write(manifest, json.dumps(plans, ensure_ascii=False, indent=2) + "\n")
     generate_sitemap(root, plans)
     return posts
-
 
 def main():
     repo = os.environ["GITHUB_REPOSITORY"]
