@@ -10,6 +10,21 @@
     <loc>https://cpuck.com/1.html</loc>
     <lastmod>2026-10-25</lastmod>
   </url>
+  <!-- 技术归档｜图像→PDF→图像：多目录队列、_p2i 命名与 Mask 坐标严格保护（完整 Python 脚本） · CPuck -->
+  <url>
+    <loc>https://cpuck.com/15.html</loc>
+    <lastmod>2026-11-04</lastmod>
+  </url>
+  <!-- 技术笔记｜边缘模型部署五大坑：ONNX、INT8、TensorRT、RKNN 与多路视频（含勘误和验收清单） · CPuck -->
+  <url>
+    <loc>https://cpuck.com/16.html</loc>
+    <lastmod>2026-11-04</lastmod>
+  </url>
+  <!-- Bug：Mask QC 画笔拖动与滚动条冲突，滚动位置漂移 · CPuck -->
+  <url>
+    <loc>https://cpuck.com/17.html</loc>
+    <lastmod>2026-11-04</lastmod>
+  </url>
   <!-- 3G-USB · CPuck -->
   <url>
     <loc>https://cpuck.com/3g-usb.html</loc>
@@ -64,6 +79,11 @@
   <url>
     <loc>https://cpuck.com/licai/</loc>
     <lastmod>2026-11-04</lastmod>
+  </url>
+  <!-- PowerShell · CPuck -->
+  <url>
+    <loc>https://cpuck.com/powershell.html</loc>
+    <lastmod>2026-11-08</lastmod>
   </url>
   <!-- Qwen3-ASR-Demo · CPuck -->
   <url>

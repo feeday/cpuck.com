@@ -102,5 +102,46 @@
     ],
     "file": "data/html/12.html",
     "markdown": "data/md/12.md"
+  },
+  "18": {
+    "url": "/powershell.html",
+    "aliases": [
+      "/18",
+      "/18.html",
+      "/blog/18.html",
+      "/blog/posts/issue-18.html"
+    ],
+    "file": "data/html/18.html",
+    "markdown": "data/md/18.md"
+  },
+  "17": {
+    "url": "/17.html",
+    "aliases": [
+      "/17",
+      "/blog/17.html",
+      "/blog/posts/issue-17.html"
+    ],
+    "file": "data/html/17.html",
+    "markdown": "data/md/17.md"
+  },
+  "16": {
+    "url": "/16.html",
+    "aliases": [
+      "/16",
+      "/blog/16.html",
+      "/blog/posts/issue-16.html"
+    ],
+    "file": "data/html/16.html",
+    "markdown": "data/md/16.md"
+  },
+  "15": {
+    "url": "/15.html",
+    "aliases": [
+      "/15",
+      "/blog/15.html",
+      "/blog/posts/issue-15.html"
+    ],
+    "file": "data/html/15.html",
+    "markdown": "data/md/15.md"
   }
 }

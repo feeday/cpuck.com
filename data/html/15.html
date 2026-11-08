@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="canonical" href="https://cpuck.com/15.html">
+<meta name="description" content="用途 保存 2026-11-03 最终版 Mask 坐标保护 的 Python 脚本（来自前次 PDF 往返转换需求），方便后续复用与改进。此 Issue 直接包含完整源码，不只是需求描述。 核心需求 弹窗连续添加多个输入目录，按队列顺序处理；目录内递归扫描图片。 每张图依次执行 图像 → 单页 PDF → PNG；允许 .jpg/.jpeg/.png/.b">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s1flQ/huFgy6VuBRpjBeumh+VIkMGvfrjrkRMtTeQo8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>技术归档｜图像→PDF→图像：多目录队列、_p2i 命名与 Mask 坐标严格保护（完整 Python 脚本） · CPuck</title>
+<style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
+:root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-underline-offset:4px; }
+button,summary { cursor:pointer; }
+button { font:inherit; }
+a:focus-visible,button:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+main { width:min(820px,calc(100% - 48px)); margin:40px auto 80px; padding:32px 52px 26px; border:1px solid var(--line); border-radius:16px; background:var(--paper); box-shadow:0 8px 36px #14203305; overflow-wrap:anywhere; }
+.page-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:25px; border-bottom:1px solid var(--line); font-size:13px; }
+.page-nav a { color:var(--muted); text-decoration:none; }
+.page-nav .home-link { color:var(--heading); font-weight:650; letter-spacing:.02em; }
+.nav-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; }
+.page-nav a:hover { color:var(--accent); }
+.theme-toggle { border:1px solid var(--line); border-radius:7px; padding:4px 10px; background:var(--paper); color:var(--muted); font-size:12px; }
+.article-header { padding:32px 0 28px; margin-bottom:28px; border-bottom:1px solid var(--line); }
+.article-label { margin:0 0 12px; color:var(--accent); font-size:11px; letter-spacing:.14em; font-weight:650; }
+.article-title { margin:0 0 16px; color:var(--heading); font-size:clamp(27px,4vw,38px); line-height:1.35; letter-spacing:-.035em; font-weight:750; }
+.article-meta { display:flex; flex-wrap:wrap; gap:8px 20px; color:var(--muted); font-size:12px; }
+article > :first-child { margin-top:0; }
+article > :last-child { margin-bottom:0; }
+article p { margin:0 0 1.25em; }
+article :is(h1,h2,h3,h4,h5,h6) { color:var(--heading); line-height:1.5; scroll-margin-top:28px; font-weight:650; }
+article h1 { font-size:28px; margin:1.7em 0 .8em; }
+article h2 { font-size:23px; margin:2em 0 .85em; padding-bottom:10px; border-bottom:1px solid var(--line); }
+article h3 { font-size:19px; margin:1.7em 0 .7em; }
+article :is(h4,h5,h6) { font-size:16px; margin:1.5em 0 .65em; }
+article :is(ul,ol) { padding-left:1.6em; margin:0 0 1.3em; }
+article li { padding-left:.2em; margin:.3em 0; }
+article li > :is(ul,ol) { margin:.4em 0; }
+article li > p { margin:.4em 0; }
+article strong { color:var(--heading); font-weight:650; }
+article blockquote { margin:1.5em 0; padding:14px 20px; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; background:var(--soft); color:var(--muted); }
+article blockquote > :last-child { margin-bottom:0; }
+article hr { height:1px; border:0; background:var(--line); margin:32px 0; }
+article :is(img,video) { max-width:100%; height:auto; border-radius:8px; }
+article table { display:block; max-width:100%; width:max-content; overflow:auto; border-collapse:collapse; margin:24px 0; font-size:14px; line-height:1.65; }
+article :is(td,th) { border:1px solid var(--line); padding:11px 15px; min-width:80px; }
+article th { background:var(--soft); color:var(--heading); font-weight:650; }
+article tr:nth-child(even) td { background:var(--soft); }
+article code { padding:.15em .38em; border-radius:4px; background:var(--soft); color:var(--heading); font: .87em/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+article pre { overflow:auto; padding:18px; background:var(--code); border-radius:8px; }
+article pre code { padding:0; background:none; font:inherit; overflow-wrap:normal; }
+.code-frame { position:relative; margin:22px 0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--code); }
+.code-fold { margin:0; }
+.code-fold summary { padding:10px 100px 10px 16px; background:var(--soft); color:var(--muted); font-size:12px; line-height:22px; }
+.code-fold[open] summary { border-bottom:1px solid var(--line); }
+.code-fold pre { margin:0; padding:17px 18px; white-space:pre; overflow:auto; font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; border-radius:0; }
+.copy-code { position:absolute; right:9px; top:8px; padding:3px 9px; border:1px solid var(--line); border-radius:5px; color:var(--muted); background:var(--paper); font:12px/20px system-ui,sans-serif; }
+.copy-code:hover { color:var(--accent); border-color:var(--accent); }
+.article-footer { display:flex; justify-content:space-between; gap:16px; padding-top:22px; margin-top:42px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.article-footer a { text-decoration:none; }
+.article-toc { position:fixed; left:calc(50% + 320px); top:62px; width:220px; font-size:12px; line-height:1.65; }
+.article-toc summary { padding:0 10px 14px; color:var(--heading); font-weight:650; }
+.article-toc nav { max-height:calc(100vh - 180px); overflow:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; border-left:1px solid var(--line); }
+.article-toc nav a { display:block; padding:6px 12px; color:var(--muted); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; overflow-wrap:anywhere; }
+.article-toc nav a:hover { color:var(--heading); }
+.article-toc nav a[aria-current] { color:var(--accent); border-left-color:var(--accent); background:var(--soft); }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:7px 12px; text-decoration:none; font-size:12px; box-shadow:0 3px 12px #00000005; }
+@media(min-width:1200px) { .has-toc main { width:820px; margin-left:calc(50% - 540px); margin-right:0; } }
+@media(max-width:1199px) { .article-toc { left:auto; right:20px; top:auto; bottom:74px; width:min(280px,calc(100% - 40px)); padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:10px; z-index:20; box-shadow:0 8px 32px #0000000d; } .article-toc summary { padding:0; } .article-toc[open] summary { padding-bottom:10px; } .article-toc nav { max-height:40vh; } }
+@media(max-width:600px) { body { font-size:15px; } main { width:100%; margin:0 0 90px; padding:22px 22px 28px; border:0; border-radius:0; box-shadow:none; } body { background:var(--paper); } .page-nav { gap:12px; padding-bottom:20px; } .nav-actions { gap:10px; font-size:12px; } .article-header { padding:26px 0 22px; margin-bottom:24px; } .article-title { font-size:28px; } article h1 { font-size:24px; } article h2 { font-size:21px; } article table { font-size:13px; } article :is(td,th) { padding:9px 11px; } .back-top { right:20px; bottom:20px; } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print { body,main { background:white; color:black; } main,.has-toc main { width:100%; margin:0; border:0; padding:0; box-shadow:none; } .page-nav,.article-toc,.back-top,.copy-code,.article-footer { display:none; } }
+</style></head><body><main id="article-top">
+<nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
+<div class="nav-actions"><a href="https://github.com/feeday/cpuck.com/issues/15">编辑原文</a><a href="/data/md/15.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
+<header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">技术归档｜图像→PDF→图像：多目录队列、_p2i 命名与 Mask 坐标严格保护（完整 Python 脚本）</h1>
+<div class="article-meta"><span>更新于 <time datetime="2026-11-04T01:15:45Z">2026年11月04日 09:15</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article><h2 dir="auto">用途</h2>
+<p dir="auto">保存 2026-11-03 最终版 <strong>Mask 坐标保护</strong> 的 Python 脚本（来自前次 PDF 往返转换需求），方便后续复用与改进。此 Issue 直接包含完整源码，不只是需求描述。</p>
+<h3 dir="auto">核心需求</h3>
+<ul dir="auto">
+<li>弹窗连续添加多个输入目录，<strong>按队列顺序处理</strong>；目录内递归扫描图片。</li>
+<li>每张图依次执行 <strong>图像 → 单页 PDF → PNG</strong>；允许 .jpg/.jpeg/.png/.bmp/.tif/.tiff/.webp。</li>
+<li>输出到输入目录<strong>同级</strong>的 <code class="notranslate">&lt;目录名&gt;_PDF</code>、<code class="notranslate">&lt;目录名&gt;_PDF2IMG</code>，保留原有相对子目录结构。</li>
+<li>输出图片文件名在原名后追加 <code class="notranslate">_p2i</code>，如 <code class="notranslate">xxx.png → xxx_p2i.png</code>。</li>
+<li>默认 DPI=300，PDF 页面尺寸计算：<code class="notranslate">W_pt = W_px * 72 / DPI</code>，<code class="notranslate">H_pt = H_px * 72 / DPI</code>。</li>
+<li><strong>不缩放、不插值、不旋转、不裁切、不留白、不平移</strong>。PDF 渲染尺寸与原图不同则报错，不输出错误坐标图片。</li>
+<li>每个输入目录生成 <code class="notranslate">尺寸校验报告.csv</code>，记录源图宽高、PDF 页面大小、渲染结果与失败原因。</li>
+<li>多个输入目录重叠时，同一原始文件只处理一次。</li>
+</ul>
+<h3 dir="auto">安装与运行</h3>
+<div class="highlight highlight-source-shell notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="pip install pymupdf pillow
+python image_pdf_roundtrip_multi_dirs_p2i_mask_safe.py"><pre class="notranslate">pip install pymupdf pillow
+python image_pdf_roundtrip_multi_dirs_p2i_mask_safe.py</pre></div>
+<blockquote>
+<p dir="auto"><strong>重要边界：</strong> 这个脚本保障的是最终 PNG 的<strong>像素宽高/坐标网格</strong>与原图一致，而不是 RGB 数值、灰度或分割 Mask 标签值逐点相同。<strong>如果 Mask 像素值必须完全无损，不应让 Mask 经历 PDF 渲染往返。</strong></p>
+<p dir="auto">另外，DPI 影响 PDF 页面物理尺寸；本脚本的严格模式不会为匹配尺寸偷偷 resize，遇到渲染取整差异会判失败。</p>
+</blockquote>
+<h2 dir="auto">完整脚本：<code class="notranslate">image_pdf_roundtrip_multi_dirs_p2i_mask_safe.py</code></h2>
+<div class="highlight highlight-source-python notranslate position-relative overflow-auto" dir="auto" data-snippet-clipboard-copy-content="# -*- coding: utf-8 -*-
+&quot;&quot;&quot;
+严格 Mask 坐标保护版：多目录排队处理
+图像 -&gt; PDF -&gt; 图像（输出文件名追加 _p2i）
+
+安装依赖：
+    pip install pymupdf pillow
+
+运行：
+    python image_pdf_roundtrip_multi_dirs_p2i_mask_safe.py
+
+保护规则：
+1. 不调用 resize，不做 LANCZOS/BICUBIC 等插值缩放。
+2. 不做 EXIF 自动旋转，不旋转 PDF 页面。
+3. 不裁切、不留白、不平移，图像直接铺满与原图比例一致的 PDF 页面。
+4. PDF 渲染后的宽高只要与原图不完全一致，就判定失败：
+   不生成错误的 p2i 图片，并将原因写入 CSV。
+5. 保留多目录队列、递归扫描、重复源文件跳过、_p2i 命名。
+6. 每个目录分别生成 PDF、PDF2IMG 输出目录和尺寸校验报告。
+
+重要：
+- 该脚本保护的是像素坐标网格与宽高，不保证 PDF 栅格化前后的每个像素颜色值
+  或 Mask 灰度值逐点完全相同。若需要像素值绝对无损，Mask 不应经过 PDF 往返。
+- 默认 DPI=300。修改 DPI 会改变 PDF 页面物理尺寸，但本脚本会要求渲染像素宽高
+  与源图一致；若当前 PDF 渲染器产生尺寸取整差异，则记录失败，不擅自缩放修正。
+&quot;&quot;&quot;
+
+from __future__ import annotations
+
+import csv
+import io
+import sys
+import traceback
+from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog, messagebox
+
+import fitz  # PyMuPDF
+from PIL import Image
+
+# ===================== 可修改配置 =====================
+DPI = 300
+SUPPORTED_EXTS = {
+    &quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.png&quot;, &quot;.bmp&quot;, &quot;.tif&quot;, &quot;.tiff&quot;, &quot;.webp&quot;
+}
+# =====================================================
+
+
+def image_to_png_bytes(image_path: Path, dpi: int):
+    &quot;&quot;&quot;
+    读取源图并编码为 PNG，保持像素宽高。
+    不执行 EXIF transpose，不改变图像方向。
+    对常见 8-bit 模式尽量保留原模式，避免不必要的色彩转换。
+    &quot;&quot;&quot;
+    with Image.open(image_path) as im:
+        im.load()
+        width, height = im.size
+        source_mode = im.mode
+
+        # 高位深度/浮点模式不能静默降位，否则可能破坏 Mask 标签值。
+        if source_mode in (&quot;I&quot;, &quot;F&quot;, &quot;I;16&quot;, &quot;I;16B&quot;, &quot;I;16L&quot;):
+            raise ValueError(
+                f&quot;源图模式为 {source_mode}，可能是高位深度/浮点图像；&quot;
+                &quot;为避免 Mask 数值被降位，本脚本拒绝自动转换。&quot;
+            )
+
+        has_alpha = (
+            &quot;A&quot; in im.getbands()
+            or &quot;transparency&quot; in im.info
+        )
+        icc_profile = im.info.get(&quot;icc_profile&quot;)
+        transparency = im.info.get(&quot;transparency&quot;)
+
+        # 直接保留 PNG 常见模式；LA 转 RGBA 是为了 PDF 透明通道兼容。
+        if source_mode in (&quot;1&quot;, &quot;L&quot;, &quot;P&quot;, &quot;RGB&quot;, &quot;RGBA&quot;):
+            converted = im.copy()
+        elif source_mode == &quot;LA&quot;:
+            converted = im.convert(&quot;RGBA&quot;)
+        else:
+            converted = im.convert(&quot;RGBA&quot; if has_alpha else &quot;RGB&quot;)
+
+        buf = io.BytesIO()
+        save_kwargs = {
+            &quot;format&quot;: &quot;PNG&quot;,
+            &quot;dpi&quot;: (dpi, dpi),
+        }
+        if icc_profile:
+            save_kwargs[&quot;icc_profile&quot;] = icc_profile
+        if transparency is not None and converted.mode == &quot;P&quot;:
+            save_kwargs[&quot;transparency&quot;] = transparency
+
+        converted.save(buf, **save_kwargs)
+        return buf.getvalue(), width, height, has_alpha, source_mode
+
+
+def convert_one(
+    image_path: Path,
+    input_root: Path,
+    pdf_root: Path,
+    image_root: Path,
+    dpi: int,
+):
+    relative = image_path.relative_to(input_root)
+
+    pdf_path = (pdf_root / relative).with_suffix(&quot;.pdf&quot;)
+    output_path = (image_root / relative).with_name(
+        relative.stem + &quot;_p2i.png&quot;
+    )
+
+    pdf_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    png_bytes, original_w, original_h, has_alpha, source_mode = (
+        image_to_png_bytes(image_path, dpi)
+    )
+
+    # 根据源图像素宽高和 DPI 反算页面物理尺寸（PDF point）。
+    # 1 inch = 72 point，因此页面尺寸 = 像素数 * 72 / DPI。
+    page_w_pt = original_w * 72.0 / dpi
+    page_h_pt = original_h * 72.0 / dpi
+
+    # 第一步：图像 -&gt; PDF。页面与图像宽高比完全一致，图片铺满页面。
+    pdf_doc = fitz.open()
+    page = pdf_doc.new_page(width=page_w_pt, height=page_h_pt)
+    page.set_rotation(0)
+    page.insert_image(
+        page.rect,
+        stream=png_bytes,
+        keep_proportion=False,
+        overlay=True,
+    )
+    pdf_doc.save(str(pdf_path), garbage=4, deflate=True)
+    pdf_doc.close()
+
+    # 第二步：PDF -&gt; 图像。相同 DPI 渲染，不进行任何尺寸修正。
+    with fitz.open(str(pdf_path)) as read_doc:
+        if read_doc.page_count != 1:
+            raise RuntimeError(
+                f&quot;生成的 PDF 页数异常：{read_doc.page_count}，预期 1 页&quot;
+            )
+
+        read_page = read_doc[0]
+        if read_page.rotation != 0:
+            raise RuntimeError(
+                f&quot;PDF 页面存在旋转：{read_page.rotation}°，拒绝继续&quot;
+            )
+
+        pix = read_page.get_pixmap(
+            dpi=dpi,
+            alpha=has_alpha,
+            annots=False,
+        )
+
+        rendered_w = pix.width
+        rendered_h = pix.height
+
+        # 严格策略：尺寸只要不一致就失败，不缩放、不裁切、不补边。
+        if (rendered_w, rendered_h) != (original_w, original_h):
+            raise RuntimeError(
+                &quot;PDF 渲染尺寸与源图不一致；为保护 Mask 坐标，&quot;
+                &quot;已拒绝缩放/裁切/补边。&quot;
+                f&quot;源图={original_w}x{original_h}，&quot;
+                f&quot;渲染={rendered_w}x{rendered_h}，DPI={dpi}。&quot;
+            )
+
+        rendered_bytes = pix.tobytes(&quot;png&quot;)
+
+    # 只重新编码 PNG 并写入 DPI 元数据，不改变像素矩阵。
+    with Image.open(io.BytesIO(rendered_bytes)) as rendered:
+        rendered.load()
+        if rendered.size != (original_w, original_h):
+            raise RuntimeError(
+                f&quot;PNG 解码后尺寸异常：{rendered.width}x{rendered.height}&quot;
+            )
+        rendered.save(
+            str(output_path),
+            format=&quot;PNG&quot;,
+            dpi=(dpi, dpi),
+        )
+
+    with Image.open(output_path) as check:
+        final_w, final_h = check.size
+
+    if (final_w, final_h) != (original_w, original_h):
+        # 不保留尺寸错误的结果文件。
+        try:
+            output_path.unlink(missing_ok=True)
+        except Exception:
+            pass
+        raise RuntimeError(
+            f&quot;最终文件尺寸校验失败：源图={original_w}x{original_h}，&quot;
+            f&quot;输出={final_w}x{final_h}&quot;
+        )
+
+    return {
+        &quot;源文件&quot;: str(image_path),
+        &quot;PDF文件&quot;: str(pdf_path),
+        &quot;输出图像&quot;: str(output_path),
+        &quot;源图模式&quot;: source_mode,
+        &quot;DPI&quot;: dpi,
+        &quot;原图宽&quot;: original_w,
+        &quot;原图高&quot;: original_h,
+        &quot;PDF页面宽(pt)&quot;: round(page_w_pt, 6),
+        &quot;PDF页面高(pt)&quot;: round(page_h_pt, 6),
+        &quot;渲染宽&quot;: rendered_w,
+        &quot;渲染高&quot;: rendered_h,
+        &quot;最终宽&quot;: final_w,
+        &quot;最终高&quot;: final_h,
+        &quot;尺寸一致&quot;: &quot;是&quot;,
+        &quot;状态&quot;: &quot;成功&quot;,
+        &quot;错误信息&quot;: &quot;&quot;,
+    }
+
+
+def process_directory(input_root: Path, globally_processed: set[str]):
+    pdf_root = input_root.parent / f&quot;{input_root.name}_PDF&quot;
+    image_root = input_root.parent / f&quot;{input_root.name}_PDF2IMG&quot;
+
+    image_files = sorted(
+        p for p in input_root.rglob(&quot;*&quot;)
+        if p.is_file() and p.suffix.lower() in SUPPORTED_EXTS
+    )
+
+    report_rows = []
+    success_count = 0
+    failed_count = 0
+    skipped_count = 0
+
+    print(&quot;\n&quot; + &quot;=&quot; * 90)
+    print(f&quot;开始目录：{input_root}&quot;)
+    print(f&quot;图片数量：{len(image_files)}&quot;)
+    print(f&quot;PDF 输出：{pdf_root}&quot;)
+    print(f&quot;图像输出：{image_root}&quot;)
+    print(&quot;=&quot; * 90)
+
+    pdf_root.mkdir(parents=True, exist_ok=True)
+    image_root.mkdir(parents=True, exist_ok=True)
+
+    for index, image_path in enumerate(image_files, 1):
+        source_key = str(image_path.resolve()).casefold()
+
+        if source_key in globally_processed:
+            skipped_count += 1
+            print(f&quot;[跳过重复 {index}/{len(image_files)}] {image_path}&quot;)
+            continue
+
+        globally_processed.add(source_key)
+        print(f&quot;[{index}/{len(image_files)}] {image_path}&quot;)
+
+        try:
+            row = convert_one(
+                image_path,
+                input_root,
+                pdf_root,
+                image_root,
+                DPI,
+            )
+            report_rows.append(row)
+            success_count += 1
+            print(
+                f&quot;  成功：{row['原图宽']}x{row['原图高']} &quot;
+                f&quot;-&gt; {row['最终宽']}x{row['最终高']} &quot;
+                f&quot;| {row['输出图像']}&quot;
+            )
+        except Exception as exc:
+            failed_count += 1
+            report_rows.append({
+                &quot;源文件&quot;: str(image_path),
+                &quot;PDF文件&quot;: &quot;&quot;,
+                &quot;输出图像&quot;: &quot;&quot;,
+                &quot;源图模式&quot;: &quot;&quot;,
+                &quot;DPI&quot;: DPI,
+                &quot;原图宽&quot;: &quot;&quot;,
+                &quot;原图高&quot;: &quot;&quot;,
+                &quot;PDF页面宽(pt)&quot;: &quot;&quot;,
+                &quot;PDF页面高(pt)&quot;: &quot;&quot;,
+                &quot;渲染宽&quot;: &quot;&quot;,
+                &quot;渲染高&quot;: &quot;&quot;,
+                &quot;最终宽&quot;: &quot;&quot;,
+                &quot;最终高&quot;: &quot;&quot;,
+                &quot;尺寸一致&quot;: &quot;否&quot;,
+                &quot;状态&quot;: &quot;失败&quot;,
+                &quot;错误信息&quot;: f&quot;{type(exc).__name__}: {exc}&quot;,
+            })
+            print(f&quot;  失败：{type(exc).__name__}: {exc}&quot;)
+
+    report_path = image_root / &quot;尺寸校验报告.csv&quot;
+    fieldnames = [
+        &quot;源文件&quot;, &quot;PDF文件&quot;, &quot;输出图像&quot;, &quot;源图模式&quot;, &quot;DPI&quot;,
+        &quot;原图宽&quot;, &quot;原图高&quot;,
+        &quot;PDF页面宽(pt)&quot;, &quot;PDF页面高(pt)&quot;,
+        &quot;渲染宽&quot;, &quot;渲染高&quot;, &quot;最终宽&quot;, &quot;最终高&quot;,
+        &quot;尺寸一致&quot;, &quot;状态&quot;, &quot;错误信息&quot;,
+    ]
+
+    with open(report_path, &quot;w&quot;, newline=&quot;&quot;, encoding=&quot;utf-8-sig&quot;) as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(report_rows)
+
+    print(
+        f&quot;\n目录完成：{input_root}\n&quot;
+        f&quot;成功：{success_count} | 失败：{failed_count} | &quot;
+        f&quot;重复跳过：{skipped_count}\n&quot;
+        f&quot;报告：{report_path}&quot;
+    )
+
+    return success_count, failed_count, skipped_count
+
+
+class QueueWindow:
+    def __init__(self, root):
+        self.root = root
+        self.root.title(&quot;图像 → PDF → 图像｜Mask 坐标保护｜多目录排队&quot;)
+        self.root.geometry(&quot;800x520&quot;)
+        self.root.minsize(680, 440)
+
+        self.directories: list[Path] = []
+
+        tk.Label(
+            root,
+            text=&quot;添加多个目录，按列表顺序依次处理&quot;,
+            font=(&quot;Microsoft YaHei UI&quot;, 12, &quot;bold&quot;),
+        ).pack(anchor=&quot;w&quot;, padx=14, pady=(14, 6))
+
+        tk.Label(
+            root,
+            text=(
+                f&quot;DPI={DPI}｜输出图片追加 _p2i｜严格尺寸校验｜&quot;
+                &quot;禁止插值缩放、旋转、裁切和补边&quot;
+            ),
+            fg=&quot;#555555&quot;,
+            anchor=&quot;w&quot;,
+        ).pack(fill=&quot;x&quot;, padx=14, pady=(0, 8))
+
+        self.listbox = tk.Listbox(
+            root,
+            selectmode=tk.EXTENDED,
+            font=(&quot;Consolas&quot;, 10),
+            activestyle=&quot;dotbox&quot;,
+        )
+        self.listbox.pack(fill=&quot;both&quot;, expand=True, padx=14, pady=6)
+
+        button_frame = tk.Frame(root)
+        button_frame.pack(fill=&quot;x&quot;, padx=14, pady=8)
+
+        tk.Button(
+            button_frame,
+            text=&quot;添加目录&quot;,
+            width=13,
+            command=self.add_directory,
+        ).pack(side=&quot;left&quot;, padx=(0, 6))
+
+        tk.Button(
+            button_frame,
+            text=&quot;移除选中&quot;,
+            width=13,
+            command=self.remove_selected,
+        ).pack(side=&quot;left&quot;, padx=6)
+
+        tk.Button(
+            button_frame,
+            text=&quot;清空队列&quot;,
+            width=13,
+            command=self.clear_queue,
+        ).pack(side=&quot;left&quot;, padx=6)
+
+        tk.Button(
+            button_frame,
+            text=&quot;开始排队处理&quot;,
+            width=16,
+            bg=&quot;#1677d2&quot;,
+            fg=&quot;white&quot;,
+            command=self.start,
+        ).pack(side=&quot;right&quot;)
+
+        self.status = tk.Label(
+            root,
+            text=&quot;当前队列：0 个目录&quot;,
+            anchor=&quot;w&quot;,
+            fg=&quot;#444444&quot;,
+        )
+        self.status.pack(fill=&quot;x&quot;, padx=14, pady=(0, 12))
+
+    def refresh(self):
+        self.listbox.delete(0, tk.END)
+        for index, directory in enumerate(self.directories, 1):
+            self.listbox.insert(tk.END, f&quot;{index:02d}. {directory}&quot;)
+        self.status.config(text=f&quot;当前队列：{len(self.directories)} 个目录&quot;)
+
+    def add_directory(self):
+        selected = filedialog.askdirectory(
+            parent=self.root,
+            title=&quot;选择要加入处理队列的目录&quot;,
+            mustexist=True,
+        )
+        if not selected:
+            return
+
+        path = Path(selected).resolve()
+        existing = {str(p).casefold() for p in self.directories}
+
+        if str(path).casefold() in existing:
+            messagebox.showinfo(
+                &quot;提示&quot;,
+                &quot;这个目录已经在队列中了。&quot;,
+                parent=self.root,
+            )
+            return
+
+        self.directories.append(path)
+        self.refresh()
+
+    def remove_selected(self):
+        selected_indices = list(self.listbox.curselection())
+        if not selected_indices:
+            return
+
+        for index in reversed(selected_indices):
+            del self.directories[index]
+        self.refresh()
+
+    def clear_queue(self):
+        self.directories.clear()
+        self.refresh()
+
+    def start(self):
+        if not self.directories:
+            messagebox.showwarning(
+                &quot;提示&quot;,
+                &quot;请先添加至少一个目录。&quot;,
+                parent=self.root,
+            )
+            return
+
+        queue = list(self.directories)
+        preview = &quot;\n&quot;.join(
+            f&quot;{i}. {p}&quot; for i, p in enumerate(queue, 1)
+        )
+
+        confirmed = messagebox.askyesno(
+            &quot;确认开始&quot;,
+            f&quot;即将按顺序处理 {len(queue)} 个目录：\n\n&quot;
+            f&quot;{preview}\n\n&quot;
+            f&quot;DPI：{DPI}\n\n&quot;
+            &quot;尺寸异常时将直接报错，不会缩放或裁切修正。\n\n&quot;
+            &quot;确定开始吗？&quot;,
+            parent=self.root,
+        )
+        if not confirmed:
+            return
+
+        self.root.destroy()
+        run_queue(queue)
+
+
+def run_queue(queue: list[Path]):
+    globally_processed: set[str] = set()
+    total_success = 0
+    total_failed = 0
+    total_skipped = 0
+
+    for queue_index, directory in enumerate(queue, 1):
+        print(f&quot;\n\n######## 队列 {queue_index}/{len(queue)} ########&quot;)
+        try:
+            success, failed, skipped = process_directory(
+                directory,
+                globally_processed,
+            )
+            total_success += success
+            total_failed += failed
+            total_skipped += skipped
+        except Exception:
+            total_failed += 1
+            traceback.print_exc()
+
+    summary = (
+        &quot;全部队列处理完成！\n\n&quot;
+        f&quot;目录数量：{len(queue)}\n&quot;
+        f&quot;成功图片：{total_success}\n&quot;
+        f&quot;失败图片：{total_failed}\n&quot;
+        f&quot;重复跳过：{total_skipped}\n\n&quot;
+        &quot;每个目录的详细结果请查看：\n&quot;
+        &quot;对应的 *_PDF2IMG\\尺寸校验报告.csv\n\n&quot;
+        &quot;注意：失败图片不会自动缩放、裁切或补边。&quot;
+    )
+
+    print(&quot;\n&quot; + &quot;=&quot; * 90 + &quot;\n&quot; + summary)
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes(&quot;-topmost&quot;, True)
+    messagebox.showinfo(&quot;处理完成&quot;, summary, parent=root)
+    root.destroy()
+
+
+def main():
+    root = tk.Tk()
+    QueueWindow(root)
+    root.mainloop()
+
+
+if __name__ == &quot;__main__&quot;:
+    try:
+        main()
+    except Exception:
+        traceback.print_exc()
+        try:
+            error_root = tk.Tk()
+            error_root.withdraw()
+            messagebox.showerror(
+                &quot;程序异常&quot;,
+                traceback.format_exc(),
+                parent=error_root,
+            )
+            error_root.destroy()
+        except Exception:
+            pass
+        sys.exit(1)"><pre class="notranslate"><span class="pl-c"># -*- coding: utf-8 -*-</span>
+<span class="pl-s">"""</span>
+<span class="pl-s">严格 Mask 坐标保护版：多目录排队处理</span>
+<span class="pl-s">图像 -&gt; PDF -&gt; 图像（输出文件名追加 _p2i）</span>
+<span class="pl-s"></span>
+<span class="pl-s">安装依赖：</span>
+<span class="pl-s">    pip install pymupdf pillow</span>
+<span class="pl-s"></span>
+<span class="pl-s">运行：</span>
+<span class="pl-s">    python image_pdf_roundtrip_multi_dirs_p2i_mask_safe.py</span>
+<span class="pl-s"></span>
+<span class="pl-s">保护规则：</span>
+<span class="pl-s">1. 不调用 resize，不做 LANCZOS/BICUBIC 等插值缩放。</span>
+<span class="pl-s">2. 不做 EXIF 自动旋转，不旋转 PDF 页面。</span>
+<span class="pl-s">3. 不裁切、不留白、不平移，图像直接铺满与原图比例一致的 PDF 页面。</span>
+<span class="pl-s">4. PDF 渲染后的宽高只要与原图不完全一致，就判定失败：</span>
+<span class="pl-s">   不生成错误的 p2i 图片，并将原因写入 CSV。</span>
+<span class="pl-s">5. 保留多目录队列、递归扫描、重复源文件跳过、_p2i 命名。</span>
+<span class="pl-s">6. 每个目录分别生成 PDF、PDF2IMG 输出目录和尺寸校验报告。</span>
+<span class="pl-s"></span>
+<span class="pl-s">重要：</span>
+<span class="pl-s">- 该脚本保护的是像素坐标网格与宽高，不保证 PDF 栅格化前后的每个像素颜色值</span>
+<span class="pl-s">  或 Mask 灰度值逐点完全相同。若需要像素值绝对无损，Mask 不应经过 PDF 往返。</span>
+<span class="pl-s">- 默认 DPI=300。修改 DPI 会改变 PDF 页面物理尺寸，但本脚本会要求渲染像素宽高</span>
+<span class="pl-s">  与源图一致；若当前 PDF 渲染器产生尺寸取整差异，则记录失败，不擅自缩放修正。</span>
+<span class="pl-s">"""</span>
+
+<span class="pl-k">from</span> __future__ <span class="pl-k">import</span> <span class="pl-s1">annotations</span>
+
+<span class="pl-k">import</span> <span class="pl-s1">csv</span>
+<span class="pl-k">import</span> <span class="pl-s1">io</span>
+<span class="pl-k">import</span> <span class="pl-s1">sys</span>
+<span class="pl-k">import</span> <span class="pl-s1">traceback</span>
+<span class="pl-k">from</span> <span class="pl-s1">pathlib</span> <span class="pl-k">import</span> <span class="pl-v">Path</span>
+<span class="pl-k">import</span> <span class="pl-s1">tkinter</span> <span class="pl-k">as</span> <span class="pl-s1">tk</span>
+<span class="pl-k">from</span> <span class="pl-s1">tkinter</span> <span class="pl-k">import</span> <span class="pl-s1">filedialog</span>, <span class="pl-s1">messagebox</span>
+
+<span class="pl-k">import</span> <span class="pl-s1">fitz</span>  <span class="pl-c"># PyMuPDF</span>
+<span class="pl-k">from</span> <span class="pl-c1">PIL</span> <span class="pl-k">import</span> <span class="pl-v">Image</span>
+
+<span class="pl-c"># ===================== 可修改配置 =====================</span>
+<span class="pl-c1">DPI</span> <span class="pl-c1">=</span> <span class="pl-c1">300</span>
+<span class="pl-c1">SUPPORTED_EXTS</span> <span class="pl-c1">=</span> {
+    <span class="pl-s">".jpg"</span>, <span class="pl-s">".jpeg"</span>, <span class="pl-s">".png"</span>, <span class="pl-s">".bmp"</span>, <span class="pl-s">".tif"</span>, <span class="pl-s">".tiff"</span>, <span class="pl-s">".webp"</span>
+}
+<span class="pl-c"># =====================================================</span>
+
+
+<span class="pl-k">def</span> <span class="pl-en">image_to_png_bytes</span>(<span class="pl-s1">image_path</span>: <span class="pl-smi">Path</span>, <span class="pl-s1">dpi</span>: <span class="pl-smi">int</span>):
+    <span class="pl-s">"""</span>
+<span class="pl-s">    读取源图并编码为 PNG，保持像素宽高。</span>
+<span class="pl-s">    不执行 EXIF transpose，不改变图像方向。</span>
+<span class="pl-s">    对常见 8-bit 模式尽量保留原模式，避免不必要的色彩转换。</span>
+<span class="pl-s">    """</span>
+    <span class="pl-k">with</span> <span class="pl-v">Image</span>.<span class="pl-c1">open</span>(<span class="pl-s1">image_path</span>) <span class="pl-k">as</span> <span class="pl-s1">im</span>:
+        <span class="pl-s1">im</span>.<span class="pl-c1">load</span>()
+        <span class="pl-s1">width</span>, <span class="pl-s1">height</span> <span class="pl-c1">=</span> <span class="pl-s1">im</span>.<span class="pl-c1">size</span>
+        <span class="pl-s1">source_mode</span> <span class="pl-c1">=</span> <span class="pl-s1">im</span>.<span class="pl-c1">mode</span>
+
+        <span class="pl-c"># 高位深度/浮点模式不能静默降位，否则可能破坏 Mask 标签值。</span>
+        <span class="pl-k">if</span> <span class="pl-s1">source_mode</span> <span class="pl-c1">in</span> (<span class="pl-s">"I"</span>, <span class="pl-s">"F"</span>, <span class="pl-s">"I;16"</span>, <span class="pl-s">"I;16B"</span>, <span class="pl-s">"I;16L"</span>):
+            <span class="pl-k">raise</span> <span class="pl-en">ValueError</span>(
+                <span class="pl-s">f"源图模式为 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">source_mode</span><span class="pl-kos">}</span></span>，可能是高位深度/浮点图像；"</span>
+                <span class="pl-s">"为避免 Mask 数值被降位，本脚本拒绝自动转换。"</span>
+            )
+
+        <span class="pl-s1">has_alpha</span> <span class="pl-c1">=</span> (
+            <span class="pl-s">"A"</span> <span class="pl-c1">in</span> <span class="pl-s1">im</span>.<span class="pl-c1">getbands</span>()
+            <span class="pl-c1">or</span> <span class="pl-s">"transparency"</span> <span class="pl-c1">in</span> <span class="pl-s1">im</span>.<span class="pl-c1">info</span>
+        )
+        <span class="pl-s1">icc_profile</span> <span class="pl-c1">=</span> <span class="pl-s1">im</span>.<span class="pl-c1">info</span>.<span class="pl-c1">get</span>(<span class="pl-s">"icc_profile"</span>)
+        <span class="pl-s1">transparency</span> <span class="pl-c1">=</span> <span class="pl-s1">im</span>.<span class="pl-c1">info</span>.<span class="pl-c1">get</span>(<span class="pl-s">"transparency"</span>)
+
+        <span class="pl-c"># 直接保留 PNG 常见模式；LA 转 RGBA 是为了 PDF 透明通道兼容。</span>
+        <span class="pl-k">if</span> <span class="pl-s1">source_mode</span> <span class="pl-c1">in</span> (<span class="pl-s">"1"</span>, <span class="pl-s">"L"</span>, <span class="pl-s">"P"</span>, <span class="pl-s">"RGB"</span>, <span class="pl-s">"RGBA"</span>):
+            <span class="pl-s1">converted</span> <span class="pl-c1">=</span> <span class="pl-s1">im</span>.<span class="pl-c1">copy</span>()
+        <span class="pl-k">elif</span> <span class="pl-s1">source_mode</span> <span class="pl-c1">==</span> <span class="pl-s">"LA"</span>:
+            <span class="pl-s1">converted</span> <span class="pl-c1">=</span> <span class="pl-s1">im</span>.<span class="pl-c1">convert</span>(<span class="pl-s">"RGBA"</span>)
+        <span class="pl-k">else</span>:
+            <span class="pl-s1">converted</span> <span class="pl-c1">=</span> <span class="pl-s1">im</span>.<span class="pl-c1">convert</span>(<span class="pl-s">"RGBA"</span> <span class="pl-k">if</span> <span class="pl-s1">has_alpha</span> <span class="pl-k">else</span> <span class="pl-s">"RGB"</span>)
+
+        <span class="pl-s1">buf</span> <span class="pl-c1">=</span> <span class="pl-s1">io</span>.<span class="pl-c1">BytesIO</span>()
+        <span class="pl-s1">save_kwargs</span> <span class="pl-c1">=</span> {
+            <span class="pl-s">"format"</span>: <span class="pl-s">"PNG"</span>,
+            <span class="pl-s">"dpi"</span>: (<span class="pl-s1">dpi</span>, <span class="pl-s1">dpi</span>),
+        }
+        <span class="pl-k">if</span> <span class="pl-s1">icc_profile</span>:
+            <span class="pl-s1">save_kwargs</span>[<span class="pl-s">"icc_profile"</span>] <span class="pl-c1">=</span> <span class="pl-s1">icc_profile</span>
+        <span class="pl-k">if</span> <span class="pl-s1">transparency</span> <span class="pl-c1"><span class="pl-c1">is</span> <span class="pl-c1">not</span></span> <span class="pl-c1">None</span> <span class="pl-c1">and</span> <span class="pl-s1">converted</span>.<span class="pl-c1">mode</span> <span class="pl-c1">==</span> <span class="pl-s">"P"</span>:
+            <span class="pl-s1">save_kwargs</span>[<span class="pl-s">"transparency"</span>] <span class="pl-c1">=</span> <span class="pl-s1">transparency</span>
+
+        <span class="pl-s1">converted</span>.<span class="pl-c1">save</span>(<span class="pl-s1">buf</span>, <span class="pl-c1">**</span><span class="pl-s1">save_kwargs</span>)
+        <span class="pl-k">return</span> <span class="pl-s1">buf</span>.<span class="pl-c1">getvalue</span>(), <span class="pl-s1">width</span>, <span class="pl-s1">height</span>, <span class="pl-s1">has_alpha</span>, <span class="pl-s1">source_mode</span>
+
+
+<span class="pl-k">def</span> <span class="pl-en">convert_one</span>(
+    <span class="pl-s1">image_path</span>: <span class="pl-smi">Path</span>,
+    <span class="pl-s1">input_root</span>: <span class="pl-smi">Path</span>,
+    <span class="pl-s1">pdf_root</span>: <span class="pl-smi">Path</span>,
+    <span class="pl-s1">image_root</span>: <span class="pl-smi">Path</span>,
+    <span class="pl-s1">dpi</span>: <span class="pl-smi">int</span>,
+):
+    <span class="pl-s1">relative</span> <span class="pl-c1">=</span> <span class="pl-s1">image_path</span>.<span class="pl-c1">relative_to</span>(<span class="pl-s1">input_root</span>)
+
+    <span class="pl-s1">pdf_path</span> <span class="pl-c1">=</span> (<span class="pl-s1">pdf_root</span> <span class="pl-c1">/</span> <span class="pl-s1">relative</span>).<span class="pl-c1">with_suffix</span>(<span class="pl-s">".pdf"</span>)
+    <span class="pl-s1">output_path</span> <span class="pl-c1">=</span> (<span class="pl-s1">image_root</span> <span class="pl-c1">/</span> <span class="pl-s1">relative</span>).<span class="pl-c1">with_name</span>(
+        <span class="pl-s1">relative</span>.<span class="pl-c1">stem</span> <span class="pl-c1">+</span> <span class="pl-s">"_p2i.png"</span>
+    )
+
+    <span class="pl-s1">pdf_path</span>.<span class="pl-c1">parent</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+    <span class="pl-s1">output_path</span>.<span class="pl-c1">parent</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+
+    <span class="pl-s1">png_bytes</span>, <span class="pl-s1">original_w</span>, <span class="pl-s1">original_h</span>, <span class="pl-s1">has_alpha</span>, <span class="pl-s1">source_mode</span> <span class="pl-c1">=</span> (
+        <span class="pl-en">image_to_png_bytes</span>(<span class="pl-s1">image_path</span>, <span class="pl-s1">dpi</span>)
+    )
+
+    <span class="pl-c"># 根据源图像素宽高和 DPI 反算页面物理尺寸（PDF point）。</span>
+    <span class="pl-c"># 1 inch = 72 point，因此页面尺寸 = 像素数 * 72 / DPI。</span>
+    <span class="pl-s1">page_w_pt</span> <span class="pl-c1">=</span> <span class="pl-s1">original_w</span> <span class="pl-c1">*</span> <span class="pl-c1">72.0</span> <span class="pl-c1">/</span> <span class="pl-s1">dpi</span>
+    <span class="pl-s1">page_h_pt</span> <span class="pl-c1">=</span> <span class="pl-s1">original_h</span> <span class="pl-c1">*</span> <span class="pl-c1">72.0</span> <span class="pl-c1">/</span> <span class="pl-s1">dpi</span>
+
+    <span class="pl-c"># 第一步：图像 -&gt; PDF。页面与图像宽高比完全一致，图片铺满页面。</span>
+    <span class="pl-s1">pdf_doc</span> <span class="pl-c1">=</span> <span class="pl-s1">fitz</span>.<span class="pl-c1">open</span>()
+    <span class="pl-s1">page</span> <span class="pl-c1">=</span> <span class="pl-s1">pdf_doc</span>.<span class="pl-c1">new_page</span>(<span class="pl-s1">width</span><span class="pl-c1">=</span><span class="pl-s1">page_w_pt</span>, <span class="pl-s1">height</span><span class="pl-c1">=</span><span class="pl-s1">page_h_pt</span>)
+    <span class="pl-s1">page</span>.<span class="pl-c1">set_rotation</span>(<span class="pl-c1">0</span>)
+    <span class="pl-s1">page</span>.<span class="pl-c1">insert_image</span>(
+        <span class="pl-s1">page</span>.<span class="pl-c1">rect</span>,
+        <span class="pl-s1">stream</span><span class="pl-c1">=</span><span class="pl-s1">png_bytes</span>,
+        <span class="pl-s1">keep_proportion</span><span class="pl-c1">=</span><span class="pl-c1">False</span>,
+        <span class="pl-s1">overlay</span><span class="pl-c1">=</span><span class="pl-c1">True</span>,
+    )
+    <span class="pl-s1">pdf_doc</span>.<span class="pl-c1">save</span>(<span class="pl-en">str</span>(<span class="pl-s1">pdf_path</span>), <span class="pl-s1">garbage</span><span class="pl-c1">=</span><span class="pl-c1">4</span>, <span class="pl-s1">deflate</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+    <span class="pl-s1">pdf_doc</span>.<span class="pl-c1">close</span>()
+
+    <span class="pl-c"># 第二步：PDF -&gt; 图像。相同 DPI 渲染，不进行任何尺寸修正。</span>
+    <span class="pl-k">with</span> <span class="pl-s1">fitz</span>.<span class="pl-c1">open</span>(<span class="pl-en">str</span>(<span class="pl-s1">pdf_path</span>)) <span class="pl-k">as</span> <span class="pl-s1">read_doc</span>:
+        <span class="pl-k">if</span> <span class="pl-s1">read_doc</span>.<span class="pl-c1">page_count</span> <span class="pl-c1">!=</span> <span class="pl-c1">1</span>:
+            <span class="pl-k">raise</span> <span class="pl-en">RuntimeError</span>(
+                <span class="pl-s">f"生成的 PDF 页数异常：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">read_doc</span>.<span class="pl-c1">page_count</span><span class="pl-kos">}</span></span>，预期 1 页"</span>
+            )
+
+        <span class="pl-s1">read_page</span> <span class="pl-c1">=</span> <span class="pl-s1">read_doc</span>[<span class="pl-c1">0</span>]
+        <span class="pl-k">if</span> <span class="pl-s1">read_page</span>.<span class="pl-c1">rotation</span> <span class="pl-c1">!=</span> <span class="pl-c1">0</span>:
+            <span class="pl-k">raise</span> <span class="pl-en">RuntimeError</span>(
+                <span class="pl-s">f"PDF 页面存在旋转：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">read_page</span>.<span class="pl-c1">rotation</span><span class="pl-kos">}</span></span>°，拒绝继续"</span>
+            )
+
+        <span class="pl-s1">pix</span> <span class="pl-c1">=</span> <span class="pl-s1">read_page</span>.<span class="pl-c1">get_pixmap</span>(
+            <span class="pl-s1">dpi</span><span class="pl-c1">=</span><span class="pl-s1">dpi</span>,
+            <span class="pl-s1">alpha</span><span class="pl-c1">=</span><span class="pl-s1">has_alpha</span>,
+            <span class="pl-s1">annots</span><span class="pl-c1">=</span><span class="pl-c1">False</span>,
+        )
+
+        <span class="pl-s1">rendered_w</span> <span class="pl-c1">=</span> <span class="pl-s1">pix</span>.<span class="pl-c1">width</span>
+        <span class="pl-s1">rendered_h</span> <span class="pl-c1">=</span> <span class="pl-s1">pix</span>.<span class="pl-c1">height</span>
+
+        <span class="pl-c"># 严格策略：尺寸只要不一致就失败，不缩放、不裁切、不补边。</span>
+        <span class="pl-k">if</span> (<span class="pl-s1">rendered_w</span>, <span class="pl-s1">rendered_h</span>) <span class="pl-c1">!=</span> (<span class="pl-s1">original_w</span>, <span class="pl-s1">original_h</span>):
+            <span class="pl-k">raise</span> <span class="pl-en">RuntimeError</span>(
+                <span class="pl-s">"PDF 渲染尺寸与源图不一致；为保护 Mask 坐标，"</span>
+                <span class="pl-s">"已拒绝缩放/裁切/补边。"</span>
+                <span class="pl-s">f"源图=<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">original_w</span><span class="pl-kos">}</span></span>x<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">original_h</span><span class="pl-kos">}</span></span>，"</span>
+                <span class="pl-s">f"渲染=<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">rendered_w</span><span class="pl-kos">}</span></span>x<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">rendered_h</span><span class="pl-kos">}</span></span>，DPI=<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">dpi</span><span class="pl-kos">}</span></span>。"</span>
+            )
+
+        <span class="pl-s1">rendered_bytes</span> <span class="pl-c1">=</span> <span class="pl-s1">pix</span>.<span class="pl-c1">tobytes</span>(<span class="pl-s">"png"</span>)
+
+    <span class="pl-c"># 只重新编码 PNG 并写入 DPI 元数据，不改变像素矩阵。</span>
+    <span class="pl-k">with</span> <span class="pl-v">Image</span>.<span class="pl-c1">open</span>(<span class="pl-s1">io</span>.<span class="pl-c1">BytesIO</span>(<span class="pl-s1">rendered_bytes</span>)) <span class="pl-k">as</span> <span class="pl-s1">rendered</span>:
+        <span class="pl-s1">rendered</span>.<span class="pl-c1">load</span>()
+        <span class="pl-k">if</span> <span class="pl-s1">rendered</span>.<span class="pl-c1">size</span> <span class="pl-c1">!=</span> (<span class="pl-s1">original_w</span>, <span class="pl-s1">original_h</span>):
+            <span class="pl-k">raise</span> <span class="pl-en">RuntimeError</span>(
+                <span class="pl-s">f"PNG 解码后尺寸异常：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">rendered</span>.<span class="pl-c1">width</span><span class="pl-kos">}</span></span>x<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">rendered</span>.<span class="pl-c1">height</span><span class="pl-kos">}</span></span>"</span>
+            )
+        <span class="pl-s1">rendered</span>.<span class="pl-c1">save</span>(
+            <span class="pl-en">str</span>(<span class="pl-s1">output_path</span>),
+            <span class="pl-s1">format</span><span class="pl-c1">=</span><span class="pl-s">"PNG"</span>,
+            <span class="pl-s1">dpi</span><span class="pl-c1">=</span>(<span class="pl-s1">dpi</span>, <span class="pl-s1">dpi</span>),
+        )
+
+    <span class="pl-k">with</span> <span class="pl-v">Image</span>.<span class="pl-c1">open</span>(<span class="pl-s1">output_path</span>) <span class="pl-k">as</span> <span class="pl-s1">check</span>:
+        <span class="pl-s1">final_w</span>, <span class="pl-s1">final_h</span> <span class="pl-c1">=</span> <span class="pl-s1">check</span>.<span class="pl-c1">size</span>
+
+    <span class="pl-k">if</span> (<span class="pl-s1">final_w</span>, <span class="pl-s1">final_h</span>) <span class="pl-c1">!=</span> (<span class="pl-s1">original_w</span>, <span class="pl-s1">original_h</span>):
+        <span class="pl-c"># 不保留尺寸错误的结果文件。</span>
+        <span class="pl-k">try</span>:
+            <span class="pl-s1">output_path</span>.<span class="pl-c1">unlink</span>(<span class="pl-s1">missing_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+        <span class="pl-k">except</span> <span class="pl-v">Exception</span>:
+            <span class="pl-k">pass</span>
+        <span class="pl-k">raise</span> <span class="pl-en">RuntimeError</span>(
+            <span class="pl-s">f"最终文件尺寸校验失败：源图=<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">original_w</span><span class="pl-kos">}</span></span>x<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">original_h</span><span class="pl-kos">}</span></span>，"</span>
+            <span class="pl-s">f"输出=<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">final_w</span><span class="pl-kos">}</span></span>x<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">final_h</span><span class="pl-kos">}</span></span>"</span>
+        )
+
+    <span class="pl-k">return</span> {
+        <span class="pl-s">"源文件"</span>: <span class="pl-en">str</span>(<span class="pl-s1">image_path</span>),
+        <span class="pl-s">"PDF文件"</span>: <span class="pl-en">str</span>(<span class="pl-s1">pdf_path</span>),
+        <span class="pl-s">"输出图像"</span>: <span class="pl-en">str</span>(<span class="pl-s1">output_path</span>),
+        <span class="pl-s">"源图模式"</span>: <span class="pl-s1">source_mode</span>,
+        <span class="pl-s">"DPI"</span>: <span class="pl-s1">dpi</span>,
+        <span class="pl-s">"原图宽"</span>: <span class="pl-s1">original_w</span>,
+        <span class="pl-s">"原图高"</span>: <span class="pl-s1">original_h</span>,
+        <span class="pl-s">"PDF页面宽(pt)"</span>: <span class="pl-en">round</span>(<span class="pl-s1">page_w_pt</span>, <span class="pl-c1">6</span>),
+        <span class="pl-s">"PDF页面高(pt)"</span>: <span class="pl-en">round</span>(<span class="pl-s1">page_h_pt</span>, <span class="pl-c1">6</span>),
+        <span class="pl-s">"渲染宽"</span>: <span class="pl-s1">rendered_w</span>,
+        <span class="pl-s">"渲染高"</span>: <span class="pl-s1">rendered_h</span>,
+        <span class="pl-s">"最终宽"</span>: <span class="pl-s1">final_w</span>,
+        <span class="pl-s">"最终高"</span>: <span class="pl-s1">final_h</span>,
+        <span class="pl-s">"尺寸一致"</span>: <span class="pl-s">"是"</span>,
+        <span class="pl-s">"状态"</span>: <span class="pl-s">"成功"</span>,
+        <span class="pl-s">"错误信息"</span>: <span class="pl-s">""</span>,
+    }
+
+
+<span class="pl-k">def</span> <span class="pl-en">process_directory</span>(<span class="pl-s1">input_root</span>: <span class="pl-smi">Path</span>, <span class="pl-s1">globally_processed</span>: <span class="pl-s1">set</span>[<span class="pl-smi">str</span>]):
+    <span class="pl-s1">pdf_root</span> <span class="pl-c1">=</span> <span class="pl-s1">input_root</span>.<span class="pl-c1">parent</span> <span class="pl-c1">/</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">input_root</span>.<span class="pl-c1">name</span><span class="pl-kos">}</span></span>_PDF"</span>
+    <span class="pl-s1">image_root</span> <span class="pl-c1">=</span> <span class="pl-s1">input_root</span>.<span class="pl-c1">parent</span> <span class="pl-c1">/</span> <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">input_root</span>.<span class="pl-c1">name</span><span class="pl-kos">}</span></span>_PDF2IMG"</span>
+
+    <span class="pl-s1">image_files</span> <span class="pl-c1">=</span> <span class="pl-en">sorted</span>(
+        <span class="pl-s1">p</span> <span class="pl-k">for</span> <span class="pl-s1">p</span> <span class="pl-c1">in</span> <span class="pl-s1">input_root</span>.<span class="pl-c1">rglob</span>(<span class="pl-s">"*"</span>)
+        <span class="pl-k">if</span> <span class="pl-s1">p</span>.<span class="pl-c1">is_file</span>() <span class="pl-c1">and</span> <span class="pl-s1">p</span>.<span class="pl-c1">suffix</span>.<span class="pl-c1">lower</span>() <span class="pl-c1">in</span> <span class="pl-c1">SUPPORTED_EXTS</span>
+    )
+
+    <span class="pl-s1">report_rows</span> <span class="pl-c1">=</span> []
+    <span class="pl-s1">success_count</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+    <span class="pl-s1">failed_count</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+    <span class="pl-s1">skipped_count</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+
+    <span class="pl-en">print</span>(<span class="pl-s">"<span class="pl-cce">\n</span>"</span> <span class="pl-c1">+</span> <span class="pl-s">"="</span> <span class="pl-c1">*</span> <span class="pl-c1">90</span>)
+    <span class="pl-en">print</span>(<span class="pl-s">f"开始目录：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">input_root</span><span class="pl-kos">}</span></span>"</span>)
+    <span class="pl-en">print</span>(<span class="pl-s">f"图片数量：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">image_files</span>)<span class="pl-kos">}</span></span>"</span>)
+    <span class="pl-en">print</span>(<span class="pl-s">f"PDF 输出：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">pdf_root</span><span class="pl-kos">}</span></span>"</span>)
+    <span class="pl-en">print</span>(<span class="pl-s">f"图像输出：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">image_root</span><span class="pl-kos">}</span></span>"</span>)
+    <span class="pl-en">print</span>(<span class="pl-s">"="</span> <span class="pl-c1">*</span> <span class="pl-c1">90</span>)
+
+    <span class="pl-s1">pdf_root</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+    <span class="pl-s1">image_root</span>.<span class="pl-c1">mkdir</span>(<span class="pl-s1">parents</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">exist_ok</span><span class="pl-c1">=</span><span class="pl-c1">True</span>)
+
+    <span class="pl-k">for</span> <span class="pl-s1">index</span>, <span class="pl-s1">image_path</span> <span class="pl-c1">in</span> <span class="pl-en">enumerate</span>(<span class="pl-s1">image_files</span>, <span class="pl-c1">1</span>):
+        <span class="pl-s1">source_key</span> <span class="pl-c1">=</span> <span class="pl-en">str</span>(<span class="pl-s1">image_path</span>.<span class="pl-c1">resolve</span>()).<span class="pl-c1">casefold</span>()
+
+        <span class="pl-k">if</span> <span class="pl-s1">source_key</span> <span class="pl-c1">in</span> <span class="pl-s1">globally_processed</span>:
+            <span class="pl-s1">skipped_count</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+            <span class="pl-en">print</span>(<span class="pl-s">f"[跳过重复 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">index</span><span class="pl-kos">}</span></span>/<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">image_files</span>)<span class="pl-kos">}</span></span>] <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">image_path</span><span class="pl-kos">}</span></span>"</span>)
+            <span class="pl-k">continue</span>
+
+        <span class="pl-s1">globally_processed</span>.<span class="pl-c1">add</span>(<span class="pl-s1">source_key</span>)
+        <span class="pl-en">print</span>(<span class="pl-s">f"[<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">index</span><span class="pl-kos">}</span></span>/<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">image_files</span>)<span class="pl-kos">}</span></span>] <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">image_path</span><span class="pl-kos">}</span></span>"</span>)
+
+        <span class="pl-k">try</span>:
+            <span class="pl-s1">row</span> <span class="pl-c1">=</span> <span class="pl-en">convert_one</span>(
+                <span class="pl-s1">image_path</span>,
+                <span class="pl-s1">input_root</span>,
+                <span class="pl-s1">pdf_root</span>,
+                <span class="pl-s1">image_root</span>,
+                <span class="pl-c1">DPI</span>,
+            )
+            <span class="pl-s1">report_rows</span>.<span class="pl-c1">append</span>(<span class="pl-s1">row</span>)
+            <span class="pl-s1">success_count</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+            <span class="pl-en">print</span>(
+                <span class="pl-s">f"  成功：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">row</span>[<span class="pl-s">'原图宽'</span>]<span class="pl-kos">}</span></span>x<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">row</span>[<span class="pl-s">'原图高'</span>]<span class="pl-kos">}</span></span> "</span>
+                <span class="pl-s">f"-&gt; <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">row</span>[<span class="pl-s">'最终宽'</span>]<span class="pl-kos">}</span></span>x<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">row</span>[<span class="pl-s">'最终高'</span>]<span class="pl-kos">}</span></span> "</span>
+                <span class="pl-s">f"| <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">row</span>[<span class="pl-s">'输出图像'</span>]<span class="pl-kos">}</span></span>"</span>
+            )
+        <span class="pl-k">except</span> <span class="pl-v">Exception</span> <span class="pl-k">as</span> <span class="pl-s1">exc</span>:
+            <span class="pl-s1">failed_count</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+            <span class="pl-s1">report_rows</span>.<span class="pl-c1">append</span>({
+                <span class="pl-s">"源文件"</span>: <span class="pl-en">str</span>(<span class="pl-s1">image_path</span>),
+                <span class="pl-s">"PDF文件"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"输出图像"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"源图模式"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"DPI"</span>: <span class="pl-c1">DPI</span>,
+                <span class="pl-s">"原图宽"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"原图高"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"PDF页面宽(pt)"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"PDF页面高(pt)"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"渲染宽"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"渲染高"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"最终宽"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"最终高"</span>: <span class="pl-s">""</span>,
+                <span class="pl-s">"尺寸一致"</span>: <span class="pl-s">"否"</span>,
+                <span class="pl-s">"状态"</span>: <span class="pl-s">"失败"</span>,
+                <span class="pl-s">"错误信息"</span>: <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">type</span>(<span class="pl-s1">exc</span>).<span class="pl-c1">__name__</span><span class="pl-kos">}</span></span>: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">exc</span><span class="pl-kos">}</span></span>"</span>,
+            })
+            <span class="pl-en">print</span>(<span class="pl-s">f"  失败：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">type</span>(<span class="pl-s1">exc</span>).<span class="pl-c1">__name__</span><span class="pl-kos">}</span></span>: <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">exc</span><span class="pl-kos">}</span></span>"</span>)
+
+    <span class="pl-s1">report_path</span> <span class="pl-c1">=</span> <span class="pl-s1">image_root</span> <span class="pl-c1">/</span> <span class="pl-s">"尺寸校验报告.csv"</span>
+    <span class="pl-s1">fieldnames</span> <span class="pl-c1">=</span> [
+        <span class="pl-s">"源文件"</span>, <span class="pl-s">"PDF文件"</span>, <span class="pl-s">"输出图像"</span>, <span class="pl-s">"源图模式"</span>, <span class="pl-s">"DPI"</span>,
+        <span class="pl-s">"原图宽"</span>, <span class="pl-s">"原图高"</span>,
+        <span class="pl-s">"PDF页面宽(pt)"</span>, <span class="pl-s">"PDF页面高(pt)"</span>,
+        <span class="pl-s">"渲染宽"</span>, <span class="pl-s">"渲染高"</span>, <span class="pl-s">"最终宽"</span>, <span class="pl-s">"最终高"</span>,
+        <span class="pl-s">"尺寸一致"</span>, <span class="pl-s">"状态"</span>, <span class="pl-s">"错误信息"</span>,
+    ]
+
+    <span class="pl-k">with</span> <span class="pl-en">open</span>(<span class="pl-s1">report_path</span>, <span class="pl-s">"w"</span>, <span class="pl-s1">newline</span><span class="pl-c1">=</span><span class="pl-s">""</span>, <span class="pl-s1">encoding</span><span class="pl-c1">=</span><span class="pl-s">"utf-8-sig"</span>) <span class="pl-k">as</span> <span class="pl-s1">f</span>:
+        <span class="pl-s1">writer</span> <span class="pl-c1">=</span> <span class="pl-s1">csv</span>.<span class="pl-c1">DictWriter</span>(<span class="pl-s1">f</span>, <span class="pl-s1">fieldnames</span><span class="pl-c1">=</span><span class="pl-s1">fieldnames</span>)
+        <span class="pl-s1">writer</span>.<span class="pl-c1">writeheader</span>()
+        <span class="pl-s1">writer</span>.<span class="pl-c1">writerows</span>(<span class="pl-s1">report_rows</span>)
+
+    <span class="pl-en">print</span>(
+        <span class="pl-s">f"<span class="pl-cce">\n</span>目录完成：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">input_root</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">f"成功：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">success_count</span><span class="pl-kos">}</span></span> | 失败：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">failed_count</span><span class="pl-kos">}</span></span> | "</span>
+        <span class="pl-s">f"重复跳过：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">skipped_count</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">f"报告：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">report_path</span><span class="pl-kos">}</span></span>"</span>
+    )
+
+    <span class="pl-k">return</span> <span class="pl-s1">success_count</span>, <span class="pl-s1">failed_count</span>, <span class="pl-s1">skipped_count</span>
+
+
+<span class="pl-k">class</span> <span class="pl-v">QueueWindow</span>:
+    <span class="pl-k">def</span> <span class="pl-en">__init__</span>(<span class="pl-s1">self</span>, <span class="pl-s1">root</span>):
+        <span class="pl-s1">self</span>.<span class="pl-c1">root</span> <span class="pl-c1">=</span> <span class="pl-s1">root</span>
+        <span class="pl-s1">self</span>.<span class="pl-c1">root</span>.<span class="pl-c1">title</span>(<span class="pl-s">"图像 → PDF → 图像｜Mask 坐标保护｜多目录排队"</span>)
+        <span class="pl-s1">self</span>.<span class="pl-c1">root</span>.<span class="pl-c1">geometry</span>(<span class="pl-s">"800x520"</span>)
+        <span class="pl-s1">self</span>.<span class="pl-c1">root</span>.<span class="pl-c1">minsize</span>(<span class="pl-c1">680</span>, <span class="pl-c1">440</span>)
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">directories</span>: <span class="pl-s1">list</span>[<span class="pl-smi">Path</span>] <span class="pl-c1">=</span> []
+
+        <span class="pl-s1">tk</span>.<span class="pl-c1">Label</span>(
+            <span class="pl-s1">root</span>,
+            <span class="pl-s1">text</span><span class="pl-c1">=</span><span class="pl-s">"添加多个目录，按列表顺序依次处理"</span>,
+            <span class="pl-s1">font</span><span class="pl-c1">=</span>(<span class="pl-s">"Microsoft YaHei UI"</span>, <span class="pl-c1">12</span>, <span class="pl-s">"bold"</span>),
+        ).<span class="pl-c1">pack</span>(<span class="pl-s1">anchor</span><span class="pl-c1">=</span><span class="pl-s">"w"</span>, <span class="pl-s1">padx</span><span class="pl-c1">=</span><span class="pl-c1">14</span>, <span class="pl-s1">pady</span><span class="pl-c1">=</span>(<span class="pl-c1">14</span>, <span class="pl-c1">6</span>))
+
+        <span class="pl-s1">tk</span>.<span class="pl-c1">Label</span>(
+            <span class="pl-s1">root</span>,
+            <span class="pl-s1">text</span><span class="pl-c1">=</span>(
+                <span class="pl-s">f"DPI=<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">DPI</span><span class="pl-kos">}</span></span>｜输出图片追加 _p2i｜严格尺寸校验｜"</span>
+                <span class="pl-s">"禁止插值缩放、旋转、裁切和补边"</span>
+            ),
+            <span class="pl-s1">fg</span><span class="pl-c1">=</span><span class="pl-s">"#555555"</span>,
+            <span class="pl-s1">anchor</span><span class="pl-c1">=</span><span class="pl-s">"w"</span>,
+        ).<span class="pl-c1">pack</span>(<span class="pl-s1">fill</span><span class="pl-c1">=</span><span class="pl-s">"x"</span>, <span class="pl-s1">padx</span><span class="pl-c1">=</span><span class="pl-c1">14</span>, <span class="pl-s1">pady</span><span class="pl-c1">=</span>(<span class="pl-c1">0</span>, <span class="pl-c1">8</span>))
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">listbox</span> <span class="pl-c1">=</span> <span class="pl-s1">tk</span>.<span class="pl-c1">Listbox</span>(
+            <span class="pl-s1">root</span>,
+            <span class="pl-s1">selectmode</span><span class="pl-c1">=</span><span class="pl-s1">tk</span>.<span class="pl-c1">EXTENDED</span>,
+            <span class="pl-s1">font</span><span class="pl-c1">=</span>(<span class="pl-s">"Consolas"</span>, <span class="pl-c1">10</span>),
+            <span class="pl-s1">activestyle</span><span class="pl-c1">=</span><span class="pl-s">"dotbox"</span>,
+        )
+        <span class="pl-s1">self</span>.<span class="pl-c1">listbox</span>.<span class="pl-c1">pack</span>(<span class="pl-s1">fill</span><span class="pl-c1">=</span><span class="pl-s">"both"</span>, <span class="pl-s1">expand</span><span class="pl-c1">=</span><span class="pl-c1">True</span>, <span class="pl-s1">padx</span><span class="pl-c1">=</span><span class="pl-c1">14</span>, <span class="pl-s1">pady</span><span class="pl-c1">=</span><span class="pl-c1">6</span>)
+
+        <span class="pl-s1">button_frame</span> <span class="pl-c1">=</span> <span class="pl-s1">tk</span>.<span class="pl-c1">Frame</span>(<span class="pl-s1">root</span>)
+        <span class="pl-s1">button_frame</span>.<span class="pl-c1">pack</span>(<span class="pl-s1">fill</span><span class="pl-c1">=</span><span class="pl-s">"x"</span>, <span class="pl-s1">padx</span><span class="pl-c1">=</span><span class="pl-c1">14</span>, <span class="pl-s1">pady</span><span class="pl-c1">=</span><span class="pl-c1">8</span>)
+
+        <span class="pl-s1">tk</span>.<span class="pl-c1">Button</span>(
+            <span class="pl-s1">button_frame</span>,
+            <span class="pl-s1">text</span><span class="pl-c1">=</span><span class="pl-s">"添加目录"</span>,
+            <span class="pl-s1">width</span><span class="pl-c1">=</span><span class="pl-c1">13</span>,
+            <span class="pl-s1">command</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">add_directory</span>,
+        ).<span class="pl-c1">pack</span>(<span class="pl-s1">side</span><span class="pl-c1">=</span><span class="pl-s">"left"</span>, <span class="pl-s1">padx</span><span class="pl-c1">=</span>(<span class="pl-c1">0</span>, <span class="pl-c1">6</span>))
+
+        <span class="pl-s1">tk</span>.<span class="pl-c1">Button</span>(
+            <span class="pl-s1">button_frame</span>,
+            <span class="pl-s1">text</span><span class="pl-c1">=</span><span class="pl-s">"移除选中"</span>,
+            <span class="pl-s1">width</span><span class="pl-c1">=</span><span class="pl-c1">13</span>,
+            <span class="pl-s1">command</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">remove_selected</span>,
+        ).<span class="pl-c1">pack</span>(<span class="pl-s1">side</span><span class="pl-c1">=</span><span class="pl-s">"left"</span>, <span class="pl-s1">padx</span><span class="pl-c1">=</span><span class="pl-c1">6</span>)
+
+        <span class="pl-s1">tk</span>.<span class="pl-c1">Button</span>(
+            <span class="pl-s1">button_frame</span>,
+            <span class="pl-s1">text</span><span class="pl-c1">=</span><span class="pl-s">"清空队列"</span>,
+            <span class="pl-s1">width</span><span class="pl-c1">=</span><span class="pl-c1">13</span>,
+            <span class="pl-s1">command</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">clear_queue</span>,
+        ).<span class="pl-c1">pack</span>(<span class="pl-s1">side</span><span class="pl-c1">=</span><span class="pl-s">"left"</span>, <span class="pl-s1">padx</span><span class="pl-c1">=</span><span class="pl-c1">6</span>)
+
+        <span class="pl-s1">tk</span>.<span class="pl-c1">Button</span>(
+            <span class="pl-s1">button_frame</span>,
+            <span class="pl-s1">text</span><span class="pl-c1">=</span><span class="pl-s">"开始排队处理"</span>,
+            <span class="pl-s1">width</span><span class="pl-c1">=</span><span class="pl-c1">16</span>,
+            <span class="pl-s1">bg</span><span class="pl-c1">=</span><span class="pl-s">"#1677d2"</span>,
+            <span class="pl-s1">fg</span><span class="pl-c1">=</span><span class="pl-s">"white"</span>,
+            <span class="pl-s1">command</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">start</span>,
+        ).<span class="pl-c1">pack</span>(<span class="pl-s1">side</span><span class="pl-c1">=</span><span class="pl-s">"right"</span>)
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">status</span> <span class="pl-c1">=</span> <span class="pl-s1">tk</span>.<span class="pl-c1">Label</span>(
+            <span class="pl-s1">root</span>,
+            <span class="pl-s1">text</span><span class="pl-c1">=</span><span class="pl-s">"当前队列：0 个目录"</span>,
+            <span class="pl-s1">anchor</span><span class="pl-c1">=</span><span class="pl-s">"w"</span>,
+            <span class="pl-s1">fg</span><span class="pl-c1">=</span><span class="pl-s">"#444444"</span>,
+        )
+        <span class="pl-s1">self</span>.<span class="pl-c1">status</span>.<span class="pl-c1">pack</span>(<span class="pl-s1">fill</span><span class="pl-c1">=</span><span class="pl-s">"x"</span>, <span class="pl-s1">padx</span><span class="pl-c1">=</span><span class="pl-c1">14</span>, <span class="pl-s1">pady</span><span class="pl-c1">=</span>(<span class="pl-c1">0</span>, <span class="pl-c1">12</span>))
+
+    <span class="pl-k">def</span> <span class="pl-en">refresh</span>(<span class="pl-s1">self</span>):
+        <span class="pl-s1">self</span>.<span class="pl-c1">listbox</span>.<span class="pl-c1">delete</span>(<span class="pl-c1">0</span>, <span class="pl-s1">tk</span>.<span class="pl-c1">END</span>)
+        <span class="pl-k">for</span> <span class="pl-s1">index</span>, <span class="pl-s1">directory</span> <span class="pl-c1">in</span> <span class="pl-en">enumerate</span>(<span class="pl-s1">self</span>.<span class="pl-c1">directories</span>, <span class="pl-c1">1</span>):
+            <span class="pl-s1">self</span>.<span class="pl-c1">listbox</span>.<span class="pl-c1">insert</span>(<span class="pl-s1">tk</span>.<span class="pl-c1">END</span>, <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">index</span>:02d<span class="pl-kos">}</span></span>. <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">directory</span><span class="pl-kos">}</span></span>"</span>)
+        <span class="pl-s1">self</span>.<span class="pl-c1">status</span>.<span class="pl-c1">config</span>(<span class="pl-s1">text</span><span class="pl-c1">=</span><span class="pl-s">f"当前队列：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">self</span>.<span class="pl-c1">directories</span>)<span class="pl-kos">}</span></span> 个目录"</span>)
+
+    <span class="pl-k">def</span> <span class="pl-en">add_directory</span>(<span class="pl-s1">self</span>):
+        <span class="pl-s1">selected</span> <span class="pl-c1">=</span> <span class="pl-s1">filedialog</span>.<span class="pl-c1">askdirectory</span>(
+            <span class="pl-s1">parent</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">root</span>,
+            <span class="pl-s1">title</span><span class="pl-c1">=</span><span class="pl-s">"选择要加入处理队列的目录"</span>,
+            <span class="pl-s1">mustexist</span><span class="pl-c1">=</span><span class="pl-c1">True</span>,
+        )
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">selected</span>:
+            <span class="pl-k">return</span>
+
+        <span class="pl-s1">path</span> <span class="pl-c1">=</span> <span class="pl-en">Path</span>(<span class="pl-s1">selected</span>).<span class="pl-c1">resolve</span>()
+        <span class="pl-s1">existing</span> <span class="pl-c1">=</span> {<span class="pl-en">str</span>(<span class="pl-s1">p</span>).<span class="pl-c1">casefold</span>() <span class="pl-k">for</span> <span class="pl-s1">p</span> <span class="pl-c1">in</span> <span class="pl-s1">self</span>.<span class="pl-c1">directories</span>}
+
+        <span class="pl-k">if</span> <span class="pl-en">str</span>(<span class="pl-s1">path</span>).<span class="pl-c1">casefold</span>() <span class="pl-c1">in</span> <span class="pl-s1">existing</span>:
+            <span class="pl-s1">messagebox</span>.<span class="pl-c1">showinfo</span>(
+                <span class="pl-s">"提示"</span>,
+                <span class="pl-s">"这个目录已经在队列中了。"</span>,
+                <span class="pl-s1">parent</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">root</span>,
+            )
+            <span class="pl-k">return</span>
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">directories</span>.<span class="pl-c1">append</span>(<span class="pl-s1">path</span>)
+        <span class="pl-s1">self</span>.<span class="pl-c1">refresh</span>()
+
+    <span class="pl-k">def</span> <span class="pl-en">remove_selected</span>(<span class="pl-s1">self</span>):
+        <span class="pl-s1">selected_indices</span> <span class="pl-c1">=</span> <span class="pl-en">list</span>(<span class="pl-s1">self</span>.<span class="pl-c1">listbox</span>.<span class="pl-c1">curselection</span>())
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">selected_indices</span>:
+            <span class="pl-k">return</span>
+
+        <span class="pl-k">for</span> <span class="pl-s1">index</span> <span class="pl-c1">in</span> <span class="pl-en">reversed</span>(<span class="pl-s1">selected_indices</span>):
+            <span class="pl-k">del</span> <span class="pl-s1">self</span>.<span class="pl-c1">directories</span>[<span class="pl-s1">index</span>]
+        <span class="pl-s1">self</span>.<span class="pl-c1">refresh</span>()
+
+    <span class="pl-k">def</span> <span class="pl-en">clear_queue</span>(<span class="pl-s1">self</span>):
+        <span class="pl-s1">self</span>.<span class="pl-c1">directories</span>.<span class="pl-c1">clear</span>()
+        <span class="pl-s1">self</span>.<span class="pl-c1">refresh</span>()
+
+    <span class="pl-k">def</span> <span class="pl-en">start</span>(<span class="pl-s1">self</span>):
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">self</span>.<span class="pl-c1">directories</span>:
+            <span class="pl-s1">messagebox</span>.<span class="pl-c1">showwarning</span>(
+                <span class="pl-s">"提示"</span>,
+                <span class="pl-s">"请先添加至少一个目录。"</span>,
+                <span class="pl-s1">parent</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">root</span>,
+            )
+            <span class="pl-k">return</span>
+
+        <span class="pl-s1">queue</span> <span class="pl-c1">=</span> <span class="pl-en">list</span>(<span class="pl-s1">self</span>.<span class="pl-c1">directories</span>)
+        <span class="pl-s1">preview</span> <span class="pl-c1">=</span> <span class="pl-s">"<span class="pl-cce">\n</span>"</span>.<span class="pl-c1">join</span>(
+            <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">i</span><span class="pl-kos">}</span></span>. <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">p</span><span class="pl-kos">}</span></span>"</span> <span class="pl-k">for</span> <span class="pl-s1">i</span>, <span class="pl-s1">p</span> <span class="pl-c1">in</span> <span class="pl-en">enumerate</span>(<span class="pl-s1">queue</span>, <span class="pl-c1">1</span>)
+        )
+
+        <span class="pl-s1">confirmed</span> <span class="pl-c1">=</span> <span class="pl-s1">messagebox</span>.<span class="pl-c1">askyesno</span>(
+            <span class="pl-s">"确认开始"</span>,
+            <span class="pl-s">f"即将按顺序处理 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">queue</span>)<span class="pl-kos">}</span></span> 个目录：<span class="pl-cce">\n</span><span class="pl-cce">\n</span>"</span>
+            <span class="pl-s">f"<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">preview</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span><span class="pl-cce">\n</span>"</span>
+            <span class="pl-s">f"DPI：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-c1">DPI</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span><span class="pl-cce">\n</span>"</span>
+            <span class="pl-s">"尺寸异常时将直接报错，不会缩放或裁切修正。<span class="pl-cce">\n</span><span class="pl-cce">\n</span>"</span>
+            <span class="pl-s">"确定开始吗？"</span>,
+            <span class="pl-s1">parent</span><span class="pl-c1">=</span><span class="pl-s1">self</span>.<span class="pl-c1">root</span>,
+        )
+        <span class="pl-k">if</span> <span class="pl-c1">not</span> <span class="pl-s1">confirmed</span>:
+            <span class="pl-k">return</span>
+
+        <span class="pl-s1">self</span>.<span class="pl-c1">root</span>.<span class="pl-c1">destroy</span>()
+        <span class="pl-en">run_queue</span>(<span class="pl-s1">queue</span>)
+
+
+<span class="pl-k">def</span> <span class="pl-en">run_queue</span>(<span class="pl-s1">queue</span>: <span class="pl-s1">list</span>[<span class="pl-smi">Path</span>]):
+    <span class="pl-s1">globally_processed</span>: <span class="pl-s1">set</span>[<span class="pl-smi">str</span>] <span class="pl-c1">=</span> <span class="pl-en">set</span>()
+    <span class="pl-s1">total_success</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+    <span class="pl-s1">total_failed</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+    <span class="pl-s1">total_skipped</span> <span class="pl-c1">=</span> <span class="pl-c1">0</span>
+
+    <span class="pl-k">for</span> <span class="pl-s1">queue_index</span>, <span class="pl-s1">directory</span> <span class="pl-c1">in</span> <span class="pl-en">enumerate</span>(<span class="pl-s1">queue</span>, <span class="pl-c1">1</span>):
+        <span class="pl-en">print</span>(<span class="pl-s">f"<span class="pl-cce">\n</span><span class="pl-cce">\n</span>######## 队列 <span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">queue_index</span><span class="pl-kos">}</span></span>/<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">queue</span>)<span class="pl-kos">}</span></span> ########"</span>)
+        <span class="pl-k">try</span>:
+            <span class="pl-s1">success</span>, <span class="pl-s1">failed</span>, <span class="pl-s1">skipped</span> <span class="pl-c1">=</span> <span class="pl-en">process_directory</span>(
+                <span class="pl-s1">directory</span>,
+                <span class="pl-s1">globally_processed</span>,
+            )
+            <span class="pl-s1">total_success</span> <span class="pl-c1">+=</span> <span class="pl-s1">success</span>
+            <span class="pl-s1">total_failed</span> <span class="pl-c1">+=</span> <span class="pl-s1">failed</span>
+            <span class="pl-s1">total_skipped</span> <span class="pl-c1">+=</span> <span class="pl-s1">skipped</span>
+        <span class="pl-k">except</span> <span class="pl-v">Exception</span>:
+            <span class="pl-s1">total_failed</span> <span class="pl-c1">+=</span> <span class="pl-c1">1</span>
+            <span class="pl-s1">traceback</span>.<span class="pl-c1">print_exc</span>()
+
+    <span class="pl-s1">summary</span> <span class="pl-c1">=</span> (
+        <span class="pl-s">"全部队列处理完成！<span class="pl-cce">\n</span><span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">f"目录数量：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-en">len</span>(<span class="pl-s1">queue</span>)<span class="pl-kos">}</span></span><span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">f"成功图片：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">total_success</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">f"失败图片：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">total_failed</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">f"重复跳过：<span class="pl-s1"><span class="pl-kos">{</span><span class="pl-s1">total_skipped</span><span class="pl-kos">}</span></span><span class="pl-cce">\n</span><span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">"每个目录的详细结果请查看：<span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">"对应的 *_PDF2IMG<span class="pl-cce">\\</span>尺寸校验报告.csv<span class="pl-cce">\n</span><span class="pl-cce">\n</span>"</span>
+        <span class="pl-s">"注意：失败图片不会自动缩放、裁切或补边。"</span>
+    )
+
+    <span class="pl-en">print</span>(<span class="pl-s">"<span class="pl-cce">\n</span>"</span> <span class="pl-c1">+</span> <span class="pl-s">"="</span> <span class="pl-c1">*</span> <span class="pl-c1">90</span> <span class="pl-c1">+</span> <span class="pl-s">"<span class="pl-cce">\n</span>"</span> <span class="pl-c1">+</span> <span class="pl-s1">summary</span>)
+    <span class="pl-s1">root</span> <span class="pl-c1">=</span> <span class="pl-s1">tk</span>.<span class="pl-c1">Tk</span>()
+    <span class="pl-s1">root</span>.<span class="pl-c1">withdraw</span>()
+    <span class="pl-s1">root</span>.<span class="pl-c1">attributes</span>(<span class="pl-s">"-topmost"</span>, <span class="pl-c1">True</span>)
+    <span class="pl-s1">messagebox</span>.<span class="pl-c1">showinfo</span>(<span class="pl-s">"处理完成"</span>, <span class="pl-s1">summary</span>, <span class="pl-s1">parent</span><span class="pl-c1">=</span><span class="pl-s1">root</span>)
+    <span class="pl-s1">root</span>.<span class="pl-c1">destroy</span>()
+
+
+<span class="pl-k">def</span> <span class="pl-en">main</span>():
+    <span class="pl-s1">root</span> <span class="pl-c1">=</span> <span class="pl-s1">tk</span>.<span class="pl-c1">Tk</span>()
+    <span class="pl-en">QueueWindow</span>(<span class="pl-s1">root</span>)
+    <span class="pl-s1">root</span>.<span class="pl-c1">mainloop</span>()
+
+
+<span class="pl-k">if</span> <span class="pl-s1">__name__</span> <span class="pl-c1">==</span> <span class="pl-s">"__main__"</span>:
+    <span class="pl-k">try</span>:
+        <span class="pl-en">main</span>()
+    <span class="pl-k">except</span> <span class="pl-v">Exception</span>:
+        <span class="pl-s1">traceback</span>.<span class="pl-c1">print_exc</span>()
+        <span class="pl-k">try</span>:
+            <span class="pl-s1">error_root</span> <span class="pl-c1">=</span> <span class="pl-s1">tk</span>.<span class="pl-c1">Tk</span>()
+            <span class="pl-s1">error_root</span>.<span class="pl-c1">withdraw</span>()
+            <span class="pl-s1">messagebox</span>.<span class="pl-c1">showerror</span>(
+                <span class="pl-s">"程序异常"</span>,
+                <span class="pl-s1">traceback</span>.<span class="pl-c1">format_exc</span>(),
+                <span class="pl-s1">parent</span><span class="pl-c1">=</span><span class="pl-s1">error_root</span>,
+            )
+            <span class="pl-s1">error_root</span>.<span class="pl-c1">destroy</span>()
+        <span class="pl-k">except</span> <span class="pl-v">Exception</span>:
+            <span class="pl-k">pass</span>
+        <span class="pl-s1">sys</span>.<span class="pl-c1">exit</span>(<span class="pl-c1">1</span>)</pre></div>
+<h2 dir="auto">后续验收 / 改进项</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 使用 512×512、奇数尺寸、不同长宽比的真实图像检查最终像素宽高和 Mask 坐标。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 用 RGB、RGBA、灰度图分别验证 PDF 往返；检查图像模式、透明度变化的可接受性。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 确认 16-bit/浮点 Mask 被明确拒绝，不产生错误转换结果。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 确认多个输入目录包含/重叠时不重复处理，输出子目录结构与报告路径正确。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 测试同目录下<strong>同名不同扩展名</strong>（如 <code class="notranslate">a.jpg</code> 和 <code class="notranslate">a.png</code>）的 PDF/PNG 输出冲突，必要时增加防覆盖策略。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 在实际 Windows 环境与目标 PyMuPDF 版本下运行回归测试（此 Issue 仅归档源码，尚未执行环境验证）。</li>
+</ul>
+<p dir="auto">关联：边缘模型部署时，同样要确保预处理 <code class="notranslate">resize/letterbox/padding</code> 与坐标还原一致。</p></article>
+<footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
+</main><script>(() => {
+  const article = document.querySelector('article');
+  if (!article) return;
+  const themeButton = document.querySelector('.theme-toggle');
+  const setTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    if (themeButton) {
+      themeButton.textContent = theme === 'dark' ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+    }
+  };
+  let theme = 'light';
+  try { theme = localStorage.getItem('cpuck-article-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+  setTheme(theme);
+  themeButton?.addEventListener('click', () => {
+    theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try { localStorage.setItem('cpuck-article-theme', theme); } catch {}
+  });
+  const readingTime = document.querySelector('.reading-time');
+  if (readingTime) readingTime.textContent = '约 ' + Math.max(1, Math.ceil(article.textContent.replace(/\s/g, '').length / 500)) + ' 分钟阅读';
+  const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const toc = document.createElement('details');
+  toc.className = 'article-toc';
+  const summary = document.createElement('summary');
+  summary.textContent = '文章目录';
+  toc.append(summary);
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', '文章目录');
+  const links = [];
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      let id = 'article-section-' + (index + 1);
+      while (document.getElementById(id)) id += '-';
+      heading.id = id;
+    }
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(heading.id);
+    link.textContent = heading.textContent.trim();
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
+    link.addEventListener('click', () => {
+      if (matchMedia('(max-width: 1199px)').matches) toc.open = false;
+    });
+    nav.append(link);
+    links.push(link);
+  });
+  if (headings.length) {
+    toc.append(nav);
+    toc.open = matchMedia('(min-width: 1200px)').matches;
+    document.body.classList.add('has-toc');
+    document.body.append(toc);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const current = entries.find(entry => entry.isIntersecting);
+        if (!current) return;
+        const index = headings.indexOf(current.target);
+        links.forEach((link, i) => {
+          if (i === index) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, {rootMargin: '0px 0px -65% 0px'});
+      headings.forEach(heading => observer.observe(heading));
+    }
+  }
+  article.querySelectorAll('pre').forEach(pre => {
+    const details = document.createElement('details');
+    details.className = 'code-fold';
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
+    const toggle = document.createElement('summary');
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = '复制代码';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent);
+        button.textContent = '已复制';
+      } catch {
+        details.open = true;
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = '已选中，请手动复制';
+      }
+      setTimeout(() => { button.textContent = '复制代码'; }, 2200);
+    });
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
+  });
+  const top = document.createElement('a');
+  top.href = '#article-top';
+  top.className = 'back-top';
+  top.textContent = '↑ 顶部';
+  top.setAttribute('aria-label', '返回顶部');
+  document.body.append(top);
+})();
+</script></body></html>

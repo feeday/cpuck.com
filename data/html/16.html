@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="canonical" href="https://cpuck.com/16.html">
+<meta name="description" content="背景与来源 原文：《边缘算力设备模型部署，5个巨坑心得分享：Nvidia、算能、瑞芯微全踩过！》 本 Issue 是基于原文整理出的可复用工程经验、技术勘误与验收清单，非全文转载。 适用：PyTorch / YOLO → ONNX → TensorRT、RKNN、算能 BMRuntime；Jetson、RK3588、BM1684 等边缘视觉设备。 原文中的 ">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s1flQ/huFgy6VuBRpjBeumh+VIkMGvfrjrkRMtTeQo8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>技术笔记｜边缘模型部署五大坑：ONNX、INT8、TensorRT、RKNN 与多路视频（含勘误和验收清单） · CPuck</title>
+<style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
+:root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-underline-offset:4px; }
+button,summary { cursor:pointer; }
+button { font:inherit; }
+a:focus-visible,button:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+main { width:min(820px,calc(100% - 48px)); margin:40px auto 80px; padding:32px 52px 26px; border:1px solid var(--line); border-radius:16px; background:var(--paper); box-shadow:0 8px 36px #14203305; overflow-wrap:anywhere; }
+.page-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:25px; border-bottom:1px solid var(--line); font-size:13px; }
+.page-nav a { color:var(--muted); text-decoration:none; }
+.page-nav .home-link { color:var(--heading); font-weight:650; letter-spacing:.02em; }
+.nav-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; }
+.page-nav a:hover { color:var(--accent); }
+.theme-toggle { border:1px solid var(--line); border-radius:7px; padding:4px 10px; background:var(--paper); color:var(--muted); font-size:12px; }
+.article-header { padding:32px 0 28px; margin-bottom:28px; border-bottom:1px solid var(--line); }
+.article-label { margin:0 0 12px; color:var(--accent); font-size:11px; letter-spacing:.14em; font-weight:650; }
+.article-title { margin:0 0 16px; color:var(--heading); font-size:clamp(27px,4vw,38px); line-height:1.35; letter-spacing:-.035em; font-weight:750; }
+.article-meta { display:flex; flex-wrap:wrap; gap:8px 20px; color:var(--muted); font-size:12px; }
+article > :first-child { margin-top:0; }
+article > :last-child { margin-bottom:0; }
+article p { margin:0 0 1.25em; }
+article :is(h1,h2,h3,h4,h5,h6) { color:var(--heading); line-height:1.5; scroll-margin-top:28px; font-weight:650; }
+article h1 { font-size:28px; margin:1.7em 0 .8em; }
+article h2 { font-size:23px; margin:2em 0 .85em; padding-bottom:10px; border-bottom:1px solid var(--line); }
+article h3 { font-size:19px; margin:1.7em 0 .7em; }
+article :is(h4,h5,h6) { font-size:16px; margin:1.5em 0 .65em; }
+article :is(ul,ol) { padding-left:1.6em; margin:0 0 1.3em; }
+article li { padding-left:.2em; margin:.3em 0; }
+article li > :is(ul,ol) { margin:.4em 0; }
+article li > p { margin:.4em 0; }
+article strong { color:var(--heading); font-weight:650; }
+article blockquote { margin:1.5em 0; padding:14px 20px; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; background:var(--soft); color:var(--muted); }
+article blockquote > :last-child { margin-bottom:0; }
+article hr { height:1px; border:0; background:var(--line); margin:32px 0; }
+article :is(img,video) { max-width:100%; height:auto; border-radius:8px; }
+article table { display:block; max-width:100%; width:max-content; overflow:auto; border-collapse:collapse; margin:24px 0; font-size:14px; line-height:1.65; }
+article :is(td,th) { border:1px solid var(--line); padding:11px 15px; min-width:80px; }
+article th { background:var(--soft); color:var(--heading); font-weight:650; }
+article tr:nth-child(even) td { background:var(--soft); }
+article code { padding:.15em .38em; border-radius:4px; background:var(--soft); color:var(--heading); font: .87em/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+article pre { overflow:auto; padding:18px; background:var(--code); border-radius:8px; }
+article pre code { padding:0; background:none; font:inherit; overflow-wrap:normal; }
+.code-frame { position:relative; margin:22px 0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--code); }
+.code-fold { margin:0; }
+.code-fold summary { padding:10px 100px 10px 16px; background:var(--soft); color:var(--muted); font-size:12px; line-height:22px; }
+.code-fold[open] summary { border-bottom:1px solid var(--line); }
+.code-fold pre { margin:0; padding:17px 18px; white-space:pre; overflow:auto; font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; border-radius:0; }
+.copy-code { position:absolute; right:9px; top:8px; padding:3px 9px; border:1px solid var(--line); border-radius:5px; color:var(--muted); background:var(--paper); font:12px/20px system-ui,sans-serif; }
+.copy-code:hover { color:var(--accent); border-color:var(--accent); }
+.article-footer { display:flex; justify-content:space-between; gap:16px; padding-top:22px; margin-top:42px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.article-footer a { text-decoration:none; }
+.article-toc { position:fixed; left:calc(50% + 320px); top:62px; width:220px; font-size:12px; line-height:1.65; }
+.article-toc summary { padding:0 10px 14px; color:var(--heading); font-weight:650; }
+.article-toc nav { max-height:calc(100vh - 180px); overflow:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; border-left:1px solid var(--line); }
+.article-toc nav a { display:block; padding:6px 12px; color:var(--muted); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; overflow-wrap:anywhere; }
+.article-toc nav a:hover { color:var(--heading); }
+.article-toc nav a[aria-current] { color:var(--accent); border-left-color:var(--accent); background:var(--soft); }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:7px 12px; text-decoration:none; font-size:12px; box-shadow:0 3px 12px #00000005; }
+@media(min-width:1200px) { .has-toc main { width:820px; margin-left:calc(50% - 540px); margin-right:0; } }
+@media(max-width:1199px) { .article-toc { left:auto; right:20px; top:auto; bottom:74px; width:min(280px,calc(100% - 40px)); padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:10px; z-index:20; box-shadow:0 8px 32px #0000000d; } .article-toc summary { padding:0; } .article-toc[open] summary { padding-bottom:10px; } .article-toc nav { max-height:40vh; } }
+@media(max-width:600px) { body { font-size:15px; } main { width:100%; margin:0 0 90px; padding:22px 22px 28px; border:0; border-radius:0; box-shadow:none; } body { background:var(--paper); } .page-nav { gap:12px; padding-bottom:20px; } .nav-actions { gap:10px; font-size:12px; } .article-header { padding:26px 0 22px; margin-bottom:24px; } .article-title { font-size:28px; } article h1 { font-size:24px; } article h2 { font-size:21px; } article table { font-size:13px; } article :is(td,th) { padding:9px 11px; } .back-top { right:20px; bottom:20px; } }
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print { body,main { background:white; color:black; } main,.has-toc main { width:100%; margin:0; border:0; padding:0; box-shadow:none; } .page-nav,.article-toc,.back-top,.copy-code,.article-footer { display:none; } }
+</style></head><body><main id="article-top">
+<nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
+<div class="nav-actions"><a href="https://github.com/feeday/cpuck.com/issues/16">编辑原文</a><a href="/data/md/16.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
+<header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">技术笔记｜边缘模型部署五大坑：ONNX、INT8、TensorRT、RKNN 与多路视频（含勘误和验收清单）</h1>
+<div class="article-meta"><span>更新于 <time datetime="2026-11-04T01:02:51Z">2026年11月04日 09:02</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article><h2 dir="auto">背景与来源</h2>
+<ul dir="auto">
+<li>原文：<a href="https://mp.weixin.qq.com/s/Aj5O90rOX1OOGKKUpuyjLA?scene=1" rel="nofollow">《边缘算力设备模型部署，5个巨坑心得分享：Nvidia、算能、瑞芯微全踩过！》</a></li>
+<li>本 Issue 是基于原文整理出的<strong>可复用工程经验、技术勘误与验收清单</strong>，非全文转载。</li>
+<li>适用：PyTorch / YOLO → ONNX → TensorRT、RKNN、算能 BMRuntime；Jetson、RK3588、BM1684 等边缘视觉设备。</li>
+<li>原文中的 mAP、FPS、延迟和“加速 3–5 倍”等数字属于作者示例，<strong>不能直接视作目标设备的可靠性能承诺</strong>。</li>
+</ul>
+<h2 dir="auto">关键结论</h2>
+<p dir="auto"><strong>模型部署 ≠ 格式转换。精度分阶段验证、性能分模块测量、兼容性在选型前确认。</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>五大坑</th>
+<th>典型现象</th>
+<th>可复用排查策略</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ONNX 导出不一致</td>
+<td>框偏移、置信度异常</td>
+<td>统一预处理、输入形状、输出布局、NMS、坐标还原；固定样本逐层比较</td>
+</tr>
+<tr>
+<td>INT8 量化掉点</td>
+<td>mAP / 某类别召回明显下降</td>
+<td>选择覆盖现场分布的校准集，按类别验证，敏感层混合精度，必要时 QAT</td>
+</tr>
+<tr>
+<td>TensorRT 反而更慢</td>
+<td>端到端耗时比 ONNX Runtime 高</td>
+<td>核对硬件/版本/引擎构建参数，拆分 H2D、推理、D2H、后处理并做同步计时</td>
+</tr>
+<tr>
+<td>跨 NPU 算子差异</td>
+<td>转换失败、精度下降或 CPU fallback</td>
+<td>检查 RKNN/BMRuntime 兼容矩阵、转换日志，先做代表性算子与模型小样测试</td>
+</tr>
+<tr>
+<td>多路视频瓶颈</td>
+<td>推理单帧很快，整体 FPS 很低</td>
+<td>硬件解码 + 批处理 + 预处理/推理流水线 + 减少内存拷贝，测每路实际时延</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h2 dir="auto">经验一：ONNX 结果不一致，先分清楚比较层次</h2>
+<ol dir="auto">
+<li>固定一张输入图与输入张量，统一 RGB/BGR、归一化、letterbox、padding、通道顺序和尺寸。</li>
+<li>分别比较模型<strong>原始输出张量</strong>与最终框结果；YOLO 的 NMS 通常不是模型原始输出本身。</li>
+<li>坐标还原使用真实缩放比例和 pad 偏移，确保映射回原图坐标系。</li>
+<li>对齐 opset 和目标 ONNX Runtime 支持情况；先跑 FP32，确认正确后再开启 FP16/INT8。</li>
+<li>不宜用“最大差异超过 0.05 必须重导出”当通用规则；应结合输出量纲、相对/绝对误差和最终 mAP、漏检率进行判断。</li>
+</ol>
+<h2 dir="auto">经验二：INT8 量化的校准集重在代表性</h2>
+<ul dir="auto">
+<li>校准样本需要覆盖白天、黄昏、夜间红外、雨雾、逆光、不同相机及真实部署时的曝光与分辨率。</li>
+<li>不要把“至少 500 张”当成固定门槛；用校准规模曲线及独立验证集判断是否足够。</li>
+<li>除整体 mAP，还要单独看烟雾、小目标、弱对比度类别的 AP、召回率与误检率。</li>
+<li>尝试敏感层保留 FP16/FP32 的混合精度，但须确认<strong>对应芯片编译器</strong>是否支持；QAT 也必须与目标工具链匹配。</li>
+<li>对照：FP32 → FP16 → INT8/混合量化，记录质量、时延、吞吐、峰值内存。</li>
+</ul>
+<h2 dir="auto">经验三：TensorRT 加速不保证端到端更快</h2>
+<ul dir="auto">
+<li>Jetson Orin NX 属 Ampere 平台，不能仅凭原文某条 FP16 warning 就断言其不支持原生 FP16；要复核实际模型、库版本及构建日志。</li>
+<li>TensorRT 10.x 等新版 API 与文中旧代码不同，<code class="notranslate">config.max_workspace_size</code> / <code class="notranslate">builder.build_engine</code> 等不可不经修改直接照抄。</li>
+<li>固定 shape / 动态 shape、batch、精度、workspace/memory pool、计时同步、引擎预热都需要记录。</li>
+<li>性能测量至少分为：解码、预处理、H2D、GPU 推理、D2H、NMS、显示/输出；再给出端到端 P50/P95。</li>
+<li>优先用 <code class="notranslate">trtexec</code> 验证 engine；部署时再确认线程、调度和运行时开销。</li>
+</ul>
+<h2 dir="auto">经验四：RKNN/算能等 NPU 依赖具体工具链版本</h2>
+<ul dir="auto">
+<li>不应笼统认定“RK3588 不支持 SiLU”：相关算子支持会随 RKNN-Toolkit2 版本和模型图结构变化。</li>
+<li>优先检查转换日志与不支持算子清单，再用逐层比较定位精度差异；CPU fallback 若存在，还需独立测其耗时。</li>
+<li>不要直接把网络激活函数 SiLU 换为 ReLU 并继续沿用旧权重；改变架构需要重新训练和验证。</li>
+<li>原文 <code class="notranslate">custom_string='detect:fp16'</code> 不能作为可直接复用的 RKNN 混合量化配置；需采用目标 RKNN 版本支持的官方 hybrid-quantization 流程。</li>
+<li>采购芯片之前，先实际转换一版目标模型并在板子上进行精度与时延验证。</li>
+</ul>
+<h2 dir="auto">经验五：多路视频要测完整流水线</h2>
+<p dir="auto">典型管道：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="RTSP/视频输入 → 硬件解码 → 颜色/尺寸处理 → Batch
+             → TensorRT/RKNN 推理 → NMS/追踪/业务逻辑 → 输出"><pre lang="text" class="notranslate"><code class="notranslate">RTSP/视频输入 → 硬件解码 → 颜色/尺寸处理 → Batch
+             → TensorRT/RKNN 推理 → NMS/追踪/业务逻辑 → 输出
+</code></pre></div>
+<ul dir="auto">
+<li>不要把单路模型 FPS × 路数直接当成真实视频系统吞吐；先确认解码能力、视频分辨率、帧率、batch 及延迟约束。</li>
+<li>GStreamer / DeepStream 能有效减少拷贝并整合流水线，<strong>但不意味着任何插件组合都是零拷贝</strong>；仍要检查缓冲类型与 CPU/GPU 边界。</li>
+<li>RTSP 设置 <code class="notranslate">latency=0</code> 未必最稳，易受网络抖动影响；合理设置缓冲、丢帧策略与断线重连。</li>
+<li>测每路 FPS、端到端 P95/P99、丢帧率、CPU/GPU/NPU/解码器占用、功耗与热降频。</li>
+</ul>
+<h2 dir="auto">标准部署验收清单</h2>
+<ul class="contains-task-list">
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 固定 PyTorch FP32 基准模型与独立数据集，保留 per-class AP/Recall。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 校验 ONNX 与原模型的预处理、原始输出、NMS 和坐标还原。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 记录导出与运行环境版本：PyTorch、ONNX、opset、ONNX Runtime、TensorRT/RKNN/算能运行时、驱动/固件。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 对比 FP32/FP16/INT8 精度、误检漏检、延迟、内存。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 核查 NPU 算子、编译器转换警告与潜在 fallback。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 分段测量解码、预处理、推理、后处理、内存拷贝与端到端耗时。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 多路视频进行真实长时间压力测试：每路 FPS、延迟分位数、丢帧率、温度、功耗、恢复能力。</li>
+<li class="task-list-item"><input type="checkbox" id="" disabled="" class="task-list-item-checkbox" aria-label="Incomplete task"> 将所有关键测试配置、输入样本、量化校准集版本与结果保存为可复现实验记录。</li>
+</ul>
+<h2 dir="auto">与图像/PDF/Mask 项目的直接关联</h2>
+<p dir="auto">预处理任何缩放、padding、旋转或 DPI 改变都可能引发检测坐标映射错误；<strong>分割/检测输出须明确原图坐标系与变换参数</strong>。像素尺寸一致也不代表 Mask 标签值完全一致。</p>
+<p dir="auto">关联：另一个 Issue 归档了用于保持像素坐标网格的 <code class="notranslate">image_pdf_roundtrip_multi_dirs_p2i_mask_safe.py</code>。</p>
+<h2 dir="auto">可参考的官方文档</h2>
+<ul dir="auto">
+<li><a href="https://docs.nvidia.com/deeplearning/tensorrt/" rel="nofollow">NVIDIA TensorRT</a></li>
+<li><a href="https://docs.nvidia.com/metropolis/deepstream/" rel="nofollow">NVIDIA DeepStream</a></li>
+<li><a href="https://onnxruntime.ai/docs/" rel="nofollow">ONNX Runtime</a></li>
+<li><a href="https://github.com/airockchip/rknn-toolkit2">Rockchip RKNN-Toolkit2</a></li>
+</ul>
+<p dir="auto"><strong>备注</strong>：本文为工程笔记/验收规范，并非在这些设备上重新复测原文章中所有性能数字。</p></article>
+<footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
+</main><script>(() => {
+  const article = document.querySelector('article');
+  if (!article) return;
+  const themeButton = document.querySelector('.theme-toggle');
+  const setTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    if (themeButton) {
+      themeButton.textContent = theme === 'dark' ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+    }
+  };
+  let theme = 'light';
+  try { theme = localStorage.getItem('cpuck-article-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+  setTheme(theme);
+  themeButton?.addEventListener('click', () => {
+    theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try { localStorage.setItem('cpuck-article-theme', theme); } catch {}
+  });
+  const readingTime = document.querySelector('.reading-time');
+  if (readingTime) readingTime.textContent = '约 ' + Math.max(1, Math.ceil(article.textContent.replace(/\s/g, '').length / 500)) + ' 分钟阅读';
+  const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const toc = document.createElement('details');
+  toc.className = 'article-toc';
+  const summary = document.createElement('summary');
+  summary.textContent = '文章目录';
+  toc.append(summary);
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', '文章目录');
+  const links = [];
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      let id = 'article-section-' + (index + 1);
+      while (document.getElementById(id)) id += '-';
+      heading.id = id;
+    }
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(heading.id);
+    link.textContent = heading.textContent.trim();
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
+    link.addEventListener('click', () => {
+      if (matchMedia('(max-width: 1199px)').matches) toc.open = false;
+    });
+    nav.append(link);
+    links.push(link);
+  });
+  if (headings.length) {
+    toc.append(nav);
+    toc.open = matchMedia('(min-width: 1200px)').matches;
+    document.body.classList.add('has-toc');
+    document.body.append(toc);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const current = entries.find(entry => entry.isIntersecting);
+        if (!current) return;
+        const index = headings.indexOf(current.target);
+        links.forEach((link, i) => {
+          if (i === index) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, {rootMargin: '0px 0px -65% 0px'});
+      headings.forEach(heading => observer.observe(heading));
+    }
+  }
+  article.querySelectorAll('pre').forEach(pre => {
+    const details = document.createElement('details');
+    details.className = 'code-fold';
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
+    const toggle = document.createElement('summary');
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = '复制代码';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent);
+        button.textContent = '已复制';
+      } catch {
+        details.open = true;
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = '已选中，请手动复制';
+      }
+      setTimeout(() => { button.textContent = '复制代码'; }, 2200);
+    });
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
+  });
+  const top = document.createElement('a');
+  top.href = '#article-top';
+  top.className = 'back-top';
+  top.textContent = '↑ 顶部';
+  top.setAttribute('aria-label', '返回顶部');
+  document.body.append(top);
+})();
+</script></body></html>
