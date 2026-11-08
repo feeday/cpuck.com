@@ -14,6 +14,44 @@ import urllib.request
 PUBLISH_EXCLUSION_LABEL = "no-publish"
 
 
+def first_line_summary(value, fallback=""):
+    """Return the first meaningful prose line for cards, SEO descriptions, and sitemaps."""
+    text = str(value or "")
+    text = re.sub(r"<!--\s*permalink:.*?-->", "", text, flags=re.I | re.S)
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+
+    in_fence = False
+    fence_marker = None
+    for raw_line in text.split("\n"):
+        line = raw_line.strip()
+        if line.startswith(chr(96) * 3) or line.startswith("~~~"):
+            marker = chr(96) if line.startswith(chr(96) * 3) else "~"
+            if not in_fence:
+                in_fence = True
+                fence_marker = marker
+            elif marker == fence_marker:
+                in_fence = False
+                fence_marker = None
+            continue
+        if in_fence or not line:
+            continue
+        # Skip headings and metadata comments; they are poor search snippets.
+        if re.match(r"^#{1,6}(?:\s|$)", line) or line.startswith("<!--"):
+            continue
+        line = re.sub(r"^>\s?", "", line)
+        line = re.sub(r"^(?:[-*+]\s+|\d+[.)]\s+)", "", line)
+        line = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", line)
+        line = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", line)
+        line = line.replace(chr(96), "")
+        line = re.sub(r"[*_~]", "", line)
+        line = re.sub(r"\s+", " ", line).strip()
+        if line:
+            return line[:180].rstrip()
+
+    fallback = re.sub(r"\s+", " ", str(fallback or "")).strip()
+    return fallback[:180].rstrip()
+
+
 def api(path):
     request = urllib.request.Request(
         "https://api.github.com" + path,
@@ -30,9 +68,15 @@ def render(issue, canonical_url=None):
     script_hash = base64.b64encode(hashlib.sha256(script.encode()).digest()).decode()
     title = html.escape(issue["title"])
     canonical_tag = f'<link rel="canonical" href="{html.escape(canonical_url, quote=True)}">' if canonical_url else ""
-    raw_description = re.sub(r"\s+", " ", issue.get("body_text") or issue.get("body") or "").strip()
-    raw_description = re.sub(r"<!--\s*permalink:.*?-->", "", raw_description, flags=re.I).strip()
-    description_tag = f'<meta name="description" content="{html.escape(raw_description[:180], quote=True)}">' if raw_description else ""
+    raw_description = first_line_summary(
+        issue.get("body_text") or issue.get("body") or "", issue.get("title") or ""
+    )
+    escaped_description = html.escape(raw_description, quote=True)
+    description_tag = (
+        f'<meta name="description" content="{escaped_description}">\n'
+        f'<meta property="og:description" content="{escaped_description}">\n'
+        f'<meta name="twitter:description" content="{escaped_description}">'
+    ) if raw_description else ""
     source = html.escape(issue["html_url"], quote=True)
     updated = datetime.fromisoformat(issue["updated_at"].replace("Z", "+00:00")).astimezone(timezone(timedelta(hours=8)))
     display_date = updated.strftime("%Y年%m月%d日 %H:%M")
@@ -352,7 +396,7 @@ def publish(root, issues, owner):
         write(root / plan["markdown"], md)
         posts.append({
             "source": "github-issue", "issue": number, "isArticle": True, "cat": "log",
-            "title": issue["title"], "desc": (issue.get("body_text") or issue.get("body") or "")[:180],
+            "title": issue["title"], "desc": first_line_summary(issue.get("body_text") or issue.get("body") or "", issue["title"]),
             "content": issue.get("body_text") or issue.get("body") or "",
             "tag": sorted(labels), "date": issue["created_at"][:10],
             "updated_at": issue["updated_at"], "url": url, "aliases": sorted(set(aliases) - {url}),
