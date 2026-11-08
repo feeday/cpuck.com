@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="description" content="CPuck AI 图像工作台：GPT Image 2 与 Qwen Image 2.1，支持文生图、图像编辑和图片下载。">
+<meta name="description" content="图像工作台：GPT Image 2 与 Qwen Image 2.1，支持文生图、图像编辑和图片下载。">
 <link rel="icon" href="/favicon.png">
 <link rel="canonical" href="https://cpuck.com/gpt-image-2.html">
-<title>GPT Image 2 · AI 生图改图工作台 | CPuck</title>
+<title>GPT Image 2 | 生图改图每张低至六分钱</title>
 <style>
 :root{color-scheme:dark;--bg:#050816;--panel:rgba(15,23,42,.84);--line:rgba(148,163,184,.17);--muted:#94a3b8;--text:#f8fafc;--blue:#38bdf8;--violet:#a78bfa;--green:#34d399;--red:#fb7185}
 *{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(circle at 10% -10%,rgba(56,189,248,.18),transparent 34%),radial-gradient(circle at 90% 0,rgba(167,139,250,.16),transparent 32%),linear-gradient(145deg,#080d1c,#030611 65%);overflow-x:hidden}
@@ -124,7 +124,7 @@ button,input,textarea,select{font:inherit}a{color:inherit;text-decoration:none}.
 <div class="models" role="tablist"><button class="model active" type="button" data-model="gpt" aria-selected="true"><b>GPT Image 2</b><small>APIMart API</small></button><button class="model" type="button" data-model="qwen" aria-selected="false"><b>Qwen Image 2.1</b><small>Hugging Face Space</small></button></div>
 <section class="settings" id="gptSettings">
 <div class="head"><b class="title">GPT Image 2 密钥设置</b></div>
-<div class="field"><label for="gptKey">APIMart API Key</label><div class="keyrow"><input class="input" id="gptKey" type="password" placeholder="粘贴你的 API Key" autocomplete="off"><button class="tiny" id="toggleGptKey" type="button">显示</button></div><div class="key-links"><a class="key-link" href="https://apimart.ai/zh/register?aff=token" target="_blank" rel="noopener noreferrer">生图改图每张7毛钱 获取 API 密钥 ↗</a><a class="key-link free" href="https://pd.qq.com/g/pd54620835/post/B_6ab3e06a3a330c001441152212553667950X60?subc=744797654" target="_blank" rel="noopener noreferrer">免费密钥测试 ↗</a></div><label class="remember"><input type="checkbox" id="rememberKeys"> 在此浏览器记住密钥</label></div>
+<div class="field"><label for="gptKey">APIMart API Key</label><div class="keyrow"><input class="input" id="gptKey" type="password" placeholder="粘贴你的 API Key" autocomplete="off"><button class="tiny" id="toggleGptKey" type="button">显示</button></div><div class="key-links"><a class="key-link" href="https://apimart.ai/zh/register?aff=token" target="_blank" rel="noopener noreferrer">生图改图每张六分钱 获取 API 密钥 ↗</a><a class="key-link free" href="https://pd.qq.com/g/pd54620835/post/B_6ab3e06a3a330c001441152212553667950X60?subc=744797654" target="_blank" rel="noopener noreferrer">免费密钥测试 ↗</a></div><label class="remember"><input type="checkbox" id="rememberKeys"> 在此浏览器记住密钥</label></div>
 <div class="field" id="resumeTaskWrap" hidden><label for="resumeTaskId">查询之前提交的任务 <span class="hint">超时后可继续取回结果</span></label><div class="keyrow"><input class="input" id="resumeTaskId" type="text" placeholder="task_..." autocomplete="off"><button class="tiny" id="queryTaskButton" type="button">查询任务</button></div><div class="micro" id="resumeTaskHint">只查询已有任务，不会重新生成或重复提交。</div></div>
 <div class="row"><div class="field"><label for="resolution">生成分辨率</label><select class="select" id="resolution"><option value="1k">1K 标准</option><option value="2k">2K 高清</option><option value="4k">4K 超清</option></select></div><div class="field"><label for="aspect">画面比例</label><select class="select" id="aspect"><option value="1:1">1:1 正方形</option><option value="3:2">3:2 横图</option><option value="2:3">2:3 竖图</option><option value="4:3">4:3 横图</option><option value="3:4">3:4 竖图</option><option value="16:9">16:9 横屏</option><option value="9:16">9:16 竖屏</option><option value="21:9">21:9 宽屏</option></select></div></div>
 <div class="micro">密钥只在当前浏览器中使用。默认不保存；勾选后才写入本机 localStorage。</div>
