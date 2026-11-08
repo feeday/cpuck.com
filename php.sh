@@ -58,12 +58,20 @@ log "架构：$(uname -m)"
 
 # systemd 检测：云开发容器、Docker、部分 Notebook 环境没有 systemd。
 SYSTEMD_AVAILABLE=0
-if [[ -d /run/systemd/system ]] && \
-   [[ "$(ps -p 1 -o comm= 2>/dev/null | tr -d '[:space:]')" == "systemd" ]]; then
+PID1_COMM="$(ps -p 1 -o comm= 2>/dev/null | tr -d '[:space:]' || true)"
+
+# FORCE_NO_SYSTEMD=1 可用于明确指定容器模式。
+# 仅看到 /run/systemd/system 不够：部分容器会挂载该目录，但 systemd manager 并未运行。
+if [[ "${FORCE_NO_SYSTEMD:-0}" != "1" ]] && \
+   [[ "$PID1_COMM" == "systemd" ]] && \
+   [[ -d /run/systemd/system ]] && \
+   [[ -S /run/systemd/private ]] && \
+   command -v systemctl >/dev/null 2>&1 && \
+   systemctl show-environment >/dev/null 2>&1; then
     SYSTEMD_AVAILABLE=1
-    log "服务管理：systemd"
+    log "服务管理：systemd（管理器连接正常）"
 else
-    warn "未检测到 systemd，按容器模式启动服务；容器内无法管理宿主机防火墙"
+    warn "未检测到可用的 systemd 管理器，按容器模式启动服务；容器内无法管理宿主机防火墙"
 fi
 
 start_fpm() {
