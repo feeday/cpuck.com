@@ -5,6 +5,70 @@
   if (adUnit) {
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
   }
+
+  // Match the homepage WXM toolbox drawer on desktop article pages.
+  const drawer = document.getElementById('desktopBtvDrawer');
+  if (drawer) {
+    const toggle = drawer.querySelector('#btvDrawerToggle');
+    const panel = drawer.querySelector('#btvDrawerPanel');
+    const frame = drawer.querySelector('#btvDrawerFrame');
+    const close = drawer.querySelector('#btvDrawerClose');
+    const shade = drawer.querySelector('#btvDrawerShade');
+    let loaded = false;
+    let savedScrollStyles = null;
+
+    function lockPageScroll() {
+      if (savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      const gap = Math.max(0, window.innerWidth - html.clientWidth);
+      const currentPadding = parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+      savedScrollStyles = {
+        htmlOverflow: html.style.overflow,
+        bodyOverflow: body.style.overflow,
+        bodyPaddingRight: body.style.paddingRight
+      };
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      if (gap > 0) body.style.paddingRight = (currentPadding + gap) + 'px';
+    }
+
+    function unlockPageScroll() {
+      if (!savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      html.style.overflow = savedScrollStyles.htmlOverflow;
+      body.style.overflow = savedScrollStyles.bodyOverflow;
+      body.style.paddingRight = savedScrollStyles.bodyPaddingRight;
+      savedScrollStyles = null;
+    }
+
+    function setDrawerOpen(open) {
+      if (open && !loaded) {
+        frame.src = '/wxm/?drawer=20261106-2';
+        loaded = true;
+      }
+      if (open) lockPageScroll();
+      else unlockPageScroll();
+      drawer.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? '关闭工具箱' : '展开工具箱');
+      panel.setAttribute('aria-hidden', String(!open));
+    }
+
+    toggle.addEventListener('click', () => setDrawerOpen(!drawer.classList.contains('is-open')));
+    close.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    shade.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
+        setDrawerOpen(false);
+        toggle.focus();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.matchMedia('(max-width:768px)').matches) setDrawerOpen(false);
+    });
+  }
   const themeButton = document.querySelector('.theme-toggle');
   const setTheme = theme => {
     document.documentElement.dataset.theme = theme;
