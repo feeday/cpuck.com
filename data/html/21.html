@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="/favicon.png">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964437526797765" crossorigin="anonymous"></script>
+<link rel="canonical" href="https://cpuck.com/21.html">
+<meta name="description" content="通过脚本快速创建指定大小文件。 fsutil file createnew f:\1GB.txt 1073741824 byte (B):1073741824 kilobyte (kB):1048576 megabyte (MB):1024 gigabyte (GB): 1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-dU/bv0xHfGIUZVIYTks97cWfGkStjey59Vjo8NtfjI0=' 'unsafe-inline' 'unsafe-eval' https:; img-src https: data: blob:; media-src https: blob:; style-src 'unsafe-inline' https:; font-src https: data:; connect-src https:; frame-src https:; child-src https: blob:; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>快速生成大文件 · CPuck</title>
+<style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
+:root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-underline-offset:4px; }
+button,summary { cursor:pointer; }
+button { font:inherit; }
+a:focus-visible,button:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+main { width:min(820px,calc(100% - 48px)); margin:40px auto 80px; padding:32px 52px 26px; border:1px solid var(--line); border-radius:16px; background:var(--paper); box-shadow:0 8px 36px #14203305; overflow-wrap:anywhere; }
+.page-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:25px; border-bottom:1px solid var(--line); font-size:13px; }
+.page-nav a { color:var(--muted); text-decoration:none; }
+.page-nav .home-link { color:var(--heading); font-weight:650; letter-spacing:.02em; }
+.nav-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; }
+.page-nav a:hover { color:var(--accent); }
+.theme-toggle { border:1px solid var(--line); border-radius:7px; padding:4px 10px; background:var(--paper); color:var(--muted); font-size:12px; }
+.article-header { padding:32px 0 28px; margin-bottom:28px; border-bottom:1px solid var(--line); }
+.article-label { margin:0 0 12px; color:var(--accent); font-size:11px; letter-spacing:.14em; font-weight:650; }
+.article-title { margin:0 0 16px; color:var(--heading); font-size:clamp(27px,4vw,38px); line-height:1.35; letter-spacing:-.035em; font-weight:750; }
+.article-meta { display:flex; flex-wrap:wrap; gap:8px 20px; color:var(--muted); font-size:12px; }
+article > :first-child { margin-top:0; }
+article > :last-child { margin-bottom:0; }
+article p { margin:0 0 1.25em; }
+article :is(h1,h2,h3,h4,h5,h6) { color:var(--heading); line-height:1.5; scroll-margin-top:28px; font-weight:650; }
+article h1 { font-size:28px; margin:1.7em 0 .8em; }
+article h2 { font-size:23px; margin:2em 0 .85em; padding-bottom:10px; border-bottom:1px solid var(--line); }
+article h3 { font-size:19px; margin:1.7em 0 .7em; }
+article :is(h4,h5,h6) { font-size:16px; margin:1.5em 0 .65em; }
+article :is(ul,ol) { padding-left:1.6em; margin:0 0 1.3em; }
+article li { padding-left:.2em; margin:.3em 0; }
+article li > :is(ul,ol) { margin:.4em 0; }
+article li > p { margin:.4em 0; }
+article strong { color:var(--heading); font-weight:650; }
+article blockquote { margin:1.5em 0; padding:14px 20px; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; background:var(--soft); color:var(--muted); }
+article blockquote > :last-child { margin-bottom:0; }
+article hr { height:1px; border:0; background:var(--line); margin:32px 0; }
+article :is(img,video) { max-width:100%; height:auto; border-radius:8px; }
+article table { display:block; max-width:100%; width:max-content; overflow:auto; border-collapse:collapse; margin:24px 0; font-size:14px; line-height:1.65; }
+article :is(td,th) { border:1px solid var(--line); padding:11px 15px; min-width:80px; }
+article th { background:var(--soft); color:var(--heading); font-weight:650; }
+article tr:nth-child(even) td { background:var(--soft); }
+article code { padding:.15em .38em; border-radius:4px; background:var(--soft); color:var(--heading); font: .87em/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+article pre { overflow:auto; padding:18px; background:var(--code); border-radius:8px; }
+article pre code { padding:0; background:none; font:inherit; overflow-wrap:normal; }
+.code-frame { position:relative; margin:22px 0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--code); }
+.code-fold { margin:0; }
+.code-fold summary { padding:10px 100px 10px 16px; background:var(--soft); color:var(--muted); font-size:12px; line-height:22px; }
+.code-fold[open] summary { border-bottom:1px solid var(--line); }
+.code-fold pre { margin:0; padding:17px 18px; white-space:pre; overflow:auto; font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; border-radius:0; }
+.copy-code { position:absolute; right:9px; top:8px; padding:3px 9px; border:1px solid var(--line); border-radius:5px; color:var(--muted); background:var(--paper); font:12px/20px system-ui,sans-serif; }
+.copy-code:hover { color:var(--accent); border-color:var(--accent); }
+.article-footer { display:flex; justify-content:space-between; gap:16px; padding-top:22px; margin-top:42px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.article-footer a { text-decoration:none; }
+.article-toc { position:fixed; left:calc(50% + 320px); top:62px; width:220px; font-size:12px; line-height:1.65; }
+.article-toc summary { padding:0 10px 14px; color:var(--heading); font-weight:650; }
+.article-toc nav { max-height:calc(100vh - 180px); overflow:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; border-left:1px solid var(--line); }
+.article-toc nav a { display:block; padding:6px 12px; color:var(--muted); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; overflow-wrap:anywhere; }
+.article-toc nav a:hover { color:var(--heading); }
+.article-toc nav a[aria-current] { color:var(--accent); border-left-color:var(--accent); background:var(--soft); }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:7px 12px; text-decoration:none; font-size:12px; box-shadow:0 3px 12px #00000005; }
+@media(min-width:1200px) { .has-toc main { width:820px; margin-left:calc(50% - 540px); margin-right:0; } }
+@media(max-width:1199px) { .article-toc { left:auto; right:20px; top:auto; bottom:74px; width:min(280px,calc(100% - 40px)); padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:10px; z-index:20; box-shadow:0 8px 32px #0000000d; } .article-toc summary { padding:0; } .article-toc[open] summary { padding-bottom:10px; } .article-toc nav { max-height:40vh; } }
+@media(max-width:600px) { body { font-size:15px; } main { width:100%; margin:0 0 90px; padding:22px 22px 28px; border:0; border-radius:0; box-shadow:none; } body { background:var(--paper); } .page-nav { gap:12px; padding-bottom:20px; } .nav-actions { gap:10px; font-size:12px; } .article-header { padding:26px 0 22px; margin-bottom:24px; } .article-title { font-size:28px; } article h1 { font-size:24px; } article h2 { font-size:21px; } article table { font-size:13px; } article :is(td,th) { padding:9px 11px; } .back-top { right:20px; bottom:20px; } }
+
+/* One small AdSense unit after the article body; keep it separate from reading content. */
+.article-ad { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; width:100%; margin:36px auto 0; padding-top:18px; border-top:1px solid var(--line); }
+.article-ad-label { color:var(--muted); font-size:10px; line-height:1.2; letter-spacing:.08em; text-transform:uppercase; }
+.article-ad .adsbygoogle { display:block!important; width:100%!important; max-width:300px!important; min-width:0!important; height:50px; }
+
+/* Desktop-only WXM toolbox drawer shared with the homepage. */
+#desktopBtvDrawer{position:fixed;inset:0;z-index:2147483000;pointer-events:none;isolation:isolate;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#desktopBtvDrawer .btv-tab{pointer-events:auto;position:absolute;right:0;top:50%;transform:translateY(-50%);width:42px;height:104px;border:1px solid rgba(148,163,184,.2);border-right:0;border-radius:14px 0 0 14px;background:rgba(15,23,42,.94);color:#cbd5e1;box-shadow:0 8px 24px rgba(0,0,0,.24);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:background .2s,width .2s,border-color .2s,color .2s}
+#desktopBtvDrawer .btv-tab:hover{width:46px;background:rgba(30,41,59,.98);border-color:rgba(148,163,184,.38);color:#f8fafc}
+#desktopBtvDrawer .btv-tab:focus-visible{outline:2px solid rgba(148,163,184,.65);outline-offset:3px}
+#desktopBtvDrawer .btv-tab svg{width:19px;height:19px}
+#desktopBtvDrawer .btv-tab span{writing-mode:vertical-rl;letter-spacing:1.5px;font-size:11px;font-weight:650}
+#desktopBtvDrawer .btv-shade{position:absolute;inset:0;background:rgba(2,6,23,.16);opacity:0;visibility:hidden;transition:opacity .28s,visibility .28s;pointer-events:none}
+#desktopBtvDrawer .btv-panel{position:fixed;top:0;right:0;bottom:0;left:auto;width:min(380px,100vw);max-width:380px;box-sizing:border-box;border:1px solid rgba(148,163,184,.2);border-right:0;border-radius:16px 0 0 16px;background:#080c12;box-shadow:-16px 0 42px rgba(0,0,0,.34);overflow:hidden;opacity:0;visibility:hidden;transform:translateX(100%);transition:transform .32s cubic-bezier(.22,.8,.25,1),opacity .2s ease,visibility .32s;pointer-events:none;display:flex;flex-direction:column}
+#desktopBtvDrawer.is-open .btv-shade{opacity:1;visibility:visible;pointer-events:auto}
+#desktopBtvDrawer.is-open .btv-panel{opacity:1;visibility:visible;transform:translateX(0);pointer-events:auto}
+#desktopBtvDrawer .btv-panel-head{height:46px;flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 16px;background:linear-gradient(180deg,#111925,#0c121b);border-bottom:1px solid rgba(148,163,184,.14);color:#e2e8f0;font-size:13px;font-weight:650;letter-spacing:.2px}
+#desktopBtvDrawer .btv-panel-close{width:30px;height:30px;display:grid;place-items:center;border:1px solid rgba(148,163,184,.2);border-radius:9px;background:rgba(255,255,255,.045);color:#cbd5e1;font-size:19px;line-height:1;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
+#desktopBtvDrawer .btv-panel-close:hover{border-color:rgba(248,113,113,.38);background:rgba(248,113,113,.1);color:#fecaca}
+#desktopBtvDrawer iframe{display:block;flex:1;width:100%;height:calc(100% - 46px);min-height:0;border:0;background:#030303}
+@media(max-width:768px),(hover:none) and (pointer:coarse){#desktopBtvDrawer{display:none!important}}
+@media(prefers-reduced-motion:reduce){#desktopBtvDrawer *{transition:none!important}}
+
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print { body,main { background:white; color:black; } main,.has-toc main { width:100%; margin:0; border:0; padding:0; box-shadow:none; } .page-nav,.article-toc,.back-top,.copy-code,.article-footer { display:none; } }
+
+/* Article layout refinement: a wider reading column and a calmer title scale. */
+@media(min-width:1200px) {
+  .has-toc main {
+    width:880px;
+    margin-left:calc(50% - 570px);
+    margin-right:0;
+  }
+  .article-toc {
+    left:calc(50% + 350px);
+    width:220px;
+  }
+  .article-title {
+    font-size:clamp(28px,2.15vw,33px);
+    line-height:1.3;
+    letter-spacing:-.025em;
+  }
+}
+
+/* On touch/tablet widths, keep the collapsed TOC as a compact floating chip. */
+@media(max-width:1199px) {
+  .article-toc {
+    left:auto;
+    right:16px;
+    top:auto;
+    bottom:76px;
+    width:fit-content;
+    max-width:calc(100vw - 32px);
+    padding:9px 13px;
+    border-radius:12px;
+  }
+  .article-toc:not([open]) {
+    width:fit-content;
+    min-width:0;
+  }
+  .article-toc:not([open]) summary {
+    padding:0;
+    white-space:nowrap;
+  }
+  .article-toc[open] {
+    width:min(320px,calc(100vw - 32px));
+    padding:12px;
+  }
+  .article-toc[open] summary {
+    padding:0 0 10px;
+  }
+  .article-toc nav {
+    max-height:min(45vh,360px);
+    overflow:auto;
+  }
+}
+
+@media(max-width:600px) {
+  .article-title {
+    font-size:25px;
+    line-height:1.35;
+    letter-spacing:-.02em;
+  }
+  .article-toc {
+    right:14px;
+    bottom:72px;
+    padding:9px 12px;
+  }
+  .article-toc[open] {
+    width:min(320px,calc(100vw - 28px));
+  }
+  .article-toc nav {
+    max-height:42vh;
+  }
+}
+
+</style></head><body><main id="article-top">
+<nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
+<div class="nav-actions"><a href="https://github.com/feeday/cpuck.com/issues/21">编辑原文</a><a href="/data/md/21.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
+<header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">快速生成大文件</h1>
+<div class="article-meta"><span>更新于 <time datetime="2026-11-08T14:26:00Z">2026年11月08日 22:26</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article><p dir="auto">通过脚本快速创建指定大小文件。</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="fsutil file createnew f:\1GB.txt 1073741824"><pre class="notranslate"><code class="notranslate">fsutil file createnew f:\1GB.txt 1073741824
+</code></pre></div>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="byte (B):1073741824
+kilobyte (kB):1048576
+megabyte (MB):1024
+gigabyte (GB):	1"><pre class="notranslate"><code class="notranslate">byte (B):1073741824
+kilobyte (kB):1048576
+megabyte (MB):1024
+gigabyte (GB):	1
+</code></pre></div></article>
+<aside class="article-ad" aria-label="Advertisements">
+<span class="article-ad-label">Advertisements</span>
+<ins class="adsbygoogle" style="display:inline-block;width:300px;height:50px" data-ad-client="ca-pub-1964437526797765" data-ad-slot="2282084339"></ins>
+</aside>
+<footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
+</main>
+
+<aside id="desktopBtvDrawer" aria-label="WXM 工具箱">
+  <button class="btv-tab" id="btvDrawerToggle" type="button" aria-expanded="false" aria-controls="btvDrawerPanel" aria-label="展开工具箱">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m8 21 4-4 4 4M8 9h8M8 13h5"/></svg>
+    <span>工具箱</span>
+  </button>
+  <div class="btv-shade" id="btvDrawerShade"></div>
+  <section class="btv-panel" id="btvDrawerPanel" aria-hidden="true">
+    <div class="btv-panel-head"><span>工具箱</span><button class="btv-panel-close" id="btvDrawerClose" type="button" aria-label="关闭工具箱">×</button></div>
+    <iframe id="btvDrawerFrame" title="WXM 工具箱页面" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads allow-top-navigation-by-user-activation"></iframe>
+  </section>
+</aside>
+<script>(() => {
+  const article = document.querySelector('article');
+  if (!article) return;
+  const adUnit = document.querySelector('.article-ad .adsbygoogle');
+  if (adUnit) {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+  }
+
+  // Match the homepage WXM toolbox drawer on desktop article pages.
+  const drawer = document.getElementById('desktopBtvDrawer');
+  if (drawer) {
+    const toggle = drawer.querySelector('#btvDrawerToggle');
+    const panel = drawer.querySelector('#btvDrawerPanel');
+    const frame = drawer.querySelector('#btvDrawerFrame');
+    const close = drawer.querySelector('#btvDrawerClose');
+    const shade = drawer.querySelector('#btvDrawerShade');
+    let loaded = false;
+    let savedScrollStyles = null;
+
+    function lockPageScroll() {
+      if (savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      const gap = Math.max(0, window.innerWidth - html.clientWidth);
+      const currentPadding = parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+      savedScrollStyles = {
+        htmlOverflow: html.style.overflow,
+        bodyOverflow: body.style.overflow,
+        bodyPaddingRight: body.style.paddingRight
+      };
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      if (gap > 0) body.style.paddingRight = (currentPadding + gap) + 'px';
+    }
+
+    function unlockPageScroll() {
+      if (!savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      html.style.overflow = savedScrollStyles.htmlOverflow;
+      body.style.overflow = savedScrollStyles.bodyOverflow;
+      body.style.paddingRight = savedScrollStyles.bodyPaddingRight;
+      savedScrollStyles = null;
+    }
+
+    function setDrawerOpen(open) {
+      if (open && !loaded) {
+        frame.src = '/wxm/?drawer=20261106-2';
+        loaded = true;
+      }
+      if (open) lockPageScroll();
+      else unlockPageScroll();
+      drawer.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? '关闭工具箱' : '展开工具箱');
+      panel.setAttribute('aria-hidden', String(!open));
+    }
+
+    toggle.addEventListener('click', () => setDrawerOpen(!drawer.classList.contains('is-open')));
+    close.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    shade.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
+        setDrawerOpen(false);
+        toggle.focus();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.matchMedia('(max-width:768px)').matches) setDrawerOpen(false);
+    });
+  }
+  const themeButton = document.querySelector('.theme-toggle');
+  const setTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    if (themeButton) {
+      themeButton.textContent = theme === 'dark' ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+    }
+  };
+  let theme = 'light';
+  try { theme = localStorage.getItem('cpuck-article-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+  setTheme(theme);
+  themeButton?.addEventListener('click', () => {
+    theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try { localStorage.setItem('cpuck-article-theme', theme); } catch {}
+  });
+  const readingTime = document.querySelector('.reading-time');
+  if (readingTime) readingTime.textContent = '约 ' + Math.max(1, Math.ceil(article.textContent.replace(/\s/g, '').length / 500)) + ' 分钟阅读';
+  const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const toc = document.createElement('details');
+  toc.className = 'article-toc';
+  const summary = document.createElement('summary');
+  summary.textContent = '文章目录';
+  toc.append(summary);
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', '文章目录');
+  const links = [];
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      let id = 'article-section-' + (index + 1);
+      while (document.getElementById(id)) id += '-';
+      heading.id = id;
+    }
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(heading.id);
+    link.textContent = heading.textContent.trim();
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
+    link.addEventListener('click', () => {
+      if (matchMedia('(max-width: 1199px)').matches) toc.open = false;
+    });
+    nav.append(link);
+    links.push(link);
+  });
+  if (headings.length) {
+    toc.append(nav);
+    toc.open = matchMedia('(min-width: 1200px)').matches;
+    document.body.classList.add('has-toc');
+    document.body.append(toc);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const current = entries.find(entry => entry.isIntersecting);
+        if (!current) return;
+        const index = headings.indexOf(current.target);
+        links.forEach((link, i) => {
+          if (i === index) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, {rootMargin: '0px 0px -65% 0px'});
+      headings.forEach(heading => observer.observe(heading));
+    }
+  }
+  article.querySelectorAll('pre').forEach(pre => {
+    const details = document.createElement('details');
+    details.className = 'code-fold';
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
+    const toggle = document.createElement('summary');
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = '复制代码';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent);
+        button.textContent = '已复制';
+      } catch {
+        details.open = true;
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = '已选中，请手动复制';
+      }
+      setTimeout(() => { button.textContent = '复制代码'; }, 2200);
+    });
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
+  });
+  const top = document.createElement('a');
+  top.href = '#article-top';
+  top.className = 'back-top';
+  top.textContent = '↑ 顶部';
+  top.setAttribute('aria-label', '返回顶部');
+  document.body.append(top);
+})();
+</script></body></html>
