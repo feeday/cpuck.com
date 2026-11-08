@@ -202,7 +202,7 @@ def page_metadata(root, route, plans, posts):
         visible = html.unescape(re.sub(r"<[^>]+>", " ", visible))
         visible = re.sub(r"\s+", " ", visible).strip()
         description = visible[:180].rstrip()
-    if len(description) < 20:
+    if len(description) < 20 and not post:
         description = f"{title}：CPuck 网站文章或工具页面。"
     if len(description) > 240:
         description = description[:237].rstrip() + "..."
