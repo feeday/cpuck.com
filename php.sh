@@ -80,6 +80,10 @@ start_fpm() {
     fi
     [[ -n "$fpm_bin" ]] || error "找不到 PHP-FPM 可执行文件"
 
+    # 容器中 systemd-tmpfiles 不会自动创建运行目录，需手动建立 Socket 目录。
+    mkdir -p "$(dirname "$FPM_SOCKET")"
+    chmod 755 "$(dirname "$FPM_SOCKET")"
+
     if ! pgrep -f '[p]hp-fpm: master process' >/dev/null 2>&1; then
         "$fpm_bin" --daemonize
     fi
