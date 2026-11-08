@@ -4,7 +4,7 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="canonical" href="https://cpuck.com/17.html">
 <meta name="description" content="问题描述 Mask QC 绘图时，画笔拖动与侧边滚动条发生冲突，滚动位置会跳回或漂移；此前叠加 touch-action:none、overflow-anchor:none 等 CSS 限制后仍未解决。 根因（已从当前 index(9).html 确认） pointerdown 调用 lockCanvasScroll()，记录右侧 .detail.scrol">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s1flQ/huFgy6VuBRpjBeumh+VIkMGvfrjrkRMtTeQo8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xm6/wDXW72FB+StG04ctoyC5dKePr4utGbN1N7Gabh8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>Bug：Mask QC 画笔拖动与滚动条冲突，滚动位置漂移 · CPuck</title>
 <style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
 :root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
@@ -128,6 +128,10 @@ article pre code { padding:0; background:none; font:inherit; overflow-wrap:norma
 </main><script>(() => {
   const article = document.querySelector('article');
   if (!article) return;
+  const adUnit = document.querySelector('.article-ad .adsbygoogle');
+  if (adUnit) {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+  }
   const themeButton = document.querySelector('.theme-toggle');
   const setTheme = theme => {
     document.documentElement.dataset.theme = theme;

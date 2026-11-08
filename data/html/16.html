@@ -4,7 +4,7 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <link rel="canonical" href="https://cpuck.com/16.html">
 <meta name="description" content="背景与来源 原文：《边缘算力设备模型部署，5个巨坑心得分享：Nvidia、算能、瑞芯微全踩过！》 本 Issue 是基于原文整理出的可复用工程经验、技术勘误与验收清单，非全文转载。 适用：PyTorch / YOLO → ONNX → TensorRT、RKNN、算能 BMRuntime；Jetson、RK3588、BM1684 等边缘视觉设备。 原文中的 ">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-s1flQ/huFgy6VuBRpjBeumh+VIkMGvfrjrkRMtTeQo8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xm6/wDXW72FB+StG04ctoyC5dKePr4utGbN1N7Gabh8='; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>技术笔记｜边缘模型部署五大坑：ONNX、INT8、TensorRT、RKNN 与多路视频（含勘误和验收清单） · CPuck</title>
 <style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
 :root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
@@ -196,6 +196,10 @@ article pre code { padding:0; background:none; font:inherit; overflow-wrap:norma
 </main><script>(() => {
   const article = document.querySelector('article');
   if (!article) return;
+  const adUnit = document.querySelector('.article-ad .adsbygoogle');
+  if (adUnit) {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+  }
   const themeButton = document.querySelector('.theme-toggle');
   const setTheme = theme => {
     document.documentElement.dataset.theme = theme;
