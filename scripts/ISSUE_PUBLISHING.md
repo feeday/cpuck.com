@@ -1,8 +1,9 @@
 # Issues 自动发布
 
-在本仓库 Issues 新建文章，标题为文章标题，正文使用 Markdown，添加 documentation 标签。
-仅仓库所有者 feeday 创建的 Issue 会发布；Pull Request 不发布。修改标题、正文或标签会自动重建。
-关闭 Issue 不下架；移除 documentation 标签会从搜索索引隐藏，已有文章文件保留。
+在本仓库新建 Issue 即可发布文章，标题作为文章标题，正文使用 Markdown；**不需要添加 documentation 标签**。
+所有仓库所有者 feeday 创建的 Issue 默认自动发布，Pull Request 不发布。修改标题、正文或标签会自动重建；Issue 关闭后仍保留在网站。
+手动排除：给不希望公开的 Issue 添加 `no-publish` 标签（大小写不敏感）。工作流会将文章从文章索引、搜索索引、网站地图和公开文章路由中撤下，并清理生成的 HTML/Markdown 文件。移除 `no-publish` 标签后会自动重新发布。
+`documentation` 标签现在只作为普通分类标签，不再控制是否发布。如果仓库尚无 `no-publish` 标签，请先在 Issues → Labels 中创建一次。
 
 ## 文件与链接
 
