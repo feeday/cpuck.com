@@ -221,7 +221,7 @@ async function pollTask(base,key,id,options={}){
 }
 async function runGpt(){
  let key=$("gptKey").value.trim(),p=$("prompt").value.trim(),m=mode();if(!key)throw Error("请填写 APIMart API Key。");if(!p)throw Error("请先输入提示词或编辑指令。");if(m==="edit"&&!sourceBlob)throw Error("图像编辑模式需要先上传参考图片。");
- let base=API_DEFAULT,body={model:"gpt-image-2",prompt:p,n:1,resolution:$("resolution").value,size:$("aspect").value,official_fallback:true};
+ let base=API_DEFAULT,body={model:"gpt-image-2-ext",prompt:p,n:1,resolution:$("resolution").value,size:$("aspect").value,official_fallback:true};
  if(m==="edit"){
   status("正在处理参考图并准备提交…","running");
   let referenceData=await jpegData(sourceBlob);
