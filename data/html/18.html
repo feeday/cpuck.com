@@ -69,6 +69,11 @@ article pre code { padding:0; background:none; font:inherit; overflow-wrap:norma
 @media(min-width:1200px) { .has-toc main { width:820px; margin-left:calc(50% - 540px); margin-right:0; } }
 @media(max-width:1199px) { .article-toc { left:auto; right:20px; top:auto; bottom:74px; width:min(280px,calc(100% - 40px)); padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:10px; z-index:20; box-shadow:0 8px 32px #0000000d; } .article-toc summary { padding:0; } .article-toc[open] summary { padding-bottom:10px; } .article-toc nav { max-height:40vh; } }
 @media(max-width:600px) { body { font-size:15px; } main { width:100%; margin:0 0 90px; padding:22px 22px 28px; border:0; border-radius:0; box-shadow:none; } body { background:var(--paper); } .page-nav { gap:12px; padding-bottom:20px; } .nav-actions { gap:10px; font-size:12px; } .article-header { padding:26px 0 22px; margin-bottom:24px; } .article-title { font-size:28px; } article h1 { font-size:24px; } article h2 { font-size:21px; } article table { font-size:13px; } article :is(td,th) { padding:9px 11px; } .back-top { right:20px; bottom:20px; } }
+
+/* One small AdSense unit after the article body; keep it separate from reading content. */
+.article-ad { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; width:100%; margin:36px auto 0; padding-top:18px; border-top:1px solid var(--line); }
+.article-ad-label { color:var(--muted); font-size:10px; line-height:1.2; letter-spacing:.08em; text-transform:uppercase; }
+.article-ad .adsbygoogle { display:inline-block; width:300px; max-width:100%; height:50px; }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
 @media print { body,main { background:white; color:black; } main,.has-toc main { width:100%; margin:0; border:0; padding:0; box-shadow:none; } .page-nav,.article-toc,.back-top,.copy-code,.article-footer { display:none; } }
 </style></head><body><main id="article-top">
