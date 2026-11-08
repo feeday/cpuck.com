@@ -1,6 +1,10 @@
 (() => {
   const article = document.querySelector('article');
   if (!article) return;
+  const adUnit = document.querySelector('.article-ad .adsbygoogle');
+  if (adUnit) {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+  }
   const themeButton = document.querySelector('.theme-toggle');
   const setTheme = theme => {
     document.documentElement.dataset.theme = theme;
