@@ -5,7 +5,7 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964437526797765" crossorigin="anonymous"></script>
 <link rel="canonical" href="https://cpuck.com/qwen3-asr-demo.html">
 <meta name="description" content="通过阿里语音识别调用抱脸空间填写密钥音频转文字 import os import re import tempfile from pathlib import Path import gradio as gr from gradio_client import Client, handle_file # pip install gradio gradio_c">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xm6/wDXW72FB+StG04ctoyC5dKePr4utGbN1N7Gabh8=' 'unsafe-inline' 'unsafe-eval' https:; img-src https: data: blob:; media-src https: blob:; style-src 'unsafe-inline' https:; font-src https: data:; connect-src https:; frame-src https:; child-src https: blob:; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-dU/bv0xHfGIUZVIYTks97cWfGkStjey59Vjo8NtfjI0=' 'unsafe-inline' 'unsafe-eval' https:; img-src https: data: blob:; media-src https: blob:; style-src 'unsafe-inline' https:; font-src https: data:; connect-src https:; frame-src https:; child-src https: blob:; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>Qwen3-ASR-Demo · CPuck</title>
 <style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
 :root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
@@ -895,6 +895,70 @@ if __name__ == "__main__":
   const adUnit = document.querySelector('.article-ad .adsbygoogle');
   if (adUnit) {
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+  }
+
+  // Match the homepage WXM toolbox drawer on desktop article pages.
+  const drawer = document.getElementById('desktopBtvDrawer');
+  if (drawer) {
+    const toggle = drawer.querySelector('#btvDrawerToggle');
+    const panel = drawer.querySelector('#btvDrawerPanel');
+    const frame = drawer.querySelector('#btvDrawerFrame');
+    const close = drawer.querySelector('#btvDrawerClose');
+    const shade = drawer.querySelector('#btvDrawerShade');
+    let loaded = false;
+    let savedScrollStyles = null;
+
+    function lockPageScroll() {
+      if (savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      const gap = Math.max(0, window.innerWidth - html.clientWidth);
+      const currentPadding = parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+      savedScrollStyles = {
+        htmlOverflow: html.style.overflow,
+        bodyOverflow: body.style.overflow,
+        bodyPaddingRight: body.style.paddingRight
+      };
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      if (gap > 0) body.style.paddingRight = (currentPadding + gap) + 'px';
+    }
+
+    function unlockPageScroll() {
+      if (!savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      html.style.overflow = savedScrollStyles.htmlOverflow;
+      body.style.overflow = savedScrollStyles.bodyOverflow;
+      body.style.paddingRight = savedScrollStyles.bodyPaddingRight;
+      savedScrollStyles = null;
+    }
+
+    function setDrawerOpen(open) {
+      if (open && !loaded) {
+        frame.src = '/wxm/?drawer=20261106-2';
+        loaded = true;
+      }
+      if (open) lockPageScroll();
+      else unlockPageScroll();
+      drawer.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? '关闭工具箱' : '展开工具箱');
+      panel.setAttribute('aria-hidden', String(!open));
+    }
+
+    toggle.addEventListener('click', () => setDrawerOpen(!drawer.classList.contains('is-open')));
+    close.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    shade.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
+        setDrawerOpen(false);
+        toggle.focus();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.matchMedia('(max-width:768px)').matches) setDrawerOpen(false);
+    });
   }
   const themeButton = document.querySelector('.theme-toggle');
   const setTheme = theme => {

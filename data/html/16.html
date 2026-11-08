@@ -5,7 +5,7 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964437526797765" crossorigin="anonymous"></script>
 <link rel="canonical" href="https://cpuck.com/16.html">
 <meta name="description" content="背景与来源 原文：《边缘算力设备模型部署，5个巨坑心得分享：Nvidia、算能、瑞芯微全踩过！》 本 Issue 是基于原文整理出的可复用工程经验、技术勘误与验收清单，非全文转载。 适用：PyTorch / YOLO → ONNX → TensorRT、RKNN、算能 BMRuntime；Jetson、RK3588、BM1684 等边缘视觉设备。 原文中的 ">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-xm6/wDXW72FB+StG04ctoyC5dKePr4utGbN1N7Gabh8=' 'unsafe-inline' 'unsafe-eval' https:; img-src https: data: blob:; media-src https: blob:; style-src 'unsafe-inline' https:; font-src https: data:; connect-src https:; frame-src https:; child-src https: blob:; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-dU/bv0xHfGIUZVIYTks97cWfGkStjey59Vjo8NtfjI0=' 'unsafe-inline' 'unsafe-eval' https:; img-src https: data: blob:; media-src https: blob:; style-src 'unsafe-inline' https:; font-src https: data:; connect-src https:; frame-src https:; child-src https: blob:; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>技术笔记｜边缘模型部署五大坑：ONNX、INT8、TensorRT、RKNN 与多路视频（含勘误和验收清单） · CPuck</title>
 <style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
 :root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
@@ -223,6 +223,70 @@ article pre code { padding:0; background:none; font:inherit; overflow-wrap:norma
   const adUnit = document.querySelector('.article-ad .adsbygoogle');
   if (adUnit) {
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+  }
+
+  // Match the homepage WXM toolbox drawer on desktop article pages.
+  const drawer = document.getElementById('desktopBtvDrawer');
+  if (drawer) {
+    const toggle = drawer.querySelector('#btvDrawerToggle');
+    const panel = drawer.querySelector('#btvDrawerPanel');
+    const frame = drawer.querySelector('#btvDrawerFrame');
+    const close = drawer.querySelector('#btvDrawerClose');
+    const shade = drawer.querySelector('#btvDrawerShade');
+    let loaded = false;
+    let savedScrollStyles = null;
+
+    function lockPageScroll() {
+      if (savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      const gap = Math.max(0, window.innerWidth - html.clientWidth);
+      const currentPadding = parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+      savedScrollStyles = {
+        htmlOverflow: html.style.overflow,
+        bodyOverflow: body.style.overflow,
+        bodyPaddingRight: body.style.paddingRight
+      };
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      if (gap > 0) body.style.paddingRight = (currentPadding + gap) + 'px';
+    }
+
+    function unlockPageScroll() {
+      if (!savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      html.style.overflow = savedScrollStyles.htmlOverflow;
+      body.style.overflow = savedScrollStyles.bodyOverflow;
+      body.style.paddingRight = savedScrollStyles.bodyPaddingRight;
+      savedScrollStyles = null;
+    }
+
+    function setDrawerOpen(open) {
+      if (open && !loaded) {
+        frame.src = '/wxm/?drawer=20261106-2';
+        loaded = true;
+      }
+      if (open) lockPageScroll();
+      else unlockPageScroll();
+      drawer.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? '关闭工具箱' : '展开工具箱');
+      panel.setAttribute('aria-hidden', String(!open));
+    }
+
+    toggle.addEventListener('click', () => setDrawerOpen(!drawer.classList.contains('is-open')));
+    close.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    shade.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
+        setDrawerOpen(false);
+        toggle.focus();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.matchMedia('(max-width:768px)').matches) setDrawerOpen(false);
+    });
   }
   const themeButton = document.querySelector('.theme-toggle');
   const setTheme = theme => {
