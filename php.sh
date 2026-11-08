@@ -56,6 +56,59 @@ esac
 log "系统：$PRETTY_NAME"
 log "架构：$(uname -m)"
 
+# systemd 检测：云开发容器、Docker、部分 Notebook 环境没有 systemd。
+SYSTEMD_AVAILABLE=0
+if [[ -d /run/systemd/system ]] && \
+   [[ "$(ps -p 1 -o comm= 2>/dev/null | tr -d '[:space:]')" == "systemd" ]]; then
+    SYSTEMD_AVAILABLE=1
+    log "服务管理：systemd"
+else
+    warn "未检测到 systemd，按容器模式启动服务；容器内无法管理宿主机防火墙"
+fi
+
+start_fpm() {
+    if [[ "$SYSTEMD_AVAILABLE" == "1" ]]; then
+        systemctl enable --now "$FPM_SERVICE"
+        return
+    fi
+
+    local fpm_bin=""
+    if [[ "$DISTRO" == "ubuntu" ]]; then
+        fpm_bin="$(command -v "php-fpm${PHP_VERSION}" || command -v php-fpm || true)"
+    else
+        fpm_bin="$(command -v php-fpm || true)"
+    fi
+    [[ -n "$fpm_bin" ]] || error "找不到 PHP-FPM 可执行文件"
+
+    if ! pgrep -f '[p]hp-fpm: master process' >/dev/null 2>&1; then
+        "$fpm_bin" --daemonize
+    fi
+
+    for _ in {1..20}; do
+        [[ -S "$FPM_SOCKET" ]] && return
+        sleep 0.5
+    done
+    error "PHP-FPM 未能创建 Socket：$FPM_SOCKET"
+}
+
+start_nginx() {
+    if [[ "$SYSTEMD_AVAILABLE" == "1" ]]; then
+        systemctl enable --now nginx
+        systemctl restart nginx
+    else
+        if pgrep -x nginx >/dev/null 2>&1; then
+            nginx -s reload
+        else
+            nginx
+        fi
+        for _ in {1..20}; do
+            pgrep -x nginx >/dev/null 2>&1 && return
+            sleep 0.5
+        done
+        error "Nginx 未能启动"
+    fi
+}
+
 # ------------------------------------------------------------
 # 检测 SSH 端口，避免启用防火墙后远程连接中断
 # ------------------------------------------------------------
@@ -111,11 +164,18 @@ if [[ "$DISTRO" == "ubuntu" ]]; then
     log "更新 Ubuntu 软件源"
     apt-get update
 
-    log "安装 Nginx、PHP-FPM、常用扩展和 UFW"
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        nginx curl ufw \
-        php php-cli php-fpm php-mysql php-gd php-mbstring \
-        php-xml php-curl php-zip php-intl php-bcmath php-soap php-opcache
+    log "安装 Nginx、PHP-FPM 和常用扩展"
+    if [[ "$SYSTEMD_AVAILABLE" == "1" ]]; then
+        DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            nginx curl ufw \
+            php php-cli php-fpm php-mysql php-gd php-mbstring \
+            php-xml php-curl php-zip php-intl php-bcmath php-soap php-opcache
+    else
+        DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            nginx curl \
+            php php-cli php-fpm php-mysql php-gd php-mbstring \
+            php-xml php-curl php-zip php-intl php-bcmath php-soap php-opcache
+    fi
 
     PHP_VERSION="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"
     FPM_SERVICE="php${PHP_VERSION}-fpm"
@@ -125,12 +185,20 @@ if [[ "$DISTRO" == "ubuntu" ]]; then
     systemctl enable --now "$FPM_SERVICE"
 
 elif [[ "$DISTRO" == "centos" ]]; then
-    log "安装 Nginx、PHP-FPM、常用扩展和 Firewalld"
-    dnf install -y \
-        nginx curl firewalld \
-        php php-cli php-fpm php-mysqlnd php-gd php-mbstring \
-        php-xml php-intl php-opcache php-bcmath php-soap \
-        php-pecl-zip php-process
+    log "安装 Nginx、PHP-FPM 和常用扩展"
+    if [[ "$SYSTEMD_AVAILABLE" == "1" ]]; then
+        dnf install -y \
+            nginx curl firewalld \
+            php php-cli php-fpm php-mysqlnd php-gd php-mbstring \
+            php-xml php-intl php-opcache php-bcmath php-soap \
+            php-pecl-zip php-process
+    else
+        dnf install -y \
+            nginx curl \
+            php php-cli php-fpm php-mysqlnd php-gd php-mbstring \
+            php-xml php-intl php-opcache php-bcmath php-soap \
+            php-pecl-zip php-process
+    fi
 
     PHP_VERSION="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;')"
     FPM_SERVICE="php-fpm"
@@ -159,12 +227,13 @@ elif [[ "$DISTRO" == "centos" ]]; then
     fi
 
     php-fpm -t
-    systemctl enable --now "$FPM_SERVICE"
-    systemctl restart "$FPM_SERVICE"
+    start_fpm
     [[ -S "$FPM_SOCKET" ]] || error "PHP-FPM Socket 未生成：$FPM_SOCKET"
 fi
 
-systemctl is-active --quiet "$FPM_SERVICE" || error "PHP-FPM 启动失败：$FPM_SERVICE"
+if [[ "$DISTRO" == "ubuntu" ]]; then
+    [[ -S "$FPM_SOCKET" ]] || error "PHP-FPM Socket 未生成：$FPM_SOCKET"
+fi
 
 # ------------------------------------------------------------
 # 创建 PHP 测试页面
@@ -301,16 +370,15 @@ fi
 
 nginx -t || error "Nginx 配置检查失败，请检查是否有其他站点占用了默认 80 端口"
 
-systemctl enable --now nginx
-systemctl restart nginx
-
-systemctl is-active --quiet nginx || error "Nginx 启动失败"
+start_nginx
 
 # ------------------------------------------------------------
 # 配置防火墙：只增加必要规则，不清空现有规则
 # ------------------------------------------------------------
 
-if [[ "$DISTRO" == "ubuntu" ]]; then
+if [[ "$SYSTEMD_AVAILABLE" != "1" ]]; then
+    warn "当前是无 systemd 的容器环境，跳过 UFW/Firewalld。请在宿主机防火墙或云服务器安全组放行 TCP 80、443 和需要的业务端口。"
+elif [[ "$DISTRO" == "ubuntu" ]]; then
     log "配置 Ubuntu UFW 防火墙"
 
     if ! ufw status | grep -q '^Status: active'; then
@@ -369,8 +437,13 @@ fi
 log "检查 PHP、PHP-FPM、Nginx 和 HTTP 页面"
 
 php -r 'echo "PHP Version: ".PHP_VERSION.PHP_EOL;'
-systemctl is-active "$FPM_SERVICE"
-systemctl is-active nginx
+if [[ "$SYSTEMD_AVAILABLE" == "1" ]]; then
+    systemctl is-active "$FPM_SERVICE"
+    systemctl is-active nginx
+else
+    [[ -S "$FPM_SOCKET" ]] || error "PHP-FPM Socket 不存在：$FPM_SOCKET"
+    pgrep -x nginx >/dev/null || error "Nginx 进程未运行"
+fi
 
 if ! curl --noproxy '*' -fsS http://127.0.0.1/php-test.php | grep -q 'PHP 运行正常'; then
     warn "PHP 测试页面访问失败，最近服务日志如下："
@@ -404,7 +477,11 @@ echo "HTTPS：443/tcp（已放行）"
 if (( ${#EXTRA_PORTS[@]} > 0 )); then
     echo "额外端口：${EXTRA_PORTS[*]}"
 fi
-echo "防火墙：已开启"
+if [[ "$SYSTEMD_AVAILABLE" == "1" ]]; then
+    echo "防火墙：已配置并开启"
+else
+    echo "防火墙：容器内未操作，请在宿主机/云安全组放行"
+fi
 echo "================================================"
 echo "提示：云服务器安全组也需要放行 TCP 80/443。"
 echo "正式部署网站后，建议删除 /var/www/html/php-test.php。"
