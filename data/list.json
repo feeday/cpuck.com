@@ -17,7 +17,7 @@
     "desc": "网络地址测速",
     "links": {
       "http": "http://cs1.bbn.com.cn:8800/gzweb/",
-      "hfCn": "https://hf-mirror.com/datasets/datxy/demo/blob/main/test/eso1242a.psb",
+      "hfCn": "https://test.ustc.edu.cn/",
       "hf": "http://ping0.cc/"
     },
     "isTop": true,
@@ -61,12 +61,12 @@
   },
   {
     "cat": "tool",
-    "title": "CPU Test",
-    "desc": "终端性能测试",
+    "title": "GPU Test",
+    "desc": "显卡能力测试",
     "links": {
       "http": "https://llm-bench.io/benchmarks",
-      "hfCn": "http://gpu.jy6d.com/",
-      "hf": "http://cpu.jy6d.com/"
+      "hfCn": "https://cpuck.com/gpu/",
+      "hf": "https://hf-mirror.com/datasets/feeday/datxy/tree/main/models"
     },
     "isTop": true,
     "hideOnMobile": true
