@@ -38,6 +38,14 @@ def first_line_summary(value, fallback=""):
         # Skip headings and metadata comments; they are poor search snippets.
         if re.match(r"^#{1,6}(?:\s|$)", line) or line.startswith("<!--"):
             continue
+        if re.match(
+            r"^(?:问题描述|背景与来源|用途|核心需求|关键结论|修复方案|解决方案|概述|简介|目标|适用范围|功能说明|操作步骤|验收标准|总结|结论|说明|注意事项|备注|数据来源|原文|参考资料)\s*[：:]?$",
+            line,
+            flags=re.I,
+        ):
+            continue
+        if re.match(r"^(?:原文|来源|作者|链接|出处|参考资料)\s*[：:]", line, flags=re.I):
+            continue
         line = re.sub(r"^>\s?", "", line)
         line = re.sub(r"^(?:[-*+]\s+|\d+[.)]\s+)", "", line)
         line = re.sub(r"!\[([^\]]*)\]\([^)]*\)", r"\1", line)
