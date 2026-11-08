@@ -1,0 +1,1745 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/png" href="/favicon.png">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964437526797765" crossorigin="anonymous"></script>
+<link rel="canonical" href="https://cpuck.com/19.html">
+<meta name="description" content="按表修改文件名 # -*- coding: utf-8 -*- &quot;&quot;&quot; 文件批量命名工作流 第一步：选择目录，递归扫描文件 第二步：导出 TXT 文件清单 第三步：自动生成 XLSX 人工核对表 第四步：人工填写 B 列新文件名 第五步：重新选择 XLSX，预览并批量重命名 A列：原文件名 B列：新文件名 C列：原文件完整路径（辅助定位） &quot;&quot;&quot; impor">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-dU/bv0xHfGIUZVIYTks97cWfGkStjey59Vjo8NtfjI0=' 'unsafe-inline' 'unsafe-eval' https:; img-src https: data: blob:; media-src https: blob:; style-src 'unsafe-inline' https:; font-src https: data:; connect-src https:; frame-src https:; child-src https: blob:; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>文件名处理 · CPuck</title>
+<style>:root { color-scheme: light; --bg:#f5f6f8; --paper:#fff; --text:#283344; --heading:#142033; --muted:#798392; --line:#e6eaf0; --soft:#f5f7fa; --accent:#2563eb; --code:#f7f8fb; }
+:root[data-theme="dark"] { color-scheme:dark; --bg:#101318; --paper:#181d25; --text:#c9d1dd; --heading:#f0f3f8; --muted:#909aaa; --line:#2b3340; --soft:#202732; --accent:#8ab4ff; --code:#121820; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:16px/1.85 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+a { color:var(--accent); text-underline-offset:4px; }
+button,summary { cursor:pointer; }
+button { font:inherit; }
+a:focus-visible,button:focus-visible,summary:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+main { width:min(820px,calc(100% - 48px)); margin:40px auto 80px; padding:32px 52px 26px; border:1px solid var(--line); border-radius:16px; background:var(--paper); box-shadow:0 8px 36px #14203305; overflow-wrap:anywhere; }
+.page-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:25px; border-bottom:1px solid var(--line); font-size:13px; }
+.page-nav a { color:var(--muted); text-decoration:none; }
+.page-nav .home-link { color:var(--heading); font-weight:650; letter-spacing:.02em; }
+.nav-actions { display:flex; align-items:center; flex-wrap:wrap; gap:16px; }
+.page-nav a:hover { color:var(--accent); }
+.theme-toggle { border:1px solid var(--line); border-radius:7px; padding:4px 10px; background:var(--paper); color:var(--muted); font-size:12px; }
+.article-header { padding:32px 0 28px; margin-bottom:28px; border-bottom:1px solid var(--line); }
+.article-label { margin:0 0 12px; color:var(--accent); font-size:11px; letter-spacing:.14em; font-weight:650; }
+.article-title { margin:0 0 16px; color:var(--heading); font-size:clamp(27px,4vw,38px); line-height:1.35; letter-spacing:-.035em; font-weight:750; }
+.article-meta { display:flex; flex-wrap:wrap; gap:8px 20px; color:var(--muted); font-size:12px; }
+article > :first-child { margin-top:0; }
+article > :last-child { margin-bottom:0; }
+article p { margin:0 0 1.25em; }
+article :is(h1,h2,h3,h4,h5,h6) { color:var(--heading); line-height:1.5; scroll-margin-top:28px; font-weight:650; }
+article h1 { font-size:28px; margin:1.7em 0 .8em; }
+article h2 { font-size:23px; margin:2em 0 .85em; padding-bottom:10px; border-bottom:1px solid var(--line); }
+article h3 { font-size:19px; margin:1.7em 0 .7em; }
+article :is(h4,h5,h6) { font-size:16px; margin:1.5em 0 .65em; }
+article :is(ul,ol) { padding-left:1.6em; margin:0 0 1.3em; }
+article li { padding-left:.2em; margin:.3em 0; }
+article li > :is(ul,ol) { margin:.4em 0; }
+article li > p { margin:.4em 0; }
+article strong { color:var(--heading); font-weight:650; }
+article blockquote { margin:1.5em 0; padding:14px 20px; border-left:3px solid var(--accent); border-radius:0 8px 8px 0; background:var(--soft); color:var(--muted); }
+article blockquote > :last-child { margin-bottom:0; }
+article hr { height:1px; border:0; background:var(--line); margin:32px 0; }
+article :is(img,video) { max-width:100%; height:auto; border-radius:8px; }
+article table { display:block; max-width:100%; width:max-content; overflow:auto; border-collapse:collapse; margin:24px 0; font-size:14px; line-height:1.65; }
+article :is(td,th) { border:1px solid var(--line); padding:11px 15px; min-width:80px; }
+article th { background:var(--soft); color:var(--heading); font-weight:650; }
+article tr:nth-child(even) td { background:var(--soft); }
+article code { padding:.15em .38em; border-radius:4px; background:var(--soft); color:var(--heading); font: .87em/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; overflow-wrap:anywhere; }
+article pre { overflow:auto; padding:18px; background:var(--code); border-radius:8px; }
+article pre code { padding:0; background:none; font:inherit; overflow-wrap:normal; }
+.code-frame { position:relative; margin:22px 0; border:1px solid var(--line); border-radius:9px; overflow:hidden; background:var(--code); }
+.code-fold { margin:0; }
+.code-fold summary { padding:10px 100px 10px 16px; background:var(--soft); color:var(--muted); font-size:12px; line-height:22px; }
+.code-fold[open] summary { border-bottom:1px solid var(--line); }
+.code-fold pre { margin:0; padding:17px 18px; white-space:pre; overflow:auto; font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; border-radius:0; }
+.copy-code { position:absolute; right:9px; top:8px; padding:3px 9px; border:1px solid var(--line); border-radius:5px; color:var(--muted); background:var(--paper); font:12px/20px system-ui,sans-serif; }
+.copy-code:hover { color:var(--accent); border-color:var(--accent); }
+.article-footer { display:flex; justify-content:space-between; gap:16px; padding-top:22px; margin-top:42px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.article-footer a { text-decoration:none; }
+.article-toc { position:fixed; left:calc(50% + 320px); top:62px; width:220px; font-size:12px; line-height:1.65; }
+.article-toc summary { padding:0 10px 14px; color:var(--heading); font-weight:650; }
+.article-toc nav { max-height:calc(100vh - 180px); overflow:auto; scrollbar-width:thin; scrollbar-color:var(--line) transparent; border-left:1px solid var(--line); }
+.article-toc nav a { display:block; padding:6px 12px; color:var(--muted); text-decoration:none; border-left:2px solid transparent; margin-left:-1px; overflow-wrap:anywhere; }
+.article-toc nav a:hover { color:var(--heading); }
+.article-toc nav a[aria-current] { color:var(--accent); border-left-color:var(--accent); background:var(--soft); }
+.back-top { position:fixed; right:24px; bottom:24px; border:1px solid var(--line); border-radius:8px; background:var(--paper); padding:7px 12px; text-decoration:none; font-size:12px; box-shadow:0 3px 12px #00000005; }
+@media(min-width:1200px) { .has-toc main { width:820px; margin-left:calc(50% - 540px); margin-right:0; } }
+@media(max-width:1199px) { .article-toc { left:auto; right:20px; top:auto; bottom:74px; width:min(280px,calc(100% - 40px)); padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:10px; z-index:20; box-shadow:0 8px 32px #0000000d; } .article-toc summary { padding:0; } .article-toc[open] summary { padding-bottom:10px; } .article-toc nav { max-height:40vh; } }
+@media(max-width:600px) { body { font-size:15px; } main { width:100%; margin:0 0 90px; padding:22px 22px 28px; border:0; border-radius:0; box-shadow:none; } body { background:var(--paper); } .page-nav { gap:12px; padding-bottom:20px; } .nav-actions { gap:10px; font-size:12px; } .article-header { padding:26px 0 22px; margin-bottom:24px; } .article-title { font-size:28px; } article h1 { font-size:24px; } article h2 { font-size:21px; } article table { font-size:13px; } article :is(td,th) { padding:9px 11px; } .back-top { right:20px; bottom:20px; } }
+
+/* One small AdSense unit after the article body; keep it separate from reading content. */
+.article-ad { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; width:100%; margin:36px auto 0; padding-top:18px; border-top:1px solid var(--line); }
+.article-ad-label { color:var(--muted); font-size:10px; line-height:1.2; letter-spacing:.08em; text-transform:uppercase; }
+.article-ad .adsbygoogle { display:block!important; width:100%!important; max-width:300px!important; min-width:0!important; height:50px; }
+
+/* Desktop-only WXM toolbox drawer shared with the homepage. */
+#desktopBtvDrawer{position:fixed;inset:0;z-index:2147483000;pointer-events:none;isolation:isolate;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#desktopBtvDrawer .btv-tab{pointer-events:auto;position:absolute;right:0;top:50%;transform:translateY(-50%);width:42px;height:104px;border:1px solid rgba(148,163,184,.2);border-right:0;border-radius:14px 0 0 14px;background:rgba(15,23,42,.94);color:#cbd5e1;box-shadow:0 8px 24px rgba(0,0,0,.24);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:background .2s,width .2s,border-color .2s,color .2s}
+#desktopBtvDrawer .btv-tab:hover{width:46px;background:rgba(30,41,59,.98);border-color:rgba(148,163,184,.38);color:#f8fafc}
+#desktopBtvDrawer .btv-tab:focus-visible{outline:2px solid rgba(148,163,184,.65);outline-offset:3px}
+#desktopBtvDrawer .btv-tab svg{width:19px;height:19px}
+#desktopBtvDrawer .btv-tab span{writing-mode:vertical-rl;letter-spacing:1.5px;font-size:11px;font-weight:650}
+#desktopBtvDrawer .btv-shade{position:absolute;inset:0;background:rgba(2,6,23,.16);opacity:0;visibility:hidden;transition:opacity .28s,visibility .28s;pointer-events:none}
+#desktopBtvDrawer .btv-panel{position:fixed;top:0;right:0;bottom:0;left:auto;width:min(380px,100vw);max-width:380px;box-sizing:border-box;border:1px solid rgba(148,163,184,.2);border-right:0;border-radius:16px 0 0 16px;background:#080c12;box-shadow:-16px 0 42px rgba(0,0,0,.34);overflow:hidden;opacity:0;visibility:hidden;transform:translateX(100%);transition:transform .32s cubic-bezier(.22,.8,.25,1),opacity .2s ease,visibility .32s;pointer-events:none;display:flex;flex-direction:column}
+#desktopBtvDrawer.is-open .btv-shade{opacity:1;visibility:visible;pointer-events:auto}
+#desktopBtvDrawer.is-open .btv-panel{opacity:1;visibility:visible;transform:translateX(0);pointer-events:auto}
+#desktopBtvDrawer .btv-panel-head{height:46px;flex:0 0 46px;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 16px;background:linear-gradient(180deg,#111925,#0c121b);border-bottom:1px solid rgba(148,163,184,.14);color:#e2e8f0;font-size:13px;font-weight:650;letter-spacing:.2px}
+#desktopBtvDrawer .btv-panel-close{width:30px;height:30px;display:grid;place-items:center;border:1px solid rgba(148,163,184,.2);border-radius:9px;background:rgba(255,255,255,.045);color:#cbd5e1;font-size:19px;line-height:1;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
+#desktopBtvDrawer .btv-panel-close:hover{border-color:rgba(248,113,113,.38);background:rgba(248,113,113,.1);color:#fecaca}
+#desktopBtvDrawer iframe{display:block;flex:1;width:100%;height:calc(100% - 46px);min-height:0;border:0;background:#030303}
+@media(max-width:768px),(hover:none) and (pointer:coarse){#desktopBtvDrawer{display:none!important}}
+@media(prefers-reduced-motion:reduce){#desktopBtvDrawer *{transition:none!important}}
+
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print { body,main { background:white; color:black; } main,.has-toc main { width:100%; margin:0; border:0; padding:0; box-shadow:none; } .page-nav,.article-toc,.back-top,.copy-code,.article-footer { display:none; } }
+
+/* Article layout refinement: a wider reading column and a calmer title scale. */
+@media(min-width:1200px) {
+  .has-toc main {
+    width:880px;
+    margin-left:calc(50% - 570px);
+    margin-right:0;
+  }
+  .article-toc {
+    left:calc(50% + 350px);
+    width:220px;
+  }
+  .article-title {
+    font-size:clamp(28px,2.15vw,33px);
+    line-height:1.3;
+    letter-spacing:-.025em;
+  }
+}
+
+/* On touch/tablet widths, keep the collapsed TOC as a compact floating chip. */
+@media(max-width:1199px) {
+  .article-toc {
+    left:auto;
+    right:16px;
+    top:auto;
+    bottom:76px;
+    width:fit-content;
+    max-width:calc(100vw - 32px);
+    padding:9px 13px;
+    border-radius:12px;
+  }
+  .article-toc:not([open]) {
+    width:fit-content;
+    min-width:0;
+  }
+  .article-toc:not([open]) summary {
+    padding:0;
+    white-space:nowrap;
+  }
+  .article-toc[open] {
+    width:min(320px,calc(100vw - 32px));
+    padding:12px;
+  }
+  .article-toc[open] summary {
+    padding:0 0 10px;
+  }
+  .article-toc nav {
+    max-height:min(45vh,360px);
+    overflow:auto;
+  }
+}
+
+@media(max-width:600px) {
+  .article-title {
+    font-size:25px;
+    line-height:1.35;
+    letter-spacing:-.02em;
+  }
+  .article-toc {
+    right:14px;
+    bottom:72px;
+    padding:9px 12px;
+  }
+  .article-toc[open] {
+    width:min(320px,calc(100vw - 28px));
+  }
+  .article-toc nav {
+    max-height:42vh;
+  }
+}
+
+</style></head><body><main id="article-top">
+<nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
+<div class="nav-actions"><a href="https://github.com/feeday/cpuck.com/issues/19">编辑原文</a><a href="/data/md/19.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
+<header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">文件名处理</h1>
+<div class="article-meta"><span>更新于 <time datetime="2026-11-08T14:11:42Z">2026年11月08日 22:11</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article><p dir="auto">按表修改文件名</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="
+# -*- coding: utf-8 -*-
+&quot;&quot;&quot;
+文件批量命名工作流
+
+第一步：选择目录，递归扫描文件
+第二步：导出 TXT 文件清单
+第三步：自动生成 XLSX 人工核对表
+第四步：人工填写 B 列新文件名
+第五步：重新选择 XLSX，预览并批量重命名
+
+A列：原文件名
+B列：新文件名
+C列：原文件完整路径（辅助定位）
+&quot;&quot;&quot;
+
+import os
+import csv
+import uuid
+import tkinter as tk
+
+from pathlib import Path
+from datetime import datetime
+from collections import defaultdict
+from tkinter import filedialog, messagebox, ttk
+
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.utils import get_column_letter
+
+
+class RenameTool:
+
+    def __init__(self, root):
+        self.root = root
+        self.root.title(&quot;Excel 批量文件命名工具&quot;)
+        self.root.geometry(&quot;950x720&quot;)
+
+        self.folder = &quot;&quot;
+        self.xlsx = &quot;&quot;
+        self.plans = []
+        self.issues = []
+
+        self.build_ui()
+
+    def build_ui(self):
+
+        main = ttk.Frame(self.root, padding=15)
+        main.pack(fill=&quot;both&quot;, expand=True)
+
+        ttk.Label(
+            main,
+            text=&quot;文件批量命名工作流&quot;,
+            font=(&quot;Microsoft YaHei&quot;, 16, &quot;bold&quot;)
+        ).pack(anchor=&quot;w&quot;, pady=10)
+
+        ttk.Label(
+            main,
+            text=&quot;第一步：选择需要整理的目录，导出 TXT 和 XLSX&quot;
+        ).pack(anchor=&quot;w&quot;)
+
+        row1 = ttk.Frame(main)
+        row1.pack(fill=&quot;x&quot;, pady=6)
+
+        ttk.Button(
+            row1,
+            text=&quot;① 选择目录并导出清单&quot;,
+            command=self.export_files
+        ).pack(side=&quot;left&quot;)
+
+        ttk.Label(
+            main,
+            text=&quot;第二步：选择人工核对、修改后的 XLSX 表格&quot;
+        ).pack(anchor=&quot;w&quot;, pady=(20, 0))
+
+        row2 = ttk.Frame(main)
+        row2.pack(fill=&quot;x&quot;, pady=6)
+
+        self.xlsx_label = ttk.Label(
+            row2,
+            text=&quot;尚未选择 XLSX 文件&quot;
+        )
+        self.xlsx_label.pack(side=&quot;left&quot;, fill=&quot;x&quot;, expand=True)
+
+        ttk.Button(
+            row2,
+            text=&quot;选择 XLSX&quot;,
+            command=self.select_xlsx
+        ).pack(side=&quot;left&quot;, padx=5)
+
+        row3 = ttk.Frame(main)
+        row3.pack(fill=&quot;x&quot;, pady=12)
+
+        ttk.Button(
+            row3,
+            text=&quot;② 预览重命名&quot;,
+            command=self.preview
+        ).pack(side=&quot;left&quot;, padx=5)
+
+        ttk.Button(
+            row3,
+            text=&quot;③ 确认批量改名&quot;,
+            command=self.execute
+        ).pack(side=&quot;left&quot;, padx=5)
+
+        ttk.Button(
+            row3,
+            text=&quot;清空日志&quot;,
+            command=self.clear_log
+        ).pack(side=&quot;left&quot;, padx=5)
+
+        self.status = ttk.Label(
+            main,
+            text=&quot;等待操作&quot;
+        )
+        self.status.pack(anchor=&quot;w&quot;, pady=5)
+
+        self.output = tk.Text(
+            main,
+            font=(&quot;Consolas&quot;, 10),
+            wrap=&quot;none&quot;
+        )
+        self.output.pack(fill=&quot;both&quot;, expand=True)
+
+        scroll = ttk.Scrollbar(
+            self.output,
+            orient=&quot;vertical&quot;,
+            command=self.output.yview
+        )
+        scroll.pack(side=&quot;right&quot;, fill=&quot;y&quot;)
+
+        self.output.configure(
+            yscrollcommand=scroll.set
+        )
+
+    def log(self, msg):
+        self.output.insert(&quot;end&quot;, msg + &quot;\n&quot;)
+        self.output.see(&quot;end&quot;)
+        self.root.update_idletasks()
+
+    def clear_log(self):
+        self.output.delete(&quot;1.0&quot;, &quot;end&quot;)
+
+    # ==========================
+    # 第一步：导出 TXT 和 XLSX
+    # ==========================
+
+    def export_files(self):
+
+        folder = filedialog.askdirectory(
+            title=&quot;选择需要扫描的文件夹&quot;
+        )
+
+        if not folder:
+            return
+
+        self.folder = str(Path(folder).resolve())
+
+        root_path = Path(self.folder)
+
+        self.clear_log()
+
+        self.log(&quot;开始递归扫描目录...&quot;)
+
+        files = []
+
+        excluded = {
+            &quot;文件清单.txt&quot;,
+            &quot;重命名核对表.xlsx&quot;
+        }
+
+        for current, dirs, filenames in os.walk(root_path):
+
+            # 排除常见隐藏目录
+            dirs[:] = [
+                d for d in dirs
+                if d not in {&quot;$RECYCLE.BIN&quot;, &quot;System Volume Information&quot;}
+            ]
+
+            for filename in filenames:
+
+                if filename in excluded:
+                    continue
+
+                path = Path(current) / filename
+
+                try:
+                    if path.is_file():
+                        files.append(path.resolve())
+                except OSError:
+                    continue
+
+        files.sort(key=lambda p: str(p).lower())
+
+        if not files:
+            messagebox.showwarning(
+                &quot;提示&quot;,
+                &quot;目录中没有找到文件&quot;
+            )
+            return
+
+        txt_path = root_path / &quot;文件清单.txt&quot;
+        xlsx_path = root_path / &quot;重命名核对表.xlsx&quot;
+
+        try:
+
+            # 导出 TXT
+            with open(
+                txt_path,
+                &quot;w&quot;,
+                encoding=&quot;utf-8-sig&quot;
+            ) as f:
+
+                for path in files:
+                    f.write(str(path) + &quot;\n&quot;)
+
+            # 生成 XLSX
+            wb = Workbook()
+            ws = wb.active
+            ws.title = &quot;重命名核对表&quot;
+
+            headers = [
+                &quot;原文件名&quot;,
+                &quot;新文件名（人工填写）&quot;,
+                &quot;原文件完整路径&quot;
+            ]
+
+            ws.append(headers)
+
+            for path in files:
+
+                ws.append([
+                    path.name,
+                    &quot;&quot;,
+                    str(path)
+                ])
+
+            # 表格样式
+            header_fill = PatternFill(
+                &quot;solid&quot;,
+                fgColor=&quot;2878B5&quot;
+            )
+
+            for cell in ws[1]:
+                cell.font = Font(
+                    bold=True,
+                    color=&quot;FFFFFF&quot;
+                )
+                cell.fill = header_fill
+                cell.alignment = Alignment(
+                    horizontal=&quot;center&quot;
+                )
+
+            ws.column_dimensions[&quot;A&quot;].width = 35
+            ws.column_dimensions[&quot;B&quot;].width = 40
+            ws.column_dimensions[&quot;C&quot;].width = 90
+
+            ws.freeze_panes = &quot;A2&quot;
+            ws.auto_filter.ref = ws.dimensions
+
+            # B列设置醒目的人工填写颜色
+            for row in range(2, len(files) + 2):
+                ws.cell(row, 2).fill = PatternFill(
+                    &quot;solid&quot;,
+                    fgColor=&quot;FFF2CC&quot;
+                )
+
+            wb.save(xlsx_path)
+            wb.close()
+
+            self.xlsx = str(xlsx_path)
+            self.xlsx_label.config(
+                text=str(xlsx_path)
+            )
+
+            self.log(&quot;========== 导出完成 ==========&quot;)
+            self.log(f&quot;扫描目录：{root_path}&quot;)
+            self.log(f&quot;文件总数：{len(files)}&quot;)
+            self.log(f&quot;TXT：{txt_path}&quot;)
+            self.log(f&quot;XLSX：{xlsx_path}&quot;)
+            self.log(&quot;&quot;)
+            self.log(&quot;请打开 XLSX，人工填写 B 列新文件名。&quot;)
+            self.log(&quot;A 列和 C 列不要修改。&quot;)
+
+            self.status.config(
+                text=f&quot;清单导出完成，共 {len(files)} 个文件&quot;
+            )
+
+            messagebox.showinfo(
+                &quot;导出完成&quot;,
+                f&quot;扫描文件：{len(files)} 个\n\n&quot;
+                f&quot;已生成：\n&quot;
+                f&quot;1. 文件清单.txt\n&quot;
+                f&quot;2. 重命名核对表.xlsx\n\n&quot;
+                f&quot;请人工填写 Excel 的 B 列。&quot;
+            )
+
+        except Exception as e:
+
+            messagebox.showerror(
+                &quot;导出失败&quot;,
+                str(e)
+            )
+
+    # ==========================
+    # 第二步：选择 XLSX
+    # ==========================
+
+    def select_xlsx(self):
+
+        path = filedialog.askopenfilename(
+            title=&quot;选择人工核对后的 XLSX&quot;,
+            filetypes=[(&quot;Excel 文件&quot;, &quot;*.xlsx&quot;)]
+        )
+
+        if path:
+            self.xlsx = path
+            self.xlsx_label.config(text=path)
+
+    # ==========================
+    # 读取 Excel
+    # ==========================
+
+    def read_excel(self):
+
+        if not self.xlsx:
+            raise ValueError(&quot;请先选择 XLSX 文件&quot;)
+
+        wb = load_workbook(
+            self.xlsx,
+            read_only=True,
+            data_only=True
+        )
+
+        ws = wb.active
+
+        plans = []
+        issues = []
+
+        try:
+
+            for row_num, row in enumerate(
+                ws.iter_rows(
+                    min_row=2,
+                    min_col=1,
+                    max_col=3,
+                    values_only=True
+                ),
+                start=2
+            ):
+
+                old, new, full_path = row
+
+                if old is None:
+                    continue
+
+                old = str(old).strip()
+
+                if not old:
+                    continue
+
+                # B列为空，视为不需要改名
+                if new is None or not str(new).strip():
+                    continue
+
+                new = str(new).strip()
+
+                # 优先使用 C 列完整路径定位
+                if full_path and str(full_path).strip():
+                    source = Path(str(full_path).strip())
+                else:
+                    issues.append(
+                        f&quot;[缺少原路径] Excel 第 {row_num} 行&quot;
+                    )
+                    continue
+
+                # 防止路径或文件名非法
+                if (
+                    Path(new).name != new
+                    or &quot;/&quot; in new
+                    or &quot;\\&quot; in new
+                    or any(c in new for c in '&lt;&gt;:&quot;|?*')
+                    or new in {&quot;.&quot;, &quot;..&quot;}
+                ):
+                    issues.append(
+                        f&quot;[新文件名非法] 第 {row_num} 行：{new}&quot;
+                    )
+                    continue
+
+                # 如果新名称没有扩展名，保留原扩展名
+                if not Path(new).suffix:
+                    new += source.suffix
+
+                target = source.with_name(new)
+
+                if source.name != old:
+                    issues.append(
+                        f&quot;[原文件名与路径不一致] {source}&quot;
+                    )
+                    continue
+
+                if not source.is_file():
+                    issues.append(
+                        f&quot;[文件不存在] {source}&quot;
+                    )
+                    continue
+
+                if source == target:
+                    issues.append(
+                        f&quot;[无需改名] {old}&quot;
+                    )
+                    continue
+
+                plans.append({
+                    &quot;old&quot;: old,
+                    &quot;new&quot;: new,
+                    &quot;source&quot;: source,
+                    &quot;target&quot;: target,
+                    &quot;row&quot;: row_num
+                })
+
+        finally:
+            wb.close()
+
+        return plans, issues
+
+    # ==========================
+    # 第三步：预览
+    # ==========================
+
+    def preview(self):
+
+        self.clear_log()
+
+        try:
+
+            plans, issues = self.read_excel()
+
+            self.issues = issues
+
+            # 检查目标路径重复
+            target_groups = defaultdict(list)
+
+            for p in plans:
+                key = os.path.normcase(
+                    os.path.abspath(str(p[&quot;target&quot;]))
+                )
+                target_groups[key].append(p)
+
+            duplicate_targets = {
+                key for key, group in target_groups.items()
+                if len(group) &gt; 1
+            }
+
+            source_set = {
+                os.path.normcase(
+                    os.path.abspath(str(p[&quot;source&quot;]))
+                )
+                for p in plans
+            }
+
+            valid = []
+
+            for p in plans:
+
+                target_key = os.path.normcase(
+                    os.path.abspath(str(p[&quot;target&quot;]))
+                )
+
+                if target_key in duplicate_targets:
+                    issues.append(
+                        f&quot;[目标文件名重复] {p['new']}&quot;
+                    )
+                    continue
+
+                # 已存在的目标文件，如果不是本批次参与改名的源文件则跳过
+                if (
+                    p[&quot;target&quot;].exists()
+                    and target_key not in source_set
+                ):
+                    issues.append(
+                        f&quot;[目标文件已存在] {p['target']}&quot;
+                    )
+                    continue
+
+                valid.append(p)
+
+            self.plans = valid
+
+            self.log(&quot;========== 重命名预览 ==========&quot;)
+
+            for p in valid:
+                self.log(
+                    f&quot;[待改名] {p['old']}  -&gt;  {p['new']}&quot;
+                )
+
+            for issue in issues:
+                self.log(issue)
+
+            self.log(&quot;--------------------------------&quot;)
+            self.log(f&quot;待改名：{len(valid)}&quot;)
+            self.log(f&quot;跳过/异常：{len(issues)}&quot;)
+
+            self.status.config(
+                text=f&quot;预览完成：{len(valid)} 个待改名&quot;
+            )
+
+        except Exception as e:
+
+            messagebox.showerror(
+                &quot;读取失败&quot;,
+                str(e)
+            )
+
+    # ==========================
+    # 第四步：执行改名
+    # ==========================
+
+    def execute(self):
+
+        if not self.plans:
+            messagebox.showwarning(
+                &quot;提示&quot;,
+                &quot;请先预览重命名清单&quot;
+            )
+            return
+
+        if not messagebox.askyesno(
+            &quot;确认执行&quot;,
+            f&quot;本次准备修改 {len(self.plans)} 个文件。\n\n&quot;
+            &quot;请确认 Excel 已经核对无误。\n&quot;
+            &quot;建议提前备份原文件。\n\n&quot;
+            &quot;确定开始吗？&quot;
+        ):
+            return
+
+        staged = []
+        completed = []
+
+        try:
+
+            # 第一阶段：全部改成临时名称
+            # 允许批量交换文件名，例如 A-&gt;B、B-&gt;A
+
+            for p in self.plans:
+
+                source = p[&quot;source&quot;]
+
+                if not source.is_file():
+                    raise FileNotFoundError(
+                        f&quot;源文件不存在：{source}&quot;
+                    )
+
+                temp = source.with_name(
+                    &quot;__rename_tmp_&quot;
+                    + uuid.uuid4().hex
+                    + &quot;.tmp&quot;
+                )
+
+                source.rename(temp)
+
+                staged.append({
+                    &quot;temp&quot;: temp,
+                    &quot;source&quot;: source,
+                    &quot;target&quot;: p[&quot;target&quot;],
+                    &quot;plan&quot;: p
+                })
+
+            # 第二阶段：临时文件改成最终名称
+
+            for item in staged:
+
+                item[&quot;temp&quot;].rename(item[&quot;target&quot;])
+                completed.append(item)
+
+            self.log(&quot;&quot;)
+            self.log(&quot;========== 全部改名成功 ==========&quot;)
+
+            for item in completed:
+                self.log(
+                    f&quot;[成功] {item['plan']['old']} &quot;
+                    f&quot;-&gt; {item['plan']['new']}&quot;
+                )
+
+            self.save_log(completed, &quot;成功&quot;)
+
+            self.status.config(
+                text=f&quot;执行完成：成功 {len(completed)} 个&quot;
+            )
+
+            messagebox.showinfo(
+                &quot;完成&quot;,
+                f&quot;批量重命名完成！\n\n&quot;
+                f&quot;成功：{len(completed)} 个文件\n&quot;
+                f&quot;日志已保存到原目录。&quot;
+            )
+
+            self.plans = []
+
+        except Exception as e:
+
+            self.log(f&quot;[执行失败] {e}&quot;)
+            self.log(&quot;[正在尝试回滚]&quot;)
+
+            # 回滚已经完成的目标文件和临时文件
+            for item in reversed(staged):
+
+                try:
+
+                    if item[&quot;target&quot;].exists():
+                        item[&quot;target&quot;].rename(item[&quot;source&quot;])
+
+                    elif item[&quot;temp&quot;].exists():
+                        item[&quot;temp&quot;].rename(item[&quot;source&quot;])
+
+                except Exception as rollback_error:
+
+                    self.log(
+                        f&quot;[回滚失败] {item['source']}：&quot;
+                        f&quot;{rollback_error}&quot;
+                    )
+
+            messagebox.showerror(
+                &quot;执行失败&quot;,
+                f&quot;{e}\n\n已尝试回滚，请检查日志和文件。&quot;
+            )
+
+            self.status.config(
+                text=&quot;执行失败，请检查日志&quot;
+            )
+
+    # ==========================
+    # 保存日志
+    # ==========================
+
+    def save_log(self, completed, status):
+
+        if self.folder:
+            output_dir = Path(self.folder)
+        else:
+            output_dir = Path(self.xlsx).parent
+
+        log_path = output_dir / (
+            &quot;批量重命名日志_&quot;
+            + datetime.now().strftime(&quot;%Y%m%d_%H%M%S&quot;)
+            + &quot;.csv&quot;
+        )
+
+        with open(
+            log_path,
+            &quot;w&quot;,
+            newline=&quot;&quot;,
+            encoding=&quot;utf-8-sig&quot;
+        ) as f:
+
+            writer = csv.writer(f)
+
+            writer.writerow([
+                &quot;原文件名&quot;,
+                &quot;新文件名&quot;,
+                &quot;原文件路径&quot;,
+                &quot;新文件路径&quot;,
+                &quot;状态&quot;
+            ])
+
+            for item in completed:
+
+                p = item[&quot;plan&quot;]
+
+                writer.writerow([
+                    p[&quot;old&quot;],
+                    p[&quot;new&quot;],
+                    str(item[&quot;source&quot;]),
+                    str(item[&quot;target&quot;]),
+                    status
+                ])
+
+        self.log(f&quot;[日志] {log_path}&quot;)
+
+
+if __name__ == &quot;__main__&quot;:
+
+    root = tk.Tk()
+    app = RenameTool(root)
+    root.mainloop()
+"><pre class="notranslate"><code class="notranslate">
+# -*- coding: utf-8 -*-
+"""
+文件批量命名工作流
+
+第一步：选择目录，递归扫描文件
+第二步：导出 TXT 文件清单
+第三步：自动生成 XLSX 人工核对表
+第四步：人工填写 B 列新文件名
+第五步：重新选择 XLSX，预览并批量重命名
+
+A列：原文件名
+B列：新文件名
+C列：原文件完整路径（辅助定位）
+"""
+
+import os
+import csv
+import uuid
+import tkinter as tk
+
+from pathlib import Path
+from datetime import datetime
+from collections import defaultdict
+from tkinter import filedialog, messagebox, ttk
+
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.utils import get_column_letter
+
+
+class RenameTool:
+
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Excel 批量文件命名工具")
+        self.root.geometry("950x720")
+
+        self.folder = ""
+        self.xlsx = ""
+        self.plans = []
+        self.issues = []
+
+        self.build_ui()
+
+    def build_ui(self):
+
+        main = ttk.Frame(self.root, padding=15)
+        main.pack(fill="both", expand=True)
+
+        ttk.Label(
+            main,
+            text="文件批量命名工作流",
+            font=("Microsoft YaHei", 16, "bold")
+        ).pack(anchor="w", pady=10)
+
+        ttk.Label(
+            main,
+            text="第一步：选择需要整理的目录，导出 TXT 和 XLSX"
+        ).pack(anchor="w")
+
+        row1 = ttk.Frame(main)
+        row1.pack(fill="x", pady=6)
+
+        ttk.Button(
+            row1,
+            text="① 选择目录并导出清单",
+            command=self.export_files
+        ).pack(side="left")
+
+        ttk.Label(
+            main,
+            text="第二步：选择人工核对、修改后的 XLSX 表格"
+        ).pack(anchor="w", pady=(20, 0))
+
+        row2 = ttk.Frame(main)
+        row2.pack(fill="x", pady=6)
+
+        self.xlsx_label = ttk.Label(
+            row2,
+            text="尚未选择 XLSX 文件"
+        )
+        self.xlsx_label.pack(side="left", fill="x", expand=True)
+
+        ttk.Button(
+            row2,
+            text="选择 XLSX",
+            command=self.select_xlsx
+        ).pack(side="left", padx=5)
+
+        row3 = ttk.Frame(main)
+        row3.pack(fill="x", pady=12)
+
+        ttk.Button(
+            row3,
+            text="② 预览重命名",
+            command=self.preview
+        ).pack(side="left", padx=5)
+
+        ttk.Button(
+            row3,
+            text="③ 确认批量改名",
+            command=self.execute
+        ).pack(side="left", padx=5)
+
+        ttk.Button(
+            row3,
+            text="清空日志",
+            command=self.clear_log
+        ).pack(side="left", padx=5)
+
+        self.status = ttk.Label(
+            main,
+            text="等待操作"
+        )
+        self.status.pack(anchor="w", pady=5)
+
+        self.output = tk.Text(
+            main,
+            font=("Consolas", 10),
+            wrap="none"
+        )
+        self.output.pack(fill="both", expand=True)
+
+        scroll = ttk.Scrollbar(
+            self.output,
+            orient="vertical",
+            command=self.output.yview
+        )
+        scroll.pack(side="right", fill="y")
+
+        self.output.configure(
+            yscrollcommand=scroll.set
+        )
+
+    def log(self, msg):
+        self.output.insert("end", msg + "\n")
+        self.output.see("end")
+        self.root.update_idletasks()
+
+    def clear_log(self):
+        self.output.delete("1.0", "end")
+
+    # ==========================
+    # 第一步：导出 TXT 和 XLSX
+    # ==========================
+
+    def export_files(self):
+
+        folder = filedialog.askdirectory(
+            title="选择需要扫描的文件夹"
+        )
+
+        if not folder:
+            return
+
+        self.folder = str(Path(folder).resolve())
+
+        root_path = Path(self.folder)
+
+        self.clear_log()
+
+        self.log("开始递归扫描目录...")
+
+        files = []
+
+        excluded = {
+            "文件清单.txt",
+            "重命名核对表.xlsx"
+        }
+
+        for current, dirs, filenames in os.walk(root_path):
+
+            # 排除常见隐藏目录
+            dirs[:] = [
+                d for d in dirs
+                if d not in {"$RECYCLE.BIN", "System Volume Information"}
+            ]
+
+            for filename in filenames:
+
+                if filename in excluded:
+                    continue
+
+                path = Path(current) / filename
+
+                try:
+                    if path.is_file():
+                        files.append(path.resolve())
+                except OSError:
+                    continue
+
+        files.sort(key=lambda p: str(p).lower())
+
+        if not files:
+            messagebox.showwarning(
+                "提示",
+                "目录中没有找到文件"
+            )
+            return
+
+        txt_path = root_path / "文件清单.txt"
+        xlsx_path = root_path / "重命名核对表.xlsx"
+
+        try:
+
+            # 导出 TXT
+            with open(
+                txt_path,
+                "w",
+                encoding="utf-8-sig"
+            ) as f:
+
+                for path in files:
+                    f.write(str(path) + "\n")
+
+            # 生成 XLSX
+            wb = Workbook()
+            ws = wb.active
+            ws.title = "重命名核对表"
+
+            headers = [
+                "原文件名",
+                "新文件名（人工填写）",
+                "原文件完整路径"
+            ]
+
+            ws.append(headers)
+
+            for path in files:
+
+                ws.append([
+                    path.name,
+                    "",
+                    str(path)
+                ])
+
+            # 表格样式
+            header_fill = PatternFill(
+                "solid",
+                fgColor="2878B5"
+            )
+
+            for cell in ws[1]:
+                cell.font = Font(
+                    bold=True,
+                    color="FFFFFF"
+                )
+                cell.fill = header_fill
+                cell.alignment = Alignment(
+                    horizontal="center"
+                )
+
+            ws.column_dimensions["A"].width = 35
+            ws.column_dimensions["B"].width = 40
+            ws.column_dimensions["C"].width = 90
+
+            ws.freeze_panes = "A2"
+            ws.auto_filter.ref = ws.dimensions
+
+            # B列设置醒目的人工填写颜色
+            for row in range(2, len(files) + 2):
+                ws.cell(row, 2).fill = PatternFill(
+                    "solid",
+                    fgColor="FFF2CC"
+                )
+
+            wb.save(xlsx_path)
+            wb.close()
+
+            self.xlsx = str(xlsx_path)
+            self.xlsx_label.config(
+                text=str(xlsx_path)
+            )
+
+            self.log("========== 导出完成 ==========")
+            self.log(f"扫描目录：{root_path}")
+            self.log(f"文件总数：{len(files)}")
+            self.log(f"TXT：{txt_path}")
+            self.log(f"XLSX：{xlsx_path}")
+            self.log("")
+            self.log("请打开 XLSX，人工填写 B 列新文件名。")
+            self.log("A 列和 C 列不要修改。")
+
+            self.status.config(
+                text=f"清单导出完成，共 {len(files)} 个文件"
+            )
+
+            messagebox.showinfo(
+                "导出完成",
+                f"扫描文件：{len(files)} 个\n\n"
+                f"已生成：\n"
+                f"1. 文件清单.txt\n"
+                f"2. 重命名核对表.xlsx\n\n"
+                f"请人工填写 Excel 的 B 列。"
+            )
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "导出失败",
+                str(e)
+            )
+
+    # ==========================
+    # 第二步：选择 XLSX
+    # ==========================
+
+    def select_xlsx(self):
+
+        path = filedialog.askopenfilename(
+            title="选择人工核对后的 XLSX",
+            filetypes=[("Excel 文件", "*.xlsx")]
+        )
+
+        if path:
+            self.xlsx = path
+            self.xlsx_label.config(text=path)
+
+    # ==========================
+    # 读取 Excel
+    # ==========================
+
+    def read_excel(self):
+
+        if not self.xlsx:
+            raise ValueError("请先选择 XLSX 文件")
+
+        wb = load_workbook(
+            self.xlsx,
+            read_only=True,
+            data_only=True
+        )
+
+        ws = wb.active
+
+        plans = []
+        issues = []
+
+        try:
+
+            for row_num, row in enumerate(
+                ws.iter_rows(
+                    min_row=2,
+                    min_col=1,
+                    max_col=3,
+                    values_only=True
+                ),
+                start=2
+            ):
+
+                old, new, full_path = row
+
+                if old is None:
+                    continue
+
+                old = str(old).strip()
+
+                if not old:
+                    continue
+
+                # B列为空，视为不需要改名
+                if new is None or not str(new).strip():
+                    continue
+
+                new = str(new).strip()
+
+                # 优先使用 C 列完整路径定位
+                if full_path and str(full_path).strip():
+                    source = Path(str(full_path).strip())
+                else:
+                    issues.append(
+                        f"[缺少原路径] Excel 第 {row_num} 行"
+                    )
+                    continue
+
+                # 防止路径或文件名非法
+                if (
+                    Path(new).name != new
+                    or "/" in new
+                    or "\\" in new
+                    or any(c in new for c in '&lt;&gt;:"|?*')
+                    or new in {".", ".."}
+                ):
+                    issues.append(
+                        f"[新文件名非法] 第 {row_num} 行：{new}"
+                    )
+                    continue
+
+                # 如果新名称没有扩展名，保留原扩展名
+                if not Path(new).suffix:
+                    new += source.suffix
+
+                target = source.with_name(new)
+
+                if source.name != old:
+                    issues.append(
+                        f"[原文件名与路径不一致] {source}"
+                    )
+                    continue
+
+                if not source.is_file():
+                    issues.append(
+                        f"[文件不存在] {source}"
+                    )
+                    continue
+
+                if source == target:
+                    issues.append(
+                        f"[无需改名] {old}"
+                    )
+                    continue
+
+                plans.append({
+                    "old": old,
+                    "new": new,
+                    "source": source,
+                    "target": target,
+                    "row": row_num
+                })
+
+        finally:
+            wb.close()
+
+        return plans, issues
+
+    # ==========================
+    # 第三步：预览
+    # ==========================
+
+    def preview(self):
+
+        self.clear_log()
+
+        try:
+
+            plans, issues = self.read_excel()
+
+            self.issues = issues
+
+            # 检查目标路径重复
+            target_groups = defaultdict(list)
+
+            for p in plans:
+                key = os.path.normcase(
+                    os.path.abspath(str(p["target"]))
+                )
+                target_groups[key].append(p)
+
+            duplicate_targets = {
+                key for key, group in target_groups.items()
+                if len(group) &gt; 1
+            }
+
+            source_set = {
+                os.path.normcase(
+                    os.path.abspath(str(p["source"]))
+                )
+                for p in plans
+            }
+
+            valid = []
+
+            for p in plans:
+
+                target_key = os.path.normcase(
+                    os.path.abspath(str(p["target"]))
+                )
+
+                if target_key in duplicate_targets:
+                    issues.append(
+                        f"[目标文件名重复] {p['new']}"
+                    )
+                    continue
+
+                # 已存在的目标文件，如果不是本批次参与改名的源文件则跳过
+                if (
+                    p["target"].exists()
+                    and target_key not in source_set
+                ):
+                    issues.append(
+                        f"[目标文件已存在] {p['target']}"
+                    )
+                    continue
+
+                valid.append(p)
+
+            self.plans = valid
+
+            self.log("========== 重命名预览 ==========")
+
+            for p in valid:
+                self.log(
+                    f"[待改名] {p['old']}  -&gt;  {p['new']}"
+                )
+
+            for issue in issues:
+                self.log(issue)
+
+            self.log("--------------------------------")
+            self.log(f"待改名：{len(valid)}")
+            self.log(f"跳过/异常：{len(issues)}")
+
+            self.status.config(
+                text=f"预览完成：{len(valid)} 个待改名"
+            )
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "读取失败",
+                str(e)
+            )
+
+    # ==========================
+    # 第四步：执行改名
+    # ==========================
+
+    def execute(self):
+
+        if not self.plans:
+            messagebox.showwarning(
+                "提示",
+                "请先预览重命名清单"
+            )
+            return
+
+        if not messagebox.askyesno(
+            "确认执行",
+            f"本次准备修改 {len(self.plans)} 个文件。\n\n"
+            "请确认 Excel 已经核对无误。\n"
+            "建议提前备份原文件。\n\n"
+            "确定开始吗？"
+        ):
+            return
+
+        staged = []
+        completed = []
+
+        try:
+
+            # 第一阶段：全部改成临时名称
+            # 允许批量交换文件名，例如 A-&gt;B、B-&gt;A
+
+            for p in self.plans:
+
+                source = p["source"]
+
+                if not source.is_file():
+                    raise FileNotFoundError(
+                        f"源文件不存在：{source}"
+                    )
+
+                temp = source.with_name(
+                    "__rename_tmp_"
+                    + uuid.uuid4().hex
+                    + ".tmp"
+                )
+
+                source.rename(temp)
+
+                staged.append({
+                    "temp": temp,
+                    "source": source,
+                    "target": p["target"],
+                    "plan": p
+                })
+
+            # 第二阶段：临时文件改成最终名称
+
+            for item in staged:
+
+                item["temp"].rename(item["target"])
+                completed.append(item)
+
+            self.log("")
+            self.log("========== 全部改名成功 ==========")
+
+            for item in completed:
+                self.log(
+                    f"[成功] {item['plan']['old']} "
+                    f"-&gt; {item['plan']['new']}"
+                )
+
+            self.save_log(completed, "成功")
+
+            self.status.config(
+                text=f"执行完成：成功 {len(completed)} 个"
+            )
+
+            messagebox.showinfo(
+                "完成",
+                f"批量重命名完成！\n\n"
+                f"成功：{len(completed)} 个文件\n"
+                f"日志已保存到原目录。"
+            )
+
+            self.plans = []
+
+        except Exception as e:
+
+            self.log(f"[执行失败] {e}")
+            self.log("[正在尝试回滚]")
+
+            # 回滚已经完成的目标文件和临时文件
+            for item in reversed(staged):
+
+                try:
+
+                    if item["target"].exists():
+                        item["target"].rename(item["source"])
+
+                    elif item["temp"].exists():
+                        item["temp"].rename(item["source"])
+
+                except Exception as rollback_error:
+
+                    self.log(
+                        f"[回滚失败] {item['source']}："
+                        f"{rollback_error}"
+                    )
+
+            messagebox.showerror(
+                "执行失败",
+                f"{e}\n\n已尝试回滚，请检查日志和文件。"
+            )
+
+            self.status.config(
+                text="执行失败，请检查日志"
+            )
+
+    # ==========================
+    # 保存日志
+    # ==========================
+
+    def save_log(self, completed, status):
+
+        if self.folder:
+            output_dir = Path(self.folder)
+        else:
+            output_dir = Path(self.xlsx).parent
+
+        log_path = output_dir / (
+            "批量重命名日志_"
+            + datetime.now().strftime("%Y%m%d_%H%M%S")
+            + ".csv"
+        )
+
+        with open(
+            log_path,
+            "w",
+            newline="",
+            encoding="utf-8-sig"
+        ) as f:
+
+            writer = csv.writer(f)
+
+            writer.writerow([
+                "原文件名",
+                "新文件名",
+                "原文件路径",
+                "新文件路径",
+                "状态"
+            ])
+
+            for item in completed:
+
+                p = item["plan"]
+
+                writer.writerow([
+                    p["old"],
+                    p["new"],
+                    str(item["source"]),
+                    str(item["target"]),
+                    status
+                ])
+
+        self.log(f"[日志] {log_path}")
+
+
+if __name__ == "__main__":
+
+    root = tk.Tk()
+    app = RenameTool(root)
+    root.mainloop()
+
+</code></pre></div></article>
+<aside class="article-ad" aria-label="Advertisements">
+<span class="article-ad-label">Advertisements</span>
+<ins class="adsbygoogle" style="display:inline-block;width:300px;height:50px" data-ad-client="ca-pub-1964437526797765" data-ad-slot="2282084339"></ins>
+</aside>
+<footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
+</main>
+
+<aside id="desktopBtvDrawer" aria-label="WXM 工具箱">
+  <button class="btv-tab" id="btvDrawerToggle" type="button" aria-expanded="false" aria-controls="btvDrawerPanel" aria-label="展开工具箱">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="m8 21 4-4 4 4M8 9h8M8 13h5"/></svg>
+    <span>工具箱</span>
+  </button>
+  <div class="btv-shade" id="btvDrawerShade"></div>
+  <section class="btv-panel" id="btvDrawerPanel" aria-hidden="true">
+    <div class="btv-panel-head"><span>工具箱</span><button class="btv-panel-close" id="btvDrawerClose" type="button" aria-label="关闭工具箱">×</button></div>
+    <iframe id="btvDrawerFrame" title="WXM 工具箱页面" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-downloads allow-top-navigation-by-user-activation"></iframe>
+  </section>
+</aside>
+<script>(() => {
+  const article = document.querySelector('article');
+  if (!article) return;
+  const adUnit = document.querySelector('.article-ad .adsbygoogle');
+  if (adUnit) {
+    try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch {}
+  }
+
+  // Match the homepage WXM toolbox drawer on desktop article pages.
+  const drawer = document.getElementById('desktopBtvDrawer');
+  if (drawer) {
+    const toggle = drawer.querySelector('#btvDrawerToggle');
+    const panel = drawer.querySelector('#btvDrawerPanel');
+    const frame = drawer.querySelector('#btvDrawerFrame');
+    const close = drawer.querySelector('#btvDrawerClose');
+    const shade = drawer.querySelector('#btvDrawerShade');
+    let loaded = false;
+    let savedScrollStyles = null;
+
+    function lockPageScroll() {
+      if (savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      const gap = Math.max(0, window.innerWidth - html.clientWidth);
+      const currentPadding = parseFloat(window.getComputedStyle(body).paddingRight) || 0;
+      savedScrollStyles = {
+        htmlOverflow: html.style.overflow,
+        bodyOverflow: body.style.overflow,
+        bodyPaddingRight: body.style.paddingRight
+      };
+      html.style.overflow = 'hidden';
+      body.style.overflow = 'hidden';
+      if (gap > 0) body.style.paddingRight = (currentPadding + gap) + 'px';
+    }
+
+    function unlockPageScroll() {
+      if (!savedScrollStyles) return;
+      const html = document.documentElement;
+      const body = document.body;
+      html.style.overflow = savedScrollStyles.htmlOverflow;
+      body.style.overflow = savedScrollStyles.bodyOverflow;
+      body.style.paddingRight = savedScrollStyles.bodyPaddingRight;
+      savedScrollStyles = null;
+    }
+
+    function setDrawerOpen(open) {
+      if (open && !loaded) {
+        frame.src = '/wxm/?drawer=20261106-2';
+        loaded = true;
+      }
+      if (open) lockPageScroll();
+      else unlockPageScroll();
+      drawer.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? '关闭工具箱' : '展开工具箱');
+      panel.setAttribute('aria-hidden', String(!open));
+    }
+
+    toggle.addEventListener('click', () => setDrawerOpen(!drawer.classList.contains('is-open')));
+    close.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    shade.addEventListener('click', () => { setDrawerOpen(false); toggle.focus(); });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && drawer.classList.contains('is-open')) {
+        setDrawerOpen(false);
+        toggle.focus();
+      }
+    });
+    window.addEventListener('resize', () => {
+      if (window.matchMedia('(max-width:768px)').matches) setDrawerOpen(false);
+    });
+  }
+  const themeButton = document.querySelector('.theme-toggle');
+  const setTheme = theme => {
+    document.documentElement.dataset.theme = theme;
+    if (themeButton) {
+      themeButton.textContent = theme === 'dark' ? '浅色' : '深色';
+      themeButton.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+    }
+  };
+  let theme = 'light';
+  try { theme = localStorage.getItem('cpuck-article-theme') === 'dark' ? 'dark' : 'light'; } catch {}
+  setTheme(theme);
+  themeButton?.addEventListener('click', () => {
+    theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(theme);
+    try { localStorage.setItem('cpuck-article-theme', theme); } catch {}
+  });
+  const readingTime = document.querySelector('.reading-time');
+  if (readingTime) readingTime.textContent = '约 ' + Math.max(1, Math.ceil(article.textContent.replace(/\s/g, '').length / 500)) + ' 分钟阅读';
+  const headings = [...article.querySelectorAll('h1,h2,h3,h4,h5,h6')];
+  const toc = document.createElement('details');
+  toc.className = 'article-toc';
+  const summary = document.createElement('summary');
+  summary.textContent = '文章目录';
+  toc.append(summary);
+  const nav = document.createElement('nav');
+  nav.setAttribute('aria-label', '文章目录');
+  const links = [];
+  headings.forEach((heading, index) => {
+    if (!heading.id) {
+      let id = 'article-section-' + (index + 1);
+      while (document.getElementById(id)) id += '-';
+      heading.id = id;
+    }
+    const link = document.createElement('a');
+    link.href = '#' + encodeURIComponent(heading.id);
+    link.textContent = heading.textContent.trim();
+    const minLevel = Math.min(...headings.map(h => Number(h.tagName.slice(1))));
+    link.style.paddingLeft = (Number(heading.tagName.slice(1)) - minLevel) * 10 + 12 + 'px';
+    link.title = link.textContent;
+    link.addEventListener('click', () => {
+      if (matchMedia('(max-width: 1199px)').matches) toc.open = false;
+    });
+    nav.append(link);
+    links.push(link);
+  });
+  if (headings.length) {
+    toc.append(nav);
+    toc.open = matchMedia('(min-width: 1200px)').matches;
+    document.body.classList.add('has-toc');
+    document.body.append(toc);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        const current = entries.find(entry => entry.isIntersecting);
+        if (!current) return;
+        const index = headings.indexOf(current.target);
+        links.forEach((link, i) => {
+          if (i === index) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+      }, {rootMargin: '0px 0px -65% 0px'});
+      headings.forEach(heading => observer.observe(heading));
+    }
+  }
+  article.querySelectorAll('pre').forEach(pre => {
+    const details = document.createElement('details');
+    details.className = 'code-fold';
+    const frame = document.createElement('div');
+    frame.className = 'code-frame';
+    const toggle = document.createElement('summary');
+    const language = pre.getAttribute('lang') || '代码';
+    const lineCount = pre.textContent.replace(/\r\n?/g, '\n').replace(/\n$/, '').split('\n').length;
+    details.open = lineCount <= 10;
+    const updateLabel = () => {
+      toggle.textContent = language + ' · ' + lineCount + ' 行 · ' + (details.open ? '收起' : '展开');
+    };
+    updateLabel();
+    details.addEventListener('toggle', updateLabel);
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'copy-code';
+    button.textContent = '复制代码';
+    button.setAttribute('aria-live', 'polite');
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent);
+        button.textContent = '已复制';
+      } catch {
+        details.open = true;
+        const range = document.createRange();
+        range.selectNodeContents(pre);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = '已选中，请手动复制';
+      }
+      setTimeout(() => { button.textContent = '复制代码'; }, 2200);
+    });
+    pre.before(frame);
+    frame.append(details, button);
+    details.append(toggle, pre);
+  });
+  const top = document.createElement('a');
+  top.href = '#article-top';
+  top.className = 'back-top';
+  top.textContent = '↑ 顶部';
+  top.setAttribute('aria-label', '返回顶部');
+  document.body.append(top);
+})();
+</script></body></html>
