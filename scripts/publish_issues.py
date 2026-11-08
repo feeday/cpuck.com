@@ -44,9 +44,10 @@ def render(issue, canonical_url=None):
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" type="image/png" href="/favicon.png">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1964437526797765" crossorigin="anonymous"></script>
 {canonical_tag}
 {description_tag}
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-{script_hash}'; img-src https: data:; media-src https:; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-{script_hash}' 'unsafe-inline' 'unsafe-eval' https:; img-src https: data: blob:; media-src https: blob:; style-src 'unsafe-inline' https:; font-src https: data:; connect-src https:; frame-src https:; child-src https: blob:; worker-src blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>{title} · CPuck</title>
 <style>{css}</style></head><body><main id="article-top">
 <nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
@@ -54,6 +55,10 @@ def render(issue, canonical_url=None):
 <header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">{title}</h1>
 <div class="article-meta"><span>更新于 <time datetime="{html.escape(issue['updated_at'], quote=True)}">{display_date}</time>（北京时间）</span><span class="reading-time"></span></div></header>
 <article>{body}</article>
+<aside class="article-ad" aria-label="Advertisements">
+<span class="article-ad-label">Advertisements</span>
+<ins class="adsbygoogle" style="display:inline-block;width:300px;height:50px" data-ad-client="ca-pub-1964437526797765" data-ad-slot="2282084339"></ins>
+</aside>
 <footer class="article-footer"><span>CPuck · 记录与分享</span><a href="/">返回资源导航 →</a></footer>
 </main><script>{script}</script></body></html>
 """
