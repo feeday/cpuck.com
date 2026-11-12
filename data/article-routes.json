@@ -173,5 +173,15 @@
     ],
     "file": "data/html/21.html",
     "markdown": "data/md/21.md"
+  },
+  "22": {
+    "url": "/22.html",
+    "aliases": [
+      "/22",
+      "/blog/22.html",
+      "/blog/posts/issue-22.html"
+    ],
+    "file": "data/html/22.html",
+    "markdown": "data/md/22.md"
   }
 }

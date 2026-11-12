@@ -1,6 +1,28 @@
 [
   {
     "source": "github-issue",
+    "issue": 22,
+    "isArticle": true,
+    "cat": "log",
+    "title": "表格常用函数",
+    "desc": "首字母大写",
+    "content": "首字母大写\n=UPPER(LEFT(A2,1))&MID(A2,2,LEN(A2))",
+    "tag": [
+      "xlsx"
+    ],
+    "date": "2026-11-12",
+    "updated_at": "2026-11-12T01:05:29Z",
+    "url": "/22.html",
+    "aliases": [
+      "/22",
+      "/blog/22.html",
+      "/blog/posts/issue-22.html"
+    ],
+    "markdown": "/data/md/22.md",
+    "issue_url": "https://github.com/feeday/cpuck.com/issues/22"
+  },
+  {
+    "source": "github-issue",
     "issue": 21,
     "isArticle": true,
     "cat": "log",
