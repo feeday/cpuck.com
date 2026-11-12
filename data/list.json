@@ -66,7 +66,7 @@
     "links": {
       "http": "https://llm-bench.io/benchmarks",
       "hfCn": "https://cpuck.com/gpu/",
-      "hf": "https://hf-mirror.com/datasets/feeday/datxy/tree/main/models"
+      "hf": "https://weicj.github.io/LLM-Speed-Chat/"
     },
     "isTop": true,
     "hideOnMobile": true
