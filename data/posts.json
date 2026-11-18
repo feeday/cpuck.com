@@ -6,12 +6,12 @@
     "cat": "log",
     "title": "表格常用函数",
     "desc": "首字母大写",
-    "content": "首字母大写\n=UPPER(LEFT(A2,1))&MID(A2,2,LEN(A2))",
+    "content": "首字母大写\n=UPPER(LEFT(A2,1))&MID(A2,2,LEN(A2))\n\n跨表筛选数据\n=COUNTIF('条件'!$A:$A,G2)>0",
     "tag": [
       "xlsx"
     ],
     "date": "2026-11-12",
-    "updated_at": "2026-11-12T01:05:29Z",
+    "updated_at": "2026-11-18T04:10:07Z",
     "url": "/22.html",
     "aliases": [
       "/22",
