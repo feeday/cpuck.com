@@ -173,13 +173,772 @@ article pre code { padding:0; background:none; font:inherit; overflow-wrap:norma
 <nav class="page-nav" aria-label="文章导航"><a class="home-link" href="/">← CPuck</a>
 <div class="nav-actions"><a href="https://github.com/feeday/cpuck.com/issues/22">编辑原文</a><a href="/data/md/22.md">Markdown</a><button type="button" class="theme-toggle" aria-label="切换深色模式">深色</button></div></nav>
 <header class="article-header"><p class="article-label">CPuck · 文章</p><h1 class="article-title">表格常用函数</h1>
-<div class="article-meta"><span>更新于 <time datetime="2026-11-18T04:10:07Z">2026年11月18日 12:10</time>（北京时间）</span><span class="reading-time"></span></div></header>
-<article><p dir="auto">首字母大写</p>
+<div class="article-meta"><span>更新于 <time datetime="2026-11-19T15:58:29Z">2026年11月19日 23:58</time>（北京时间）</span><span class="reading-time"></span></div></header>
+<article><h2 dir="auto">首字母大写</h2>
 <div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=UPPER(LEFT(A2,1))&amp;MID(A2,2,LEN(A2))"><pre class="notranslate"><code class="notranslate">=UPPER(LEFT(A2,1))&amp;MID(A2,2,LEN(A2))
 </code></pre></div>
-<p dir="auto">跨表筛选数据</p>
+<h2 dir="auto"><strong>根据另一张工作表的名单判断数据是否存在</strong></h2>
+<p dir="auto"><strong>原始表格</strong></p>
+<p dir="auto"><strong>工作表：生成文件夹</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>G列 待查询名称</th>
+<th>H列 查询结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>PersonB</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>PersonC</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>PersonD</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>PersonE</td>
+<td>FALSE</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto"><strong>工作表：条件</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列 指定名单</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+</tr>
+<tr>
+<td>PersonC</td>
+</tr>
+<tr>
+<td>PersonF</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">H2 输入：</p>
 <div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=COUNTIF('条件'!$A:$A,G2)&gt;0"><pre class="notranslate"><code class="notranslate">=COUNTIF('条件'!$A:$A,G2)&gt;0
-</code></pre></div></article>
+</code></pre></div>
+<p dir="auto"><strong>运行结果</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>G列 待查询</th>
+<th>条件表是否存在</th>
+<th>H列查询结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+<td>存在</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>PersonB</td>
+<td>不存在</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>PersonC</td>
+<td>存在</td>
+<td>TRUE</td>
+</tr>
+<tr>
+<td>PersonD</td>
+<td>不存在</td>
+<td>FALSE</td>
+</tr>
+<tr>
+<td>PersonE</td>
+<td>不存在</td>
+<td>FALSE</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto"><strong>作用：</strong> 使用当前工作表 G 列的内容，到「条件」工作表 A 列查找。找到返回 TRUE，找不到返回 FALSE。</p>
+<p dir="auto"><strong>其他结果显示方式：</strong></p>
+<p dir="auto">如果不想显示 TRUE/FALSE，而是显示中文：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=IF(COUNTIF('条件'!$A:$A,G2)&gt;0,&quot;存在&quot;,&quot;不存在&quot;)"><pre class="notranslate"><code class="notranslate">=IF(COUNTIF('条件'!$A:$A,G2)&gt;0,"存在","不存在")
+</code></pre></div>
+<p dir="auto">结果为：存在 / 不存在。</p>
+<h2 dir="auto">根据英文代号查中文名称</h2>
+<p dir="auto"><strong>原始表格</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列 中文名</th>
+<th>B列 英文代号</th>
+<th>C列待查询</th>
+<th>D列查询结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>虚构人物甲</td>
+<td>PersonA</td>
+<td>PersonB</td>
+<td>虚构人物乙</td>
+</tr>
+<tr>
+<td>虚构人物乙</td>
+<td>PersonB</td>
+<td>PersonA</td>
+<td>虚构人物甲</td>
+</tr>
+<tr>
+<td>虚构人物丙</td>
+<td>PersonC</td>
+<td>PersonD</td>
+<td>未找到</td>
+</tr>
+<tr>
+<td>虚构人物丁</td>
+<td>PersonD</td>
+<td>PersonD</td>
+<td>虚构人物丁</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">D2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=XLOOKUP(C2,$B$2:$B$5,$A$2:$A$5,&quot;未找到&quot;)"><pre lang="excel" class="notranslate"><code class="notranslate">=XLOOKUP(C2,$B$2:$B$5,$A$2:$A$5,"未找到")
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> C 列的英文代号去 B 列查找，找到后返回对应 A 列的中文名称。</p>
+<h2 dir="auto">2. VLOOKUP：根据名称查数量</h2>
+<p dir="auto"><strong>原始表格</strong></p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列人物代号</th>
+<th align="right">B列图片数量</th>
+<th>C列查询名称</th>
+<th align="right">D列结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+<td align="right">8</td>
+<td>PersonB</td>
+<td align="right">6</td>
+</tr>
+<tr>
+<td>PersonB</td>
+<td align="right">6</td>
+<td>PersonA</td>
+<td align="right">8</td>
+</tr>
+<tr>
+<td>PersonC</td>
+<td align="right">5</td>
+<td>PersonC</td>
+<td align="right">5</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">D2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=VLOOKUP(C2,$A$2:$B$4,2,FALSE)"><pre lang="excel" class="notranslate"><code class="notranslate">=VLOOKUP(C2,$A$2:$B$4,2,FALSE)
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> 在 A 列查找人物代号，返回同一行 B 列的图片数量。2 表示返回查询区域第 2 列，FALSE 表示精确匹配。</p>
+<h2 dir="auto">3. COUNTIF：判断 ID 是否存在</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列已确定ID</th>
+<th>B列待查ID</th>
+<th>C列结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00001</td>
+<td>00001</td>
+<td>存在</td>
+</tr>
+<tr>
+<td>00016</td>
+<td>00003</td>
+<td>不存在</td>
+</tr>
+<tr>
+<td>00031</td>
+<td>00031</td>
+<td>存在</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">C2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=IF(COUNTIF($A$2:$A$4,B2)&gt;0,&quot;存在&quot;,&quot;不存在&quot;)"><pre lang="excel" class="notranslate"><code class="notranslate">=IF(COUNTIF($A$2:$A$4,B2)&gt;0,"存在","不存在")
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> 检查待查 ID 是否存在于确定名单中。</p>
+<h2 dir="auto">4. COUNTIF：统计 ID 重复次数</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列原图ID</th>
+<th align="right">B列出现次数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00001</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>00001</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>00016</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>00001</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>00016</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>00031</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">B2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=COUNTIF($A$2:$A$7,A2)"><pre lang="excel" class="notranslate"><code class="notranslate">=COUNTIF($A$2:$A$7,A2)
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> 统计当前 ID 在 A 列出现的总次数。</p>
+<h2 dir="auto">5. COUNTIFS：同时满足两个条件</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列人物</th>
+<th>B列模型</th>
+<th align="right">C列图片数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+<td>Flux</td>
+<td align="right">3</td>
+</tr>
+<tr>
+<td>PersonA</td>
+<td>SDXL</td>
+<td align="right">2</td>
+</tr>
+<tr>
+<td>PersonA</td>
+<td>Flux</td>
+<td align="right">4</td>
+</tr>
+<tr>
+<td>PersonB</td>
+<td>Flux</td>
+<td align="right">5</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">统计 PersonA 使用 Flux 模型的记录数：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=COUNTIFS(A2:A5,&quot;PersonA&quot;,B2:B5,&quot;Flux&quot;)"><pre lang="excel" class="notranslate"><code class="notranslate">=COUNTIFS(A2:A5,"PersonA",B2:B5,"Flux")
+</code></pre></div>
+<p dir="auto">结果：<strong>2 条记录</strong></p>
+<p dir="auto">统计符合条件的图片总数：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=SUMIFS(C2:C5,A2:A5,&quot;PersonA&quot;,B2:B5,&quot;Flux&quot;)"><pre lang="excel" class="notranslate"><code class="notranslate">=SUMIFS(C2:C5,A2:A5,"PersonA",B2:B5,"Flux")
+</code></pre></div>
+<p dir="auto">结果：<strong>7 张图片</strong></p>
+<p dir="auto"><strong>区别：</strong> COUNTIFS 统计符合条件的记录数量，SUMIFS 统计符合条件的数值总和。</p>
+<h2 dir="auto">6. FILTER：根据名单提取完整数据</h2>
+<p dir="auto">原始数据：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列ID</th>
+<th>B列人物</th>
+<th>C列模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00001</td>
+<td>PersonA</td>
+<td>Flux</td>
+</tr>
+<tr>
+<td>00002</td>
+<td>PersonA</td>
+<td>SDXL</td>
+</tr>
+<tr>
+<td>00003</td>
+<td>PersonB</td>
+<td>SD1.5</td>
+</tr>
+<tr>
+<td>00004</td>
+<td>PersonC</td>
+<td>Flux</td>
+</tr>
+<tr>
+<td>00005</td>
+<td>PersonD</td>
+<td>SDXL</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">指定名单 E2:E3：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>E列保留名单</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+</tr>
+<tr>
+<td>PersonD</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">G2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=FILTER(A2:C6,ISNUMBER(MATCH(B2:B6,E2:E3,0)),&quot;无结果&quot;)"><pre lang="excel" class="notranslate"><code class="notranslate">=FILTER(A2:C6,ISNUMBER(MATCH(B2:B6,E2:E3,0)),"无结果")
+</code></pre></div>
+<p dir="auto">筛选结果：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>ID</th>
+<th>人物</th>
+<th>模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00001</td>
+<td>PersonA</td>
+<td>Flux</td>
+</tr>
+<tr>
+<td>00002</td>
+<td>PersonA</td>
+<td>SDXL</td>
+</tr>
+<tr>
+<td>00005</td>
+<td>PersonD</td>
+<td>SDXL</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto"><strong>作用：</strong> 根据指定人物名单，自动提取所有符合条件的完整数据行。</p>
+<h2 dir="auto">7. UNIQUE：提取不重复 ID</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列原始ID</th>
+<th>B列去重结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00001</td>
+<td>00001</td>
+</tr>
+<tr>
+<td>00001</td>
+<td>00016</td>
+</tr>
+<tr>
+<td>00016</td>
+<td>00031</td>
+</tr>
+<tr>
+<td>00016</td>
+<td></td>
+</tr>
+<tr>
+<td>00031</td>
+<td></td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">B2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=UNIQUE(A2:A6)"><pre lang="excel" class="notranslate"><code class="notranslate">=UNIQUE(A2:A6)
+</code></pre></div>
+<p dir="auto">统计去重后的 ID 数量：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=ROWS(UNIQUE(A2:A6))"><pre lang="excel" class="notranslate"><code class="notranslate">=ROWS(UNIQUE(A2:A6))
+</code></pre></div>
+<p dir="auto">结果：<strong>3 个不同 ID</strong></p>
+<h2 dir="auto">8. LEFT：提取文件名前五位编号</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列文件名</th>
+<th>B列ID</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>07206_Real_Original_Person_PersonA.png</td>
+<td>07206</td>
+</tr>
+<tr>
+<td>00001_Original_Person_PersonB.png</td>
+<td>00001</td>
+</tr>
+<tr>
+<td>00027_Original_Landmark_DemoLandmarkA.png</td>
+<td>00027</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">B2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=LEFT(A2,5)"><pre lang="excel" class="notranslate"><code class="notranslate">=LEFT(A2,5)
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> 提取文件名前 5 个字符，保留前导零。</p>
+<h2 dir="auto">9. TEXTAFTER：从路径提取文件名</h2>
+<p dir="auto">A2 完整路径：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="G:\数据集\Flux\Fake\PersonA\00001_Original_Person_PersonA_7.png"><pre lang="text" class="notranslate"><code class="notranslate">G:\数据集\Flux\Fake\PersonA\00001_Original_Person_PersonA_7.png
+</code></pre></div>
+<p dir="auto">B2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=TEXTAFTER(A2,&quot;\&quot;,-1)"><pre lang="excel" class="notranslate"><code class="notranslate">=TEXTAFTER(A2,"\",-1)
+</code></pre></div>
+<p dir="auto">结果：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="00001_Original_Person_PersonA_7.png"><pre lang="text" class="notranslate"><code class="notranslate">00001_Original_Person_PersonA_7.png
+</code></pre></div>
+<p dir="auto">提取上一级人物文件夹名：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=TEXTBEFORE(TEXTAFTER(A2,&quot;\&quot;,-2),&quot;\&quot;)"><pre lang="excel" class="notranslate"><code class="notranslate">=TEXTBEFORE(TEXTAFTER(A2,"\",-2),"\")
+</code></pre></div>
+<p dir="auto">结果：<code class="notranslate">PersonA</code></p>
+<h2 dir="auto">10. MID：提取文件名中间内容</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列文件名</th>
+<th>B列提取结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P00001_PS00001_PersonA_Original.png</td>
+<td>00001</td>
+</tr>
+<tr>
+<td>P00002_PS00001_PersonB_Original.png</td>
+<td>00002</td>
+</tr>
+<tr>
+<td>P00003_PS00001_PersonC_Original.png</td>
+<td>00003</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">B2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=MID(A2,2,5)"><pre lang="excel" class="notranslate"><code class="notranslate">=MID(A2,2,5)
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> 从第 2 个字符开始，截取 5 个字符。</p>
+<h2 dir="auto">11. SEARCH：判断路径是否包含关键词</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列路径或文件名</th>
+<th>B列关键词</th>
+<th>C列结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flux\PersonA\00001.png</td>
+<td>Flux</td>
+<td>包含</td>
+</tr>
+<tr>
+<td>SDXL\PersonB\00016.png</td>
+<td>Flux</td>
+<td>不包含</td>
+</tr>
+<tr>
+<td>Flux\PersonD\00031.png</td>
+<td>Flux</td>
+<td>包含</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">C2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=IF(ISNUMBER(SEARCH(B2,A2)),&quot;包含&quot;,&quot;不包含&quot;)"><pre lang="excel" class="notranslate"><code class="notranslate">=IF(ISNUMBER(SEARCH(B2,A2)),"包含","不包含")
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> 根据文件路径中的模型名、人物代号或文件名关键词筛选，不要求整格完全相同。</p>
+<h2 dir="auto">12. INDEX + MATCH：按英文代号匹配中文名称</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列中文名</th>
+<th>B列英文代号</th>
+<th>D列查询</th>
+<th>E列结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>虚构人物甲</td>
+<td>PersonA</td>
+<td>PersonD</td>
+<td>虚构人物丁</td>
+</tr>
+<tr>
+<td>虚构人物乙</td>
+<td>PersonB</td>
+<td>PersonA</td>
+<td>虚构人物甲</td>
+</tr>
+<tr>
+<td>虚构人物丙</td>
+<td>PersonC</td>
+<td>PersonB</td>
+<td>虚构人物乙</td>
+</tr>
+<tr>
+<td>虚构人物丁</td>
+<td>PersonD</td>
+<td>PersonC</td>
+<td>虚构人物丙</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">E2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=INDEX($A$2:$A$5,MATCH(D2,$B$2:$B$5,0))"><pre lang="excel" class="notranslate"><code class="notranslate">=INDEX($A$2:$A$5,MATCH(D2,$B$2:$B$5,0))
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> MATCH 找到代号对应的位置，INDEX 返回相应中文名称。适合兼容旧版 Excel/WPS。</p>
+<h2 dir="auto">13. IFERROR：查找失败时返回指定文字</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列人物</th>
+<th align="right">B列数量</th>
+<th>C列查询</th>
+<th align="right">D列结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+<td align="right">8</td>
+<td>PersonA</td>
+<td align="right">8</td>
+</tr>
+<tr>
+<td>PersonB</td>
+<td align="right">6</td>
+<td>PersonD</td>
+<td align="right">未找到</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">D2 输入：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=IFERROR(VLOOKUP(C2,$A$2:$B$3,2,FALSE),&quot;未找到&quot;)"><pre lang="excel" class="notranslate"><code class="notranslate">=IFERROR(VLOOKUP(C2,$A$2:$B$3,2,FALSE),"未找到")
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> 将 #N/A 等错误替换成指定文字。</p>
+<h2 dir="auto">14. 条件格式：跨工作表匹配自动标红</h2>
+<p dir="auto">假设“生成文件夹”工作表 G 列：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>G列人物代号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+</tr>
+<tr>
+<td>PersonB</td>
+</tr>
+<tr>
+<td>PersonC</td>
+</tr>
+<tr>
+<td>PersonD</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">“条件”工作表 A 列有：</p>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列指定名单</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PersonA</td>
+</tr>
+<tr>
+<td>PersonC</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">在“生成文件夹”工作表选中 G2:G1000，设置条件格式公式：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=AND(G2&lt;&gt;&quot;&quot;,COUNTIF(INDIRECT(&quot;'条件'!$A:$A&quot;),G2)&gt;0)"><pre lang="excel" class="notranslate"><code class="notranslate">=AND(G2&lt;&gt;"",COUNTIF(INDIRECT("'条件'!$A:$A"),G2)&gt;0)
+</code></pre></div>
+<p dir="auto">效果：</p>
+<ul dir="auto">
+<li>PersonA：匹配，标红</li>
+<li>PersonB：不匹配</li>
+<li>PersonC：匹配，标红</li>
+<li>PersonD：不匹配</li>
+</ul>
+<p dir="auto"><strong>作用：</strong> 自动比较不同工作表中的数据，匹配成功的单元格自动标红。</p>
+<h2 dir="auto">15. AND + COUNTIF：重复数据标红</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>A列ID</th>
+<th>判断结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>00001</td>
+<td>重复</td>
+</tr>
+<tr>
+<td>00016</td>
+<td>不重复</td>
+</tr>
+<tr>
+<td>00001</td>
+<td>重复</td>
+</tr>
+<tr>
+<td>00031</td>
+<td>不重复</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<p dir="auto">条件格式公式：</p>
+<div class="snippet-clipboard-content notranslate position-relative overflow-auto" data-snippet-clipboard-copy-content="=AND(A2&lt;&gt;&quot;&quot;,COUNTIF($A$2:$A$5,A2)&gt;1)"><pre lang="excel" class="notranslate"><code class="notranslate">=AND(A2&lt;&gt;"",COUNTIF($A$2:$A$5,A2)&gt;1)
+</code></pre></div>
+<p dir="auto"><strong>作用：</strong> 所有重复出现的 ID 都会标红，包括首次出现的记录。</p>
+<hr>
+<h2 dir="auto">四、常用公式速查</h2>
+<markdown-accessiblity-table><table role="table">
+<thead>
+<tr>
+<th>使用场景</th>
+<th>函数</th>
+<th>主要作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>英文代号匹配中文名</td>
+<td>XLOOKUP</td>
+<td>查找并返回对应值</td>
+</tr>
+<tr>
+<td>根据 ID 查数量</td>
+<td>VLOOKUP</td>
+<td>跨列查询</td>
+</tr>
+<tr>
+<td>判断 ID 是否存在</td>
+<td>COUNTIF</td>
+<td>存在性判断</td>
+</tr>
+<tr>
+<td>统计 ID 重复次数</td>
+<td>COUNTIF</td>
+<td>重复统计</td>
+</tr>
+<tr>
+<td>按人物和模型统计</td>
+<td>COUNTIFS</td>
+<td>多条件计数</td>
+</tr>
+<tr>
+<td>按人物和模型求和</td>
+<td>SUMIFS</td>
+<td>多条件求和</td>
+</tr>
+<tr>
+<td>按名单筛选完整数据</td>
+<td>FILTER</td>
+<td>多行数据提取</td>
+</tr>
+<tr>
+<td>提取不重复 ID</td>
+<td>UNIQUE</td>
+<td>数据去重</td>
+</tr>
+<tr>
+<td>提取文件名前缀</td>
+<td>LEFT</td>
+<td>字符截取</td>
+</tr>
+<tr>
+<td>提取路径文件名</td>
+<td>TEXTAFTER</td>
+<td>路径解析</td>
+</tr>
+<tr>
+<td>提取文件名中间内容</td>
+<td>MID</td>
+<td>指定位置截取</td>
+</tr>
+<tr>
+<td>判断路径关键词</td>
+<td>SEARCH</td>
+<td>模糊查找</td>
+</tr>
+<tr>
+<td>兼容旧版匹配</td>
+<td>INDEX+MATCH</td>
+<td>组合查找</td>
+</tr>
+<tr>
+<td>处理查找错误</td>
+<td>IFERROR</td>
+<td>错误替换</td>
+</tr>
+<tr>
+<td>跨表自动标红</td>
+<td>COUNTIF+INDIRECT</td>
+<td>跨表匹配</td>
+</tr>
+<tr>
+<td>重复值自动标红</td>
+<td>AND+COUNTIF</td>
+<td>条件格式</td>
+</tr>
+</tbody>
+</table></markdown-accessiblity-table>
+<h3 dir="auto">实际使用优先掌握的五类</h3>
+<ol dir="auto">
+<li>COUNTIF：统计、查重、判断 ID 是否存在。</li>
+<li>XLOOKUP：人物、地标名称与编号对应。</li>
+<li>FILTER：按名单批量筛选完整数据。</li>
+<li>TEXTAFTER：批量解析文件路径和文件名。</li>
+<li>COUNTIFS / SUMIFS：按人物、模型、类别统计数量。</li>
+</ol>
+<p dir="auto"><strong>注意：</strong> 00001、07206 等编号建议使用文本格式保存，避免 Excel/WPS 自动删除前导零。</p></article>
 <aside class="article-ad" aria-label="Advertisements">
 <span class="article-ad-label">Advertisements</span>
 <ins class="adsbygoogle" style="display:inline-block;width:300px;height:50px" data-ad-client="ca-pub-1964437526797765" data-ad-slot="2282084339"></ins>
