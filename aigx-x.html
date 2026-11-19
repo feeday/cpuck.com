@@ -909,6 +909,10 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             let wrap = null;
             let style = null;
             let progress = null;
+            const previousHtmlOverflow = document.documentElement.style.overflow;
+            const previousBodyOverflow = document.body.style.overflow;
+            const previousHtmlHeight = document.documentElement.style.height;
+            const previousBodyHeight = document.body.style.height;
             try {
                 const markdown = getTextarea().value || '';
                 if (!markdown.trim()) throw new Error('当前 Markdown 文档为空，没有可导出的内容。');
@@ -948,6 +952,10 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 content.className = 'pdf-export-content';
                 content.innerHTML = renderMarkdown(markdown);
                 wrap.appendChild(content);
+                document.documentElement.style.overflow = 'visible';
+                document.body.style.overflow = 'visible';
+                document.documentElement.style.height = 'auto';
+                document.body.style.height = 'auto';
                 document.body.appendChild(wrap);
 
                 progress = document.createElement('div');
@@ -981,6 +989,10 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 if (wrap) wrap.remove();
                 if (style) style.remove();
                 if (progress) progress.remove();
+                document.documentElement.style.overflow = previousHtmlOverflow;
+                document.body.style.overflow = previousBodyOverflow;
+                document.documentElement.style.height = previousHtmlHeight;
+                document.body.style.height = previousBodyHeight;
                 if (button) button.disabled = false;
             }
         }
