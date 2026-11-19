@@ -115,7 +115,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             overflow: hidden;
         }
 
-        .panel-scroll { padding: 22px; overflow-y: auto; }
+        .panel-scroll { flex: 1 1 auto; min-height: 0; padding: 22px; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
         .panel-scroll::-webkit-scrollbar { width: 6px; }
         .panel-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 
@@ -199,6 +199,11 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             .split { grid-template-columns: 1fr; }
             .panel, .editor-card, .preview-card { border-radius: 18px; }
             #markdownInput, .preview-container { height: 52vh; }
+            .panel { max-height: 78svh; min-height: 0; }
+            .panel-scroll { flex: 1 1 auto; min-height: 0; }
+            .panel.collapsed { display: none; }
+            .topbar { align-items: center; }
+            #docStats { order: 20; margin-left: auto; margin-right: 0 !important; }
         }
     
         .workspace-section-title{font-size:.9rem;font-weight:850;color:#7dd3fc;margin:8px 0 12px;letter-spacing:.02em}
@@ -227,6 +232,21 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         .export-btn{padding:0 10px;font-size:.76rem;min-width:42px}
         @media(max-width:980px){.chat-log{max-height:220px}.image-result img{max-height:260px}}
 
+
+        .key-input-row{display:flex;align-items:stretch;gap:7px;min-width:0}
+        .key-input-row .glass-input{flex:1;min-width:0}
+        .key-toggle{flex:0 0 52px;min-width:52px;border:1px solid var(--border-light);border-radius:10px;background:rgba(255,255,255,.07);color:var(--text-secondary);font-size:.75rem;font-weight:700;cursor:pointer}
+        .key-toggle:hover{background:rgba(56,189,248,.14);color:var(--text-primary)}
+        .prompt-count{float:right;font-size:.72rem;font-weight:500;color:var(--text-tertiary);text-transform:none;letter-spacing:0}
+        .image-upload-drop{padding:9px;border:1px dashed rgba(148,163,184,.35);border-radius:12px;background:rgba(0,0,0,.14);transition:border-color .18s,background .18s}
+        .image-upload-drop.drag{border-color:var(--theme-blue);background:rgba(56,189,248,.1)}
+        .image-upload-drop .glass-input{padding:8px;font-size:.78rem}
+        .image-upload-drop .small{margin:7px 2px 0}
+        #docStats{display:inline-flex;align-items:center;white-space:nowrap;flex:0 0 auto;font-size:12px;font-variant-numeric:tabular-nums;line-height:1.5}
+        .image-settings a{color:#7dd3fc;text-decoration:none}
+        .image-settings a:hover{text-decoration:underline}
+        @media(max-width:980px){.key-toggle{flex-basis:48px;min-width:48px}.image-upload-drop{padding:8px}}
+
 </style>
 </head>
 <body>
@@ -238,8 +258,8 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 <div class="workspace-section-title">对话 API 配置</div>
 
                 <div class="form-group">
-                    <label for="apiKey">🔑 API Key</label>
-                    <input id="apiKey" class="glass-input" type="password" placeholder="请输入你的 API Key">
+                    <label for="apiKey">🔑 对话 API Key</label>
+                    <div class="key-input-row"><input id="apiKey" class="glass-input" type="password" placeholder="请输入你的 API Key" autocomplete="off"><button class="key-toggle" id="toggleChatKey" type="button">显示</button></div>
                 </div>
                 <div class="form-group">
                     <label for="apiBaseUrl">🌐 API URL</label>
@@ -277,7 +297,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 <section class="image-settings" id="imageGptSettings">
                     <div class="form-group">
                         <label for="imageApiKey">APIMart API Key</label>
-                        <input id="imageApiKey" class="glass-input" type="password" placeholder="粘贴你的 APIMart API Key" autocomplete="off">
+                        <div class="key-input-row"><input id="imageApiKey" class="glass-input" type="password" placeholder="粘贴你的 APIMart API Key" autocomplete="off"><button class="key-toggle" id="toggleImageApiKey" type="button">显示</button></div>
                     </div>
                     <div class="form-group">
                         <label for="imageApiBaseUrl">图像 API Base URL</label>
@@ -295,7 +315,8 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 <section class="image-settings" id="imageQwenSettings" hidden>
                     <div class="form-group">
                         <label for="hfToken">Hugging Face Token（可选）</label>
-                        <input id="hfToken" class="glass-input" type="password" placeholder="hf_...；公开 Space 可留空" autocomplete="off">
+                        <div class="key-input-row"><input id="hfToken" class="glass-input" type="password" placeholder="hf_...；公开 Space 可留空" autocomplete="off"><button class="key-toggle" id="toggleHfToken" type="button">显示</button></div>
+                        <p class="small"><a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener noreferrer">获取 Hugging Face Token ↗</a>；公开 Space 通常可留空。</p>
                     </div>
                     <div class="image-row">
                         <div class="form-group">
@@ -317,8 +338,8 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 </section>
 
                 <div class="image-row">
-                    <div class="form-group">
-                        <label for="imageResolution">生成分辨率</label>
+                    <div class="form-group" id="imageResolutionGroup">
+                        <label for="imageResolution">生成分辨率（GPT Image 2）</label>
                         <select id="imageResolution" class="glass-input"><option value="1k">1K</option><option value="2k">2K</option><option value="4k">4K</option></select>
                     </div>
                     <div class="form-group">
@@ -335,12 +356,12 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="imagePrompt">提示词 / 编辑指令</label>
+                    <label for="imagePrompt">提示词 / 编辑指令 <span class="prompt-count" id="imagePromptCount">0 字</span></label>
                     <textarea id="imagePrompt" class="glass-input" rows="4" placeholder="描述想生成的画面，或说明如何修改参考图片…"></textarea>
                 </div>
                 <div class="form-group">
                     <label for="imageInput">参考图片（可选）</label>
-                    <input id="imageInput" class="glass-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+                    <div class="image-upload-drop" id="imageUploadDrop"><input id="imageInput" class="glass-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><p class="small">点击选择图片，或将 JPG / PNG / WebP 拖拽到这里</p></div>
                     <div class="image-source" id="imageSourcePreview">
                         <img id="imageSourceThumb" alt="参考图预览">
                         <div class="image-source-info" id="imageSourceInfo">参考图片已载入</div>
@@ -499,10 +520,14 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             document.getElementById('apiBaseUrl').value = localStorage.getItem(STORAGE_KEYS.apiBaseUrl) || localStorage.getItem('frontend_base_url') || 'https://api.poixe.com/v1/';
             document.getElementById('modelName').value = localStorage.getItem(STORAGE_KEYS.modelName) || 'deepseek-v4-flash';
             document.getElementById('imageModel').value = localStorage.getItem(STORAGE_KEYS.imageModel) || 'gpt';
-            document.getElementById('imageApiKey').value = safeStorageGet('cpuck_image_api_key') || safeStorageGet('tcq_html_imageApiKey') || '';
+            const savedImageApiKey = safeStorageGet('cpuck_image_api_key') || safeStorageGet('tcq_html_imageApiKey');
+            document.getElementById('imageApiKey').value = savedImageApiKey;
+            document.getElementById('rememberImageKey').checked = !!savedImageApiKey;
             document.getElementById('imageApiBaseUrl').value = localStorage.getItem(STORAGE_KEYS.imageApiBaseUrl) || safeStorageGet('cpuck_image_api_base') || 'https://api.apimart.ai';
             document.getElementById('imageModelId').value = localStorage.getItem(STORAGE_KEYS.imageModelId) || 'gpt-image-2-ext';
-            document.getElementById('hfToken').value = safeStorageGet('cpuck_image_hf_token') || safeStorageGet('tcq_html_hfApiKey') || '';
+            const savedHfToken = safeStorageGet('cpuck_image_hf_token') || safeStorageGet('tcq_html_hfApiKey');
+            document.getElementById('hfToken').value = savedHfToken;
+            document.getElementById('rememberHfToken').checked = !!savedHfToken;
             document.getElementById('imageResolution').value = localStorage.getItem(STORAGE_KEYS.imageResolution) || '1k';
             document.getElementById('imageAspect').value = localStorage.getItem(STORAGE_KEYS.imageAspect) || '1:1';
             document.getElementById('qwenSteps').value = localStorage.getItem(STORAGE_KEYS.qwenSteps) || '40';
@@ -522,14 +547,14 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         });
 
         function saveSettings() {
-            localStorage.setItem(STORAGE_KEYS.apiKey, document.getElementById('apiKey').value.trim());
-            localStorage.setItem(STORAGE_KEYS.apiBaseUrl, document.getElementById('apiBaseUrl').value.trim());
-            localStorage.setItem(STORAGE_KEYS.modelName, document.getElementById('modelName').value.trim());
+            safeStorageSet(STORAGE_KEYS.apiKey, document.getElementById('apiKey').value.trim());
+            safeStorageSet(STORAGE_KEYS.apiBaseUrl, document.getElementById('apiBaseUrl').value.trim());
+            safeStorageSet(STORAGE_KEYS.modelName, document.getElementById('modelName').value.trim());
         }
 
         function handleInput() {
             const text = document.getElementById('markdownInput').value;
-            localStorage.setItem(STORAGE_KEYS.doc, text);
+            safeStorageSet(STORAGE_KEYS.doc, text);
             renderPreview();
         }
 
@@ -631,14 +656,15 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         function loadExternalScript(src, isReady) {
             if (isReady()) return Promise.resolve();
             return new Promise((resolve, reject) => {
-                const existing = Array.from(document.scripts).find(item => item.src === src);
+                let existing = Array.from(document.scripts).find(item => item.src === src);
+                if (existing && isReady()) { resolve(); return; }
+                if (existing && existing.dataset.failed === 'true') { existing.remove(); existing = null; }
+                if (existing && existing.dataset.loaded === 'true') {
+                    reject(new Error('组件已加载，但初始化失败：' + src));
+                    return;
+                }
                 if (existing) {
-                    if (existing.dataset.loaded === 'true') {
-                        if (isReady()) resolve();
-                        else reject(new Error('组件已加载，但初始化失败：' + src));
-                        return;
-                    }
-                    existing.addEventListener('load', resolve, { once: true });
+                    existing.addEventListener('load', () => resolve(), { once: true });
                     existing.addEventListener('error', () => reject(new Error('组件加载失败：' + src)), { once: true });
                     return;
                 }
@@ -646,7 +672,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 script.src = src;
                 script.async = true;
                 script.onload = () => { script.dataset.loaded = 'true'; resolve(); };
-                script.onerror = () => reject(new Error('组件加载失败，请检查网络或 CDN：' + src));
+                script.onerror = () => { script.dataset.failed = 'true'; script.remove(); reject(new Error('组件加载失败，请检查网络或 CDN：' + src)); };
                 document.head.appendChild(script);
             });
         }
@@ -855,38 +881,106 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             }
         }
 
+        async function waitForPdfImages(root) {
+            const images = Array.from(root.querySelectorAll('img'));
+            await Promise.all(images.map(img => new Promise(resolve => {
+                let done = false;
+                const finish = () => {
+                    if (done) return;
+                    done = true;
+                    if (!img.naturalWidth && img.parentNode) {
+                        const fallback = document.createElement('div');
+                        fallback.className = 'pdf-image-fallback';
+                        fallback.textContent = img.alt ? '图片：' + img.alt : '图片加载失败';
+                        img.replaceWith(fallback);
+                    }
+                    resolve();
+                };
+                if (img.complete) { finish(); return; }
+                img.addEventListener('load', finish, { once: true });
+                img.addEventListener('error', finish, { once: true });
+                setTimeout(finish, 12000);
+            })));
+        }
+
         async function downloadPdf() {
             const button = document.querySelector('[onclick="downloadPdf()"]');
             if (button) button.disabled = true;
             let wrap = null;
+            let style = null;
+            let progress = null;
             try {
+                const markdown = getTextarea().value || '';
+                if (!markdown.trim()) throw new Error('当前 Markdown 文档为空，没有可导出的内容。');
                 await loadExternalScript('https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js', () => typeof window.html2pdf === 'function');
-                const preview = document.getElementById('previewPane');
+
+                style = document.createElement('style');
+                style.id = 'mdePdfExportStyle';
+                style.textContent = [
+                    '.pdf-export-root{position:fixed;left:0;top:0;width:794px;min-height:1123px;display:block;overflow:visible;z-index:2147483647;margin:0;padding:0;background:#fff;color:#1f2937;font-family:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC","Source Han Sans SC",SimSun,Arial,sans-serif;font-size:14px;line-height:1.75;box-sizing:border-box}',
+                    '.pdf-export-root *{box-sizing:border-box!important;color:#1f2937!important;text-shadow:none!important;box-shadow:none!important}',
+                    '.pdf-export-content{width:794px;min-height:1123px;padding:42px 46px 52px;background:#fff;overflow:visible;overflow-wrap:anywhere;word-break:normal}',
+                    '.pdf-export-content h1{font-size:26px;line-height:1.35;margin:0 0 22px;padding-bottom:12px;border-bottom:1px solid #cbd5e1;break-after:avoid;page-break-after:avoid}',
+                    '.pdf-export-content h2{font-size:21px;line-height:1.4;margin:24px 0 12px;break-after:avoid;page-break-after:avoid}',
+                    '.pdf-export-content h3,.pdf-export-content h4,.pdf-export-content h5,.pdf-export-content h6{font-size:16px;line-height:1.45;margin:18px 0 9px;break-after:avoid;page-break-after:avoid}',
+                    '.pdf-export-content p{margin:9px 0;line-height:1.8;overflow-wrap:anywhere;word-break:normal}',
+                    '.pdf-export-content ul,.pdf-export-content ol{padding-left:25px;margin:10px 0}',
+                    '.pdf-export-content li{margin:4px 0;line-height:1.7;overflow-wrap:anywhere}',
+                    '.pdf-export-content blockquote{margin:12px 0;padding:8px 14px;border-left:4px solid #64748b;background:#f8fafc}',
+                    '.pdf-export-content a{color:#0369a1!important;overflow-wrap:anywhere;word-break:break-all}',
+                    '.pdf-export-content table{width:100%!important;max-width:100%!important;margin:14px 0;border-collapse:collapse;table-layout:fixed;font-size:12px;page-break-inside:auto}',
+                    '.pdf-export-content th,.pdf-export-content td{border:1px solid #cbd5e1!important;padding:7px 8px;text-align:left;vertical-align:top;overflow-wrap:anywhere;word-break:break-word}',
+                    '.pdf-export-content th{background:#eaf2f8!important;font-weight:700}',
+                    '.pdf-export-content tr{break-inside:avoid;page-break-inside:avoid}',
+                    '.pdf-export-content pre{max-width:100%;margin:12px 0;padding:12px;border:1px solid #dbe3ec;border-radius:5px;background:#f3f4f6!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;word-break:break-word;font-family:Consolas,"Courier New",monospace;font-size:10px;line-height:1.55}',
+                    '.pdf-export-content code{background:#f1f5f9!important;font-family:Consolas,"Courier New",monospace;font-size:.92em;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}',
+                    '.pdf-export-content pre code{background:transparent!important}',
+                    '.pdf-export-content img{display:block;max-width:100%!important;height:auto!important;margin:12px auto;object-fit:contain;break-inside:avoid;page-break-inside:avoid}',
+                    '.pdf-export-content video{display:none!important}',
+                    '.pdf-image-fallback{margin:10px 0;padding:8px 10px;border:1px dashed #94a3b8;color:#64748b!important;font-size:12px}',
+                    '.pdf-export-content hr{border:0;border-top:1px solid #cbd5e1;margin:18px 0}'
+                ].join('\n');
+                document.head.appendChild(style);
+
                 wrap = document.createElement('div');
                 wrap.className = 'pdf-export-root';
-                const style = document.createElement('style');
-                style.textContent = '.pdf-export-root{position:fixed;left:-12000px;top:0;width:794px;padding:28px;background:#fff;color:#111827;font-family:"Microsoft YaHei",Arial,sans-serif;z-index:-1}.pdf-export-root *{color:#111827!important;box-shadow:none!important;text-shadow:none!important}.pdf-export-root h1,.pdf-export-root h2,.pdf-export-root h3{color:#111827!important;border-color:#d1d5db!important;page-break-after:avoid}.pdf-export-root p,.pdf-export-root li{line-height:1.7}.pdf-export-root pre,.pdf-export-root code{background:#f3f4f6!important;color:#111827!important;white-space:pre-wrap;overflow-wrap:anywhere}.pdf-export-root blockquote{background:#f8fafc!important;border-left:4px solid #64748b!important}.pdf-export-root table{width:100%;border-collapse:collapse}.pdf-export-root th,.pdf-export-root td{border:1px solid #cbd5e1!important;padding:7px 9px}.pdf-export-root th{background:#eaf2f8!important}.pdf-export-root img{max-width:100%;height:auto;page-break-inside:avoid}.pdf-export-root pre,.pdf-export-root table{page-break-inside:avoid}';
-                wrap.appendChild(style);
-                const clone = preview.cloneNode(true);
-                clone.style.cssText = 'height:auto;overflow:visible;padding:0;background:#fff;color:#111827;line-height:1.75;width:100%;';
-                wrap.appendChild(clone);
+                const content = document.createElement('div');
+                content.className = 'pdf-export-content';
+                content.innerHTML = renderMarkdown(markdown);
+                wrap.appendChild(content);
                 document.body.appendChild(wrap);
-                await Promise.all(Array.from(clone.querySelectorAll('img')).map(img => img.complete ? Promise.resolve() : new Promise(resolve => {
-                    img.onload = resolve;
-                    img.onerror = resolve;
-                })));
+
+                progress = document.createElement('div');
+                progress.textContent = '正在生成 PDF，请稍候…';
+                progress.style.cssText = 'position:fixed;right:16px;top:16px;z-index:2147483647;padding:10px 14px;border-radius:10px;background:#0f172a;color:#fff;font:13px/1.5 sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.25)';
+                document.body.appendChild(progress);
+
+                for (const img of Array.from(content.querySelectorAll('img'))) {
+                    const src = img.getAttribute('src') || '';
+                    if (/^https?:\/\//i.test(src)) {
+                        img.removeAttribute('src');
+                        img.crossOrigin = 'anonymous';
+                        img.src = src;
+                    }
+                }
+                await waitForPdfImages(content);
+                if (document.fonts && document.fonts.ready) await document.fonts.ready;
+                await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
                 await window.html2pdf().set({
                     margin: [10, 10, 12, 10],
                     filename: getDocumentBaseName() + '.pdf',
                     image: { type: 'jpeg', quality: 0.96 },
-                    html2canvas: { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff', scrollY: 0 },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['css', 'legacy'] }
-                }).from(wrap).save();
+                    html2canvas: { scale: 2, useCORS: true, allowTaint: false, backgroundColor: '#ffffff', scrollX: 0, scrollY: 0, windowWidth: 794, logging: false },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+                    pagebreak: { mode: ['css', 'legacy'], avoid: ['h1', 'h2', 'h3', 'tr', 'img'] }
+                }).from(content).save();
             } catch (error) {
                 alert('PDF 导出失败：' + (error.message || error));
             } finally {
                 if (wrap) wrap.remove();
+                if (style) style.remove();
+                if (progress) progress.remove();
                 if (button) button.disabled = false;
             }
         }
@@ -924,7 +1018,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             const en = (text.match(/[a-zA-Z]/g) || []).length;
             const num = (text.match(/\d/g) || []).length;
             // 匹配常见中英文标点及特殊符号
-            const punc = (text.match(/[.,\/#!$%\^&\*;:{}=\-_`~()。\n\s,、；：？！…—·「」『』（）［］【】《》〈〉"']/g) || []).length;
+            const punc = (text.match(/[.,\/#!$%\^&\*;:{}=\-_\x60~()。,、；：？！…—·「」『』（）［］【】《》〈〉"']/g) || []).length;
 
             document.getElementById('docStats').innerHTML = `总:${total} &nbsp;汉:${cn} &nbsp;英:${en} &nbsp;数:${num} &nbsp;标:${punc}`;
         }
@@ -1053,10 +1147,10 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             const lines = markdown.split('\n');
             const html = [];
             let inCode = false; let codeLines = [];
-            let inUl = false; let inOl = false; let inTable = false;
+            let inUl = false; let inOl = false; let inTable = false; let tableHasHeader = false;
 
             const closeLists = () => { if (inUl) { html.push('</ul>'); inUl = false; } if (inOl) { html.push('</ol>'); inOl = false; } };
-            const closeTable = () => { if (inTable) { html.push('</tbody></table>'); inTable = false; } };
+            const closeTable = () => { if (inTable) { html.push('</tbody></table>'); inTable = false; tableHasHeader = false; } };
 
             lines.forEach((line) => {
                 if (line.trim().startsWith('```')) {
@@ -1075,8 +1169,9 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                     closeLists();
                     const cells = trimmed.slice(1, -1).split('|').map(cell => inlineMarkdown(cell.trim()));
                     if (cells.every(cell => /^:?-{3,}:?$/.test(cell))) return;
-                    if (!inTable) { html.push('<table><tbody>'); inTable = true; }
-                    const tag = html.join('').includes('<tr>') ? 'td' : 'th';
+                    if (!inTable) { html.push('<table><tbody>'); inTable = true; tableHasHeader = false; }
+                    const tag = tableHasHeader ? 'td' : 'th';
+                    tableHasHeader = true;
                     html.push(`<tr>${cells.map(cell => `<${tag}>${cell}</${tag}>`).join('')}</tr>`);
                     return;
                 }
@@ -1252,7 +1347,8 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             const sendButton = document.getElementById('chatSendBtn');
             if (!prompt) { status.textContent = '请先输入对话内容。'; return; }
             if (!key) { status.textContent = '请先填写上方对话 API Key。'; return; }
-            chatHistory.push({ role: 'user', content: prompt });
+            const userMessage = { role: 'user', content: prompt };
+            chatHistory.push(userMessage);
             input.value = '';
             renderChatLog();
             sendButton.disabled = true;
@@ -1279,13 +1375,17 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 renderChatLog();
                 status.textContent = '完成 · ' + (data.usage && data.usage.total_tokens ? data.usage.total_tokens + ' Tokens' : model);
             } catch (error) {
-                status.textContent = '请求失败：' + (error.message || error);
+                const index = chatHistory.lastIndexOf(userMessage);
+                if (index >= 0) chatHistory.splice(index, 1);
+                input.value = prompt;
+                renderChatLog();
+                status.textContent = '请求失败：' + (error.message || error) + '。已保留输入，可修改后重试。';
             } finally {
                 sendButton.disabled = false;
             }
         }
 
-        function initChatUI() {
+                function initChatUI() {
             document.getElementById('chatSendBtn').addEventListener('click', sendChatPrompt);
             document.getElementById('chatInsertBtn').addEventListener('click', () => {
                 if (lastChatReply) insertAtCursor('\n\n' + lastChatReply + '\n\n');
@@ -1314,6 +1414,10 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             try { localStorage.setItem(key, value); } catch (error) {}
         }
 
+        function safeStorageRemove(key) {
+            try { localStorage.removeItem(key); } catch (error) {}
+        }
+
         const IMAGE_SPACE_ID = 'assembledchaos/qwen-image-2-1-studio';
         const IMAGE_API_DEFAULT = 'https://api.apimart.ai';
         let activeImageModel = 'gpt';
@@ -1322,6 +1426,11 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         let imageResultUrl = '';
         let imageRunning = false;
         let activeImageTaskId = '';
+
+        function updateImagePromptCount() {
+            const count = document.getElementById('imagePrompt').value.length;
+            document.getElementById('imagePromptCount').textContent = count.toLocaleString('zh-CN') + ' 字';
+        }
 
         function imageStatus(message, type) {
             const box = document.getElementById('imageStatus');
@@ -1350,6 +1459,9 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             document.getElementById('imageGptSettings').hidden = activeImageModel !== 'gpt';
             document.getElementById('imageQwenSettings').hidden = activeImageModel !== 'qwen';
             document.getElementById('imageTransparentOption').hidden = activeImageModel !== 'qwen';
+            document.getElementById('imageResolutionGroup').hidden = activeImageModel !== 'gpt';
+            if (activeImageModel !== 'gpt') document.getElementById('imageTaskWrap').hidden = true;
+            else if (activeImageTaskId) document.getElementById('imageTaskWrap').hidden = false;
             if (activeImageModel === 'gpt' && document.getElementById('imageTaskMode').value === 'transparent') {
                 document.getElementById('imageTaskMode').value = 'auto';
             }
@@ -1367,9 +1479,15 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             safeStorageSet(STORAGE_KEYS.qwenSeed, document.getElementById('qwenSeed').value);
             if (document.getElementById('rememberImageKey').checked) {
                 safeStorageSet('cpuck_image_api_key', document.getElementById('imageApiKey').value.trim());
+            } else {
+                safeStorageRemove('cpuck_image_api_key');
+                safeStorageRemove('tcq_html_imageApiKey');
             }
             if (document.getElementById('rememberHfToken').checked) {
                 safeStorageSet('cpuck_image_hf_token', document.getElementById('hfToken').value.trim());
+            } else {
+                safeStorageRemove('cpuck_image_hf_token');
+                safeStorageRemove('tcq_html_hfApiKey');
             }
         }
 
@@ -1609,6 +1727,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             if (modeText === 'Edit an image' && !imageSourceBlob) throw new Error('Qwen 图像编辑模式需要先上传参考图片。');
             const token = document.getElementById('hfToken').value.trim();
             if (token && document.getElementById('rememberHfToken').checked) safeStorageSet('cpuck_image_hf_token', token);
+
             imageStatus('正在连接 Hugging Face Space…');
             const module = await import('https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js');
             const client = await module.Client.connect(IMAGE_SPACE_ID, Object.assign({}, token ? { token: token } : {}, { events: ['status', 'data'] }));
@@ -1623,9 +1742,12 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             const seed = Math.max(0, Math.min(2147483647, Number(document.getElementById('qwenSeed').value) || 42));
             const random = document.getElementById('randomSeed').checked;
             const inputs = buildQwenInputs(parameters, prompt, modeText, reference, imageRatioLabel(document.getElementById('imageAspect').value), steps, seed, random);
+
             imageStatus('已连接 Qwen Space，正在提交任务…');
             const job = client.submit(endpoint, inputs);
-            let finalData, lastStatus = null;
+            let finalData;
+            let lastStatus = null;
+            let dataEvents = 0;
             for await (const update of job) {
                 if (!update) continue;
                 if (update.type === 'status') {
@@ -1636,16 +1758,19 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                     }
                 } else if (update.type === 'data') {
                     finalData = update.data;
+                    dataEvents += 1;
                     imageStatus('Qwen Image 2.1 · 已收到生成结果，正在解析图片…');
                 }
             }
-            if (finalData === undefined) throw new Error('Gradio 任务结束，但没有收到 data 结果事件。状态：' + JSON.stringify(lastStatus || {}));
+            if (finalData === undefined) {
+                throw new Error('Gradio 任务结束，但没有收到 data 结果事件。状态：' + JSON.stringify(lastStatus || {}) + '；data 事件数：' + dataEvents + '。请检查 Space 是否正常运行及 API 参数。');
+            }
             const url = findQwenImage(finalData);
-            if (!url) throw new Error('Space 已返回结果，但未识别到图片文件：' + JSON.stringify(finalData).slice(0, 500));
+            if (!url) throw new Error('Space 已返回 data 结果，但未识别到图片文件：' + JSON.stringify(finalData).slice(0, 500));
             showGeneratedImage(url, 'Qwen Image 2.1');
         }
 
-        function showGeneratedImage(url, modelName) {
+                function showGeneratedImage(url, modelName) {
             imageResultUrl = url;
             document.getElementById('imageResultImage').src = url;
             document.getElementById('imageResultPreview').hidden = false;
@@ -1713,24 +1838,55 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         function initImageGenerator() {
             document.getElementById('imageModel').addEventListener('change', updateImageModel);
             document.getElementById('imageTaskMode').addEventListener('change', updateImageTaskLabel);
+            document.getElementById('toggleChatKey').addEventListener('click', function () {
+                const field = document.getElementById('apiKey');
+                field.type = field.type === 'password' ? 'text' : 'password';
+                this.textContent = field.type === 'password' ? '显示' : '隐藏';
+            });
+            document.getElementById('toggleImageApiKey').addEventListener('click', function () {
+                const field = document.getElementById('imageApiKey');
+                field.type = field.type === 'password' ? 'text' : 'password';
+                this.textContent = field.type === 'password' ? '显示' : '隐藏';
+            });
+            document.getElementById('toggleHfToken').addEventListener('click', function () {
+                const field = document.getElementById('hfToken');
+                field.type = field.type === 'password' ? 'text' : 'password';
+                this.textContent = field.type === 'password' ? '显示' : '隐藏';
+            });
+            document.getElementById('imagePrompt').addEventListener('input', updateImagePromptCount);
+            updateImagePromptCount();
             document.getElementById('generateImageBtn').addEventListener('click', generateImage);
             document.getElementById('insertImageBtn').addEventListener('click', insertGeneratedImageIntoMarkdown);
             document.getElementById('downloadImageBtn').addEventListener('click', downloadGeneratedImage);
             document.getElementById('useImageBtn').addEventListener('click', useGeneratedImageAsSource);
             document.getElementById('removeImageSource').addEventListener('click', clearImageSource);
-            document.getElementById('imageInput').addEventListener('change', event => {
-                const file = event.target.files && event.target.files[0];
+            const imageInput = document.getElementById('imageInput');
+            const imageDrop = document.getElementById('imageUploadDrop');
+            const acceptImageFile = file => {
                 if (!file) return;
                 if (!file.type.startsWith('image/')) {
-                    imageStatus('请选择图片文件。', 'error');
+                    imageStatus('请选择 PNG、JPG、WebP 等图片文件。', 'error');
                     return;
                 }
                 setImageSource(file, file.name);
                 imageStatus('参考图片已载入。可选择图像编辑，或保持自动判断。');
+            };
+            imageInput.addEventListener('change', event => acceptImageFile(event.target.files && event.target.files[0]));
+            ['dragenter', 'dragover'].forEach(name => imageDrop.addEventListener(name, event => {
+                event.preventDefault();
+                imageDrop.classList.add('drag');
+            }));
+            ['dragleave', 'drop'].forEach(name => imageDrop.addEventListener(name, event => {
+                event.preventDefault();
+                imageDrop.classList.remove('drag');
+            }));
+            imageDrop.addEventListener('drop', event => {
+                const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+                acceptImageFile(file);
             });
             document.getElementById('imagePrompt').addEventListener('input', saveImageSettings);
-            document.getElementById('imageApiKey').addEventListener('change', saveImageSettings);
-            document.getElementById('hfToken').addEventListener('change', saveImageSettings);
+            document.getElementById('imageApiKey').addEventListener('input', saveImageSettings);
+            document.getElementById('hfToken').addEventListener('input', saveImageSettings);
             document.getElementById('rememberImageKey').addEventListener('change', saveImageSettings);
             document.getElementById('rememberHfToken').addEventListener('change', saveImageSettings);
             document.getElementById('queryImageTaskBtn').addEventListener('click', async function () {
