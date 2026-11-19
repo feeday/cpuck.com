@@ -133,7 +133,7 @@ const systemPrompt =
 "If task needs work beyond this browser (large datasets, many millions of cells, complex transformations), return operations [] and python_code as a self-contained complete Python 3 script using pandas or polars, accepting original input filenames as paths, writing a new result file and NEVER deleting/overwriting the source. " +
 "Use snippets to understand task, not to hallucinate the full output. In the JSON summary explain what will happen. Output valid JSON.";
 const parseResponse = value => {
-  let txt=String(value??"").trim().replace(/^\\s*\\x60\\x60\\x60(?:json)?\\s*/i,"").replace(/\\s*\\x60\\x60\\x60$/,"");
+  let txt=String(value??"").trim().replace(/^\s*\x60\x60\x60(?:json)?\s*/i,"").replace(/\s*\x60\x60\x60$/,"");
   const obj=JSON.parse(txt);
   if(!obj || typeof obj!=="object"||Array.isArray(obj))throw Error("API 未返回 JSON 对象");
   if(!Array.isArray(obj.operations))obj.operations=[];
