@@ -633,6 +633,11 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             return new Promise((resolve, reject) => {
                 const existing = Array.from(document.scripts).find(item => item.src === src);
                 if (existing) {
+                    if (existing.dataset.loaded === 'true') {
+                        if (isReady()) resolve();
+                        else reject(new Error('组件已加载，但初始化失败：' + src));
+                        return;
+                    }
                     existing.addEventListener('load', resolve, { once: true });
                     existing.addEventListener('error', () => reject(new Error('组件加载失败：' + src)), { once: true });
                     return;
@@ -640,7 +645,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 const script = document.createElement('script');
                 script.src = src;
                 script.async = true;
-                script.onload = resolve;
+                script.onload = () => { script.dataset.loaded = 'true'; resolve(); };
                 script.onerror = () => reject(new Error('组件加载失败，请检查网络或 CDN：' + src));
                 document.head.appendChild(script);
             });
@@ -670,7 +675,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             });
         }
 
-        function markdownToDocxBlocks(markdown, lib) {
+        async function markdownToDocxBlocks(markdown, lib) {
             const lines = String(markdown || '').replace(/\r/g, '').split('\n');
             const children = [];
             let codeLines = [];
@@ -705,7 +710,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                     const colCount = Math.max(1, ...rows.map(row => row.length));
                     const border = { style: lib.BorderStyle.SINGLE, size: 1, color: 'CBD5E1' };
                     const borders = { top: border, bottom: border, left: border, right: border, insideHorizontal: border, insideVertical: border };
-                    const table = new lib.Table({
+                    children.push(new lib.Table({
                         width: { size: 100, type: lib.WidthType.PERCENTAGE },
                         columnWidths: Array(colCount).fill(Math.floor(9000 / colCount)),
                         borders,
@@ -721,30 +726,58 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                                 })]
                             }))
                         }))
-                    });
-                    children.push(table);
+                    }));
                     children.push(new lib.Paragraph({ children: [new lib.TextRun('')], spacing: { after: 100 } }));
                 }
                 tableLines = [];
             };
 
-            lines.forEach(line => {
+            for (const line of lines) {
                 if (/^\s*\x60{3}/.test(line)) {
                     flushTable();
                     if (inCode) flushCode();
                     inCode = !inCode;
-                    return;
+                    continue;
                 }
                 if (inCode) {
                     codeLines.push(line);
-                    return;
+                    continue;
                 }
                 if (/^\s*\|.*\|\s*$/.test(line)) {
                     tableLines.push(line);
-                    return;
+                    continue;
                 }
                 flushTable();
-                if (!line.trim()) return;
+                if (!line.trim()) continue;
+
+                const image = line.match(/^\s*!\[([^\]]*)\]\((.+)\)\s*$/);
+                if (image) {
+                    try {
+                        const response = await fetch(image[2]);
+                        if (!response.ok) throw new Error('HTTP ' + response.status);
+                        const blob = await response.blob();
+                        const bytes = new Uint8Array(await blob.arrayBuffer());
+                        let width = 520, height = 340;
+                        try {
+                            const bitmap = await createImageBitmap(blob);
+                            const scale = Math.min(1, 560 / bitmap.width, 420 / bitmap.height);
+                            width = Math.max(1, Math.round(bitmap.width * scale));
+                            height = Math.max(1, Math.round(bitmap.height * scale));
+                            bitmap.close();
+                        } catch (error) {}
+                        children.push(new lib.Paragraph({
+                            children: [new lib.ImageRun({
+                                data: bytes,
+                                transformation: { width: width, height: height }
+                            })],
+                            alignment: lib.AlignmentType.CENTER,
+                            spacing: { before: 100, after: 160 }
+                        }));
+                    } catch (error) {
+                        children.push(paragraph('图片：' + image[1] + '（图片链接：' + image[2] + '）'));
+                    }
+                    continue;
+                }
 
                 const heading = line.match(/^(#{1,6})\s+(.+)$/);
                 if (heading) {
@@ -762,30 +795,30 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                         heading: headingLevels[level],
                         spacing: { before: 220, after: 120 }
                     }));
-                    return;
+                    continue;
                 }
                 if (/^\s*[-*+]\s+/.test(line)) {
                     children.push(paragraph('•  ' + line.replace(/^\s*[-*+]\s+/, ''), { indent: { left: 360, hanging: 180 } }));
-                    return;
+                    continue;
                 }
                 const ordered = line.match(/^\s*(\d+)[.)]\s+(.+)$/);
                 if (ordered) {
                     children.push(paragraph(ordered[1] + '.  ' + ordered[2], { indent: { left: 360, hanging: 180 } }));
-                    return;
+                    continue;
                 }
                 if (/^\s*>\s?/.test(line)) {
                     children.push(paragraph(line.replace(/^\s*>\s?/, ''), {
                         indent: { left: 420 },
                         border: { left: { color: '38BDF8', space: 8, style: lib.BorderStyle.SINGLE, size: 16 } }
                     }));
-                    return;
+                    continue;
                 }
                 if (/^\s*(---|\*\*\*|___)\s*$/.test(line)) {
                     children.push(new lib.Paragraph({ border: { bottom: { color: 'CBD5E1', style: lib.BorderStyle.SINGLE, size: 6 } }, spacing: { after: 180 } }));
-                    return;
+                    continue;
                 }
                 children.push(paragraph(line));
-            });
+            }
             if (inCode) flushCode();
             flushTable();
             if (!children.length) children.push(new lib.Paragraph({ children: [new lib.TextRun(' ')] }));
@@ -810,7 +843,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                     },
                     sections: [{
                         properties: { page: { margin: { top: 900, right: 900, bottom: 900, left: 900 } } },
-                        children: markdownToDocxBlocks(getTextarea().value, lib)
+                        children: await markdownToDocxBlocks(getTextarea().value, lib)
                     }]
                 });
                 const blob = await lib.Packer.toBlob(doc);
