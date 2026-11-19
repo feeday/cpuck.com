@@ -128,7 +128,7 @@ const systemPrompt =
 "filter: {type,target_col,term,exact}; " +
 "clear_filter: {type}. " +
 "Columns are A/B/C... or header names. start_row and end_row are 1-based Excel rows. " +
-"For lookup_fill source_file MUST exactly equal an attached filename and duplicate_policy should be 'error' unless user explicitly chose 'first' or 'last'. " +
+"For lookup_fill source_file is either the literal string current (for existing working sheet) or exactly an attached filename; duplicate_policy should be 'error' unless user explicitly chose 'first' or 'last'. " +
 "Do not invent filenames, cells, columns, rows or data. Keep leading zeros in IDs. Only use listed operations. " +
 "If task needs work beyond this browser (large datasets, many millions of cells, complex transformations), return operations [] and python_code as a self-contained complete Python 3 script using pandas or polars, accepting original input filenames as paths, writing a new result file and NEVER deleting/overwriting the source. " +
 "Use snippets to understand task, not to hallucinate the full output. In the JSON summary explain what will happen. Output valid JSON.";
@@ -142,9 +142,9 @@ const parseResponse = value => {
 };
 const shiftFormula = (formula,delta) => String(formula).split(/("(?:[^"]|"")*")/).map(part=>{
   if(part.startsWith('"'))return part;
-  return part.replace(/(\$?)([A-Za-z]{1,3})(\$?)([1-9]\d*)/g,(all,ca,letters,ra,row)=>{
+  return part.replace(/(^|[^A-Za-z0-9_.])(\$?)([A-Za-z]{1,3})(\$?)([1-9]\d*)(?![A-Za-z0-9_])/g,(all,prefix,ca,letters,ra,row)=>{
     if(ra==="$")return all;
-    return ca+letters+ra+String(Math.max(1,+row+delta));
+    return prefix+ca+letters+ra+String(Math.max(1,+row+delta));
   });
 }).join("");
 const trimId = x => String(x??"").trim();
@@ -159,12 +159,14 @@ const computePlan = plan => {
     if(!op||typeof op!=="object")throw Error("无效操作");
     const type=op.type;
     if(type==="lookup_fill"){
-      const file=attachments.find(x=>x.name===op.source_file);
-      if(!file || !file.rows.length || file.large)throw Error("对照文件未完整读取，无法直接匹配。请使用 Python 模式。");
-      const sk=colNumber(op.source_key_col,file.columns),sv=colNumber(op.source_value_col,file.columns),tk=index(op.target_key_col),tc=index(op.target_col),begin=Number(op.start_row||2),last=end(op.end_row,begin);
+      const isCurrent=op.source_file==="current"||op.source_file===main.name;
+      const file=isCurrent?null:attachments.find(x=>x.name===op.source_file);
+      if(!isCurrent&&(!file || !file.rows.length || file.large))throw Error("对照文件未完整读取，无法直接匹配。请使用 Python 模式。");
+      const sk=isCurrent?index(op.source_key_col):colNumber(op.source_key_col,file.columns),sv=isCurrent?index(op.source_value_col):colNumber(op.source_value_col,file.columns),tk=index(op.target_key_col),tc=index(op.target_col),begin=Number(op.start_row||2),last=end(op.end_row,begin);
       if([sk,sv].some(i=>i<0||i>99))throw Error("对照列不存在");
       const map=new Map(),dups=new Set(),policy=op.duplicate_policy||"error";
-      for(let i=1;i<file.rows.length;i++){const row=file.rows[i],key=trimId(row[sk]);if(!key)continue;if(map.has(key)){dups.add(key);if(policy==="last")map.set(key,String(row[sv]??""));}else map.set(key,String(row[sv]??""));}
+      const sourceCount=isCurrent?C.used(main):file.rows.length;
+      for(let i=1;i<sourceCount;i++){const row=isCurrent?null:file.rows[i],key=trimId(isCurrent?temp[C.k(i,sk)]:row[sk]),val=String(isCurrent?(temp[C.k(i,sv)]??""):(row[sv]??""));if(!key)continue;if(map.has(key)){dups.add(key);if(policy==="last")map.set(key,val);}else map.set(key,val);}
       if(dups.size && !["first","last"].includes(policy))throw Error("对照表有 "+dups.size+" 个重复 ID；请指定第一条或最后一条，或先去重");
       let hits=0;
       for(let row=begin-1;row<last;row++){
@@ -231,7 +233,7 @@ async function generate(){
     say("正在分析本地数据结构…");
     const shape=await collectInputs();
     say("正在调用第三方 AI API…");
-    const payload={model,temperature:0,messages:[{role:"system",content:systemPrompt},{role:"user",content:"Please return JSON operation plan based on these actual spreadsheet facts:\n"+JSON.stringify(shape)}]};
+    const payload={model,messages:[{role:"system",content:systemPrompt},{role:"user",content:"Please return JSON operation plan based on these actual spreadsheet facts:\n"+JSON.stringify(shape)}]};
     if($("aiopJsonMode").checked)payload.response_format={type:"json_object"};
     const response=await fetch(url,{method:"POST",headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},body:JSON.stringify(payload)});
     const raw=await response.text();
