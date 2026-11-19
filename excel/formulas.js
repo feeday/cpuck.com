@@ -28,6 +28,25 @@ COUNT:a=>a.flatMap(arr).filter(x=>typeof x==="number").length,
 COUNTA:a=>a.flatMap(arr).filter(x=>x!==""&&x!==null&&x!==undefined).length,
 COUNTBLANK:a=>a.flatMap(arr).filter(x=>x===""||x===null).length,
 MAX:a=>Math.max(...a.flatMap(arr).map(num)),MIN:a=>Math.min(...a.flatMap(arr).map(num)),
+AVERAGEIFS:a=>{const base=arr(a[0]),out=[];for(let j=0;j<base.length;j++){let ok=true;for(let i=1;i<a.length;i+=2)if(!matches(arr(a[i])[j]??"",a[i+1]))ok=false;if(ok&&base[j]!=="")out.push(num(base[j]))}return out.length?out.reduce((x,y)=>x+y,0)/out.length:fail("#DIV/0!")},
+MAXIFS:a=>{const base=arr(a[0]),out=[];for(let j=0;j<base.length;j++){let ok=true;for(let i=1;i<a.length;i+=2)if(!matches(arr(a[i])[j]??"",a[i+1]))ok=false;if(ok)out.push(num(base[j]))}return out.length?Math.max(...out):0},
+MINIFS:a=>{const base=arr(a[0]),out=[];for(let j=0;j<base.length;j++){let ok=true;for(let i=1;i<a.length;i+=2)if(!matches(arr(a[i])[j]??"",a[i+1]))ok=false;if(ok)out.push(num(base[j]))}return out.length?Math.min(...out):0},
+MEDIAN:a=>{let x=a.flatMap(arr).filter(y=>y!=="").map(num).sort((a,b)=>a-b),m=Math.floor(x.length/2);return x.length?x.length%2?x[m]:(x[m-1]+x[m])/2:fail("#NUM!")},
+"RANK.EQ":a=>1+arr(a[1]).map(num).filter(x=>num(a[2]??0)?x<num(a[0]):x>num(a[0])).length,
+HLOOKUP:a=>{const matrix=mat(a[1]),i=matrix[0]?.findIndex(x=>eq(x,a[0]))??-1;return i<0?"#N/A":matrix[num(a[2])-1]?.[i]??"#REF!"},
+CHOOSECOLS:a=>mat(a[0]).map(row=>a.slice(1).map(i=>row[num(i)-1]??"")),
+TAKE:a=>num(a[1])>=0?mat(a[0]).slice(0,num(a[1])):mat(a[0]).slice(num(a[1])),
+DROP:a=>num(a[1])>=0?mat(a[0]).slice(num(a[1])):mat(a[0]).slice(0,num(a[1])),
+VSTACK:a=>a.flatMap(mat),
+HSTACK:a=>{const all=a.map(mat),count=Math.max(...all.map(x=>x.length));return Array.from({length:count},(_,i)=>all.flatMap(x=>x[i]||Array(x[0]?.length||1).fill("")))},
+REPT:a=>str(a[0]).repeat(Math.max(0,Math.min(20000,num(a[1])))),
+PROPER:a=>str(a[0]).toLowerCase().replace(/\b[a-z]/g,x=>x.toUpperCase()),
+SWITCH:a=>{for(let i=1;i<a.length-1;i+=2)if(eq(a[0],a[i]))return a[i+1];return a.length%2===0?a.at(-1):"#N/A"},
+ISERROR:a=>typeof a[0]==="string"&&a[0].startsWith("#"),
+EOMONTH:a=>{const d=new Date(str(a[0]));return new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+num(a[1])+1,0)).toISOString().slice(0,10)},
+EDATE:a=>{const d=new Date(str(a[0]));d.setUTCMonth(d.getUTCMonth()+num(a[1]));return d.toISOString().slice(0,10)},
+NETWORKDAYS:a=>{let d=new Date(str(a[0])),end=new Date(str(a[1])),count=0;if(!Number.isFinite(d.getTime()+end.getTime()))fail("#VALUE!");while(d<=end&&count<100000){if(d.getUTCDay()!==0&&d.getUTCDay()!==6)count++;d.setUTCDate(d.getUTCDate()+1)}return count},
+
 COUNTIF:a=>arr(a[0]).filter(v=>matches(v,a[1])).length,
 COUNTIFS:a=>{let n=0;const nrow=arr(a[0]).length;for(let j=0;j<nrow;j++){let ok=true;for(let i=0;i<a.length;i+=2)if(!matches(arr(a[i])[j]??"",a[i+1]))ok=false;if(ok)n++}return n},
 SUMIF:a=>arr(a[0]).reduce((s,v,i)=>s+(matches(v,a[1])?num(arr(a[2]??a[0])[i]):0),0),
@@ -82,7 +101,7 @@ if(node.k==="u")return node.op==="-"?-num(visit(node.a)):num(visit(node.a));
 if(node.k==="percent")return num(visit(node.a))/100;
 if(node.k==="bin"){const a=visit(node.a),b=visit(node.b);if(["=","<>","<",">","<=",">="].includes(node.op)){if(a&&a.__matrix||b&&b.__matrix){const left=a&&a.__matrix?mat(a):null,right=b&&b.__matrix?mat(b):null;const rows=Math.max(left?.length||1,right?.length||1),cols=Math.max(left?.[0]?.length||1,right?.[0]?.length||1);return {__matrix:true,data:Array.from({length:rows},(_,r)=>Array.from({length:cols},(_,c)=>cmp(left?left[r]?.[c]??"":a,right?right[r]?.[c]??"":b,node.op)))}}return cmp(a,b,node.op)}if(node.op==="&")return str(a)+str(b);if(node.op==="+")return num(a)+num(b);if(node.op==="-")return num(a)-num(b);if(node.op==="*")return num(a)*num(b);if(node.op==="/")return num(b)?num(a)/num(b):fail("#DIV/0!");if(node.op==="^")return num(a)**num(b)}
 if(node.k==="fn"){const n=node.name;if(n==="IF")return yes(visit(node.args[0]))?visit(node.args[1]):node.args[2]?visit(node.args[2]):false;if(n==="IFERROR"||n==="IFNA"){try{let z=visit(node.args[0]);return typeof z==="string"&&z.startsWith("#")?(node.args[1]?visit(node.args[1]):""):z}catch(e){return node.args[1]?visit(node.args[1]):""}}if(n==="IFS"){for(let i=0;i<node.args.length;i+=2)if(yes(visit(node.args[i])))return visit(node.args[i+1]);return"#N/A"}if(n==="AND"){for(let a of node.args)if(!yes(visit(a)))return false;return true}if(n==="OR"){for(let a of node.args)if(yes(visit(a)))return true;return false}
-if(n==="ROW"&&!node.args.length)return(stack.currentRow||0)+1;if(n==="COLUMN"&&!node.args.length)return(stack.currentCol||0)+1;
+if(n==="ROW")return node.args[0]?.k==="ref"?coordinate(node.args[0].ref).r+1:(stack.currentRow||0)+1;if(n==="COLUMN")return node.args[0]?.k==="ref"?coordinate(node.args[0].ref).c+1:(stack.currentCol||0)+1;if(n==="INDIRECT"){const p=coordinate(str(visit(node.args[0])));return getCell(sheet,p.r,p.c,stack)};
 if(!functions[n])fail("#NAME? "+n);return functions[n](node.args.map(visit))}
 fail("#ERROR!")};
 try{return visit(ast)}catch(e){return e.message||"#ERROR!"}}
