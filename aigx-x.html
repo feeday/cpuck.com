@@ -1,25 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="AI 对话、图像生成与 Markdown 编辑预览工作台，支持导出 MD、Word 和 PDF。">
-<link rel="icon" type="image/png" href="/favicon.png">
-<title>MDE Markdown 工作台</title>
-<style>
-*{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#020617}
-#mdFrame{display:block;width:100%;height:100%;border:0;background:#020617}
-</style>
-</head>
-<body>
-<iframe id="mdFrame" title="MDE Markdown 工作台"></iframe>
-<script type="text/plain" id="mdSource" class="embedded-source">
-
-
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+<meta name="description" content="AI 对话、图像生成与 Markdown 编辑预览工作台。">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <script>
 (function () {
   function memStore() {
@@ -33,10 +16,10 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
     catch { try {Object.defineProperty(window,name,{configurable:true,value:memStore()});}catch{} }
   }
 })();
-<\/script>
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-     <link rel="icon" type="image/png" href="/assets/favicon.png">
+     <link rel="icon" type="image/png" href="/favicon.png">
     <title>MDE Markdown 工作台</title>
     <style>
         :root {
@@ -71,13 +54,20 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         .workspace {
             display: flex;
             width: 100%;
-            height: calc(100vh - 36px);
+            height: calc(100dvh - 36px);
+            min-height: 0;
             gap: 14px;
+            transition: gap 0.28s ease;
+        }
+
+        .workspace.sidebar-collapsed {
+            gap: 0;
         }
 
         .panel {
             width: 330px;
-            flex-shrink: 0;
+            min-width: 0;
+            flex: 0 0 330px;
             background: var(--bg-card);
             border: 1px solid var(--border-light);
             border-radius: 22px;
@@ -86,13 +76,17 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             -webkit-backdrop-filter: blur(18px);
             display: flex;
             flex-direction: column;
-            transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s;
+            transition: flex-basis 0.28s cubic-bezier(0.4, 0, 0.2, 1), border-width 0.28s, opacity 0.2s;
             overflow: hidden;
         }
 
         /* 侧边栏折叠状态 */
         .panel.collapsed {
-            margin-left: -344px; /* 330px 宽度 + 14px 间距 */
+            flex-basis: 0;
+            width: 0;
+            min-width: 0;
+            margin-left: 0;
+            border-width: 0;
             opacity: 0;
             pointer-events: none;
         }
@@ -193,13 +187,13 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         .small { font-size: 0.78rem; color: var(--text-tertiary); line-height: 1.55; }
 
         @media (max-width: 980px) {
-            body { padding: 0; overflow: auto; }
-            .workspace { height: auto; min-height: 100vh; flex-direction: column; padding: 12px; }
-            .panel { width: 100% !important; margin-left: 0 !important; }
+            html, body { height: auto; min-height: 100%; }
+            body { padding: 0; overflow-x: hidden; overflow-y: auto; }
+            .workspace { height: auto; min-height: 100svh; flex-direction: column; padding: 12px; gap: 14px; }
+            .panel { width: 100%; flex: 0 0 auto; margin-left: 0; height: min(78svh, 760px); max-height: none; min-height: 0; }
             .split { grid-template-columns: 1fr; }
             .panel, .editor-card, .preview-card { border-radius: 18px; }
             #markdownInput, .preview-container { height: 52vh; }
-            .panel { max-height: 78svh; min-height: 0; }
             .panel-scroll { flex: 1 1 auto; min-height: 0; }
             .panel.collapsed { display: none; }
             .topbar { align-items: center; }
@@ -214,6 +208,8 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         .chat-empty{color:var(--text-tertiary);font-size:.76rem;line-height:1.6;text-align:center;padding:14px 5px}
         .chat-status,.image-status{font-size:.76rem;line-height:1.55;color:var(--text-secondary);overflow-wrap:anywhere;margin-top:7px}
         .chat-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+        .chat-diagnostics{grid-template-columns:auto minmax(0,1fr);align-items:center}
+        .chat-diagnostics .btn{height:34px;padding:0 11px;font-size:.76rem}
         .image-settings{padding:12px;border:1px solid rgba(148,163,184,.14);border-radius:13px;background:rgba(2,6,23,.25);margin-bottom:10px}
         .image-settings[hidden],.image-result[hidden],#imageTaskWrap[hidden]{display:none!important}
         .image-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -276,6 +272,10 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                     <div class="chat-actions">
                         <button class="btn" id="chatSendBtn" type="button">发送对话</button>
                         <button class="btn secondary" id="chatInsertBtn" type="button" disabled>插入回答到 MD</button>
+                    </div>
+                    <div class="chat-actions chat-diagnostics">
+                        <button class="btn secondary" id="chatTestBtn" type="button">测试 API 连接</button>
+                        <span class="small">浏览器直连服务商；测试会发送一条很短的请求。</span>
                     </div>
                     <div id="chatStatus" class="chat-status">支持 OpenAI 兼容的 /v1/chat/completions 接口。</div>
                     <div id="chatLog" class="chat-log" aria-live="polite"><div class="chat-empty">对话内容会显示在这里。回答可一键插入 Markdown。</div></div>
@@ -433,7 +433,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         <main class="main">
 
             <div class="topbar">
-                <button class="tool-btn" title="展开/收起控制台" onclick="toggleSidebar()" style="font-size: 1.2rem; color: var(--theme-blue);">☰</button>
+                <button class="tool-btn" id="sidebarToggleBtn" type="button" title="展开/收起侧边栏" aria-controls="sidePanel" aria-expanded="true" onclick="toggleSidebar()" style="font-size: 1.2rem; color: var(--theme-blue);">☰</button>
                 <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1); margin: 0 4px;"></div>
 
                 <button class="tool-btn" title="标题" onclick="wrapLine('# ', '')">H1</button>
@@ -544,7 +544,12 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         // --- 控制台平滑折叠 ---
         function toggleSidebar() {
             const panel = document.getElementById('sidePanel');
-            panel.classList.toggle('collapsed');
+            const workspace = document.querySelector('.workspace');
+            const button = document.getElementById('sidebarToggleBtn');
+            const collapsed = panel.classList.toggle('collapsed');
+            workspace.classList.toggle('sidebar-collapsed', collapsed);
+            button.setAttribute('aria-expanded', String(!collapsed));
+            button.setAttribute('aria-label', collapsed ? '展开侧边栏' : '收起侧边栏');
         }
 
         // --- 核心：在新标签打开网页预览 ---
@@ -1146,7 +1151,6 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         // --- AI API 调用逻辑 ---
         async function runAiEdit(mode) {
             const apiKey = document.getElementById('apiKey').value.trim();
-            const endpoint = getChatApiEndpoint();
             const model = document.getElementById('modelName').value.trim() || 'deepseek-v4-flash';
             const doc = getTextarea().value.trim();
             const instruction = document.getElementById('aiInstruction').value;
@@ -1162,28 +1166,11 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             saveSettings();
 
             try {
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model,
-                        messages: [
-                            { role: 'system', content: '你是专业的文档排版与处理助手。直接输出修改后的结果内容，严禁输出任何寒暄或废话。除非用户文本当中本身包含 markdown 代码块包裹，否则你绝对不要使用 ``` 标记来包裹你的回复全文。' },
-                            { role: 'user', content: `${instruction}\n${customInstruction ? `补充要求：${customInstruction}\n` : ''}\n---\n${doc}` }
-                        ],
-                        max_tokens: 8192
-                    })
-                });
+                const data = await requestChatCompletion([
+                    { role: 'system', content: '你是专业的文档排版与处理助手。直接输出修改后的结果内容，严禁输出任何寒暄或废话。除非用户文本当中本身包含 markdown 代码块包裹，否则你绝对不要使用代码围栏包裹你的回复全文。' },
+                    { role: 'user', content: instruction + '\n' + (customInstruction ? '补充要求：' + customInstruction + '\n' : '') + '\n---\n' + doc }
+                ], 8192);
 
-                if (!response.ok) {
-                    const errData = await response.json().catch(() => ({}));
-                    throw new Error(errData?.error?.message || `HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
                 let result = data.choices?.[0]?.message?.content?.trim();
 
                 // 去除可能被大模型错误包裹的代码块标记
@@ -1207,10 +1194,74 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         }
 
         function getChatApiEndpoint() {
-            let base = (document.getElementById('apiBaseUrl').value.trim() || 'https://api.poixe.com/v1/').replace(/\/+$/, '');
-            if (/\/chat\/completions$/i.test(base)) return base;
-            if (!/\/v1$/i.test(base)) base += '/v1';
-            return base + '/chat/completions';
+            const raw = (document.getElementById('apiBaseUrl').value.trim() || 'https://api.poixe.com/v1');
+            let url;
+            try { url = new URL(raw); } catch (error) {
+                throw new Error('API URL 必须是完整的 http:// 或 https:// 地址。');
+            }
+            if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+                throw new Error('API URL 仅支持 HTTP 或 HTTPS。');
+            }
+            url.hash = '';
+            const path = url.pathname.replace(/\/+$/, '');
+            if (/\/chat\/completions$/i.test(path)) {
+                url.pathname = path;
+            } else if (/\/v\d+$/i.test(path)) {
+                url.pathname = path + '/chat/completions';
+            } else {
+                url.pathname = path + '/v1/chat/completions';
+            }
+            return url.toString();
+        }
+
+        async function requestChatCompletion(messages, maxTokens, timeoutMs) {
+            const model = document.getElementById('modelName').value.trim() || 'deepseek-v4-flash';
+            const limit = Number(maxTokens) || 8192;
+            const timeout = Number(timeoutMs) || 90000;
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeout);
+            try {
+                const response = await fetch(getChatApiEndpoint(), {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + document.getElementById('apiKey').value.trim(),
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ model: model, messages: messages, max_tokens: limit, stream: false }),
+                    signal: controller.signal
+                });
+                const raw = await response.text();
+                let data = {};
+                if (raw) {
+                    try { data = JSON.parse(raw); } catch (error) {
+                        throw new Error('API 返回的不是 JSON（HTTP ' + response.status + '）：' + raw.slice(0, 220));
+                    }
+                }
+                if (!response.ok) {
+                    const errorData = data.error || {};
+                    const message = (typeof errorData === 'string' ? errorData : errorData.message) || data.message || ('HTTP ' + response.status);
+                    const hints = {
+                        401: '请检查 API Key 是否正确。',
+                        403: 'Key 可能无权限、额度不足或账号受限。',
+                        404: '请检查 API URL 和模型路由是否正确。',
+                        429: '服务商限流或账户额度已用完。',
+                        502: '上游模型服务可能暂时不可用。',
+                        503: '服务商暂时不可用，请稍后重试。'
+                    };
+                    throw new Error('HTTP ' + response.status + '：' + message + (hints[response.status] ? ' ' + hints[response.status] : ''));
+                }
+                return data;
+            } catch (error) {
+                if (error && error.name === 'AbortError') {
+                    throw new Error('API 请求超过 ' + Math.round(timeout / 1000) + ' 秒，已自动停止等待。');
+                }
+                if (error instanceof TypeError) {
+                    throw new Error('网络连接失败或浏览器跨域（CORS）拦截：' + (error.message || 'Failed to fetch') + '。请检查服务商状态、API URL 和网络。');
+                }
+                throw error;
+            } finally {
+                clearTimeout(timer);
+            }
         }
 
         function renderChatLog() {
@@ -1249,17 +1300,10 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             status.textContent = '正在请求 ' + model + ' …';
             try {
                 saveSettings();
-                const response = await fetch(getChatApiEndpoint(), {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: [{ role: 'system', content: '你是一个准确、清晰的 AI 助手。请直接回答用户问题。' }].concat(chatHistory.slice(-16)),
-                        max_tokens: 8192
-                    })
-                });
-                const data = await response.json().catch(() => ({}));
-                if (!response.ok) throw new Error(data?.error?.message || data?.message || ('HTTP ' + response.status));
+                const data = await requestChatCompletion(
+                    [{ role: 'system', content: '你是一个准确、清晰的 AI 助手。请直接回答用户问题。' }].concat(chatHistory.slice(-16)),
+                    8192
+                );
                 const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
                 const reply = Array.isArray(content) ? content.map(part => part.text || '').join('') : String(content || '').trim();
                 if (!reply) throw new Error('API 未返回有效文本。');
@@ -1279,8 +1323,37 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             }
         }
 
-                function initChatUI() {
+                async function testChatApi() {
+            const button = document.getElementById('chatTestBtn');
+            const status = document.getElementById('chatStatus');
+            const key = document.getElementById('apiKey').value.trim();
+            if (!key) {
+                status.textContent = '请先填写对话 API Key。';
+                return;
+            }
+            button.disabled = true;
+            button.textContent = '测试中…';
+            status.textContent = '正在测试 API 地址、密钥和模型…';
+            try {
+                const data = await requestChatCompletion(
+                    [{ role: 'user', content: 'Reply with OK only.' }],
+                    8,
+                    30000
+                );
+                const content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+                if (!content) throw new Error('接口已响应，但没有返回有效文本。');
+                status.textContent = '连接成功 · ' + (document.getElementById('modelName').value.trim() || '当前模型');
+            } catch (error) {
+                status.textContent = '连接失败：' + (error.message || String(error));
+            } finally {
+                button.disabled = false;
+                button.textContent = '测试 API 连接';
+            }
+        }
+
+        function initChatUI() {
             document.getElementById('chatSendBtn').addEventListener('click', sendChatPrompt);
+            document.getElementById('chatTestBtn').addEventListener('click', testChatApi);
             document.getElementById('chatInsertBtn').addEventListener('click', () => {
                 if (lastChatReply) insertAtCursor('\n\n' + lastChatReply + '\n\n');
             });
@@ -1339,9 +1412,17 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         }
 
         function normalizeImageBase(value) {
-            let base = String(value || IMAGE_API_DEFAULT).trim().replace(/\/+$/, '');
-            base = base.replace(/\/v1$/i, '');
-            return base || IMAGE_API_DEFAULT;
+            const raw = String(value || IMAGE_API_DEFAULT).trim();
+            let url;
+            try { url = new URL(raw); } catch (error) {
+                throw new Error('图像 API Base URL 必须是完整的 http:// 或 https:// 地址。');
+            }
+            if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+                throw new Error('图像 API Base URL 仅支持 HTTP 或 HTTPS。');
+            }
+            url.hash = '';
+            url.pathname = url.pathname.replace(/\/v1(?:\/.*)?$/i, '').replace(/\/+$/, '');
+            return url.origin + url.pathname;
         }
 
         function getImageTaskMode() {
@@ -1487,13 +1568,22 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         }
 
         async function imageApiJson(url, options) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 60000);
             let response;
+            let raw = '';
             try {
-                response = await fetch(url, options);
+                response = await fetch(url, Object.assign({}, options || {}, { signal: controller.signal }));
+                raw = await response.text();
             } catch (error) {
-                throw new Error('网络或跨域访问失败：' + error.message + '。请检查网络、API 地址和服务商 CORS 设置。');
+                if (error && error.name === 'AbortError') {
+                    throw new Error('图像 API 请求超过 60 秒，已自动停止等待。');
+                }
+                throw new Error('网络或跨域访问失败：' + (error.message || error) + '。请检查网络、API 地址和服务商 CORS 设置。');
+            } finally {
+                clearTimeout(timer);
             }
-            const raw = await response.text();
+
             let data;
             try { data = JSON.parse(raw); } catch (error) {
                 throw new Error('接口返回非 JSON（HTTP ' + response.status + '）：' + raw.slice(0, 220));
@@ -1505,7 +1595,15 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 if (response.status === 403 && /quota is not enough|token quota|insufficient.*(balance|quota)|quota.*(balance|insufficient)/i.test(String(message))) {
                     throw new Error('APIMart 返回 HTTP 403：API Key 的 Token 额度或账户余额不足。');
                 }
-                throw new Error('HTTP ' + response.status + '：' + message);
+                const hints = {
+                    401: '请检查 APIMart API Key。',
+                    403: '请检查账户余额、Token 额度和模型权限。',
+                    404: '请检查 API 地址和模型 ID。',
+                    429: '服务商限流或账户额度已用完。',
+                    502: '上游图像服务可能暂时不可用。',
+                    503: 'APIMart 暂时不可用，请稍后重试。'
+                };
+                throw new Error('HTTP ' + response.status + '：' + message + (hints[response.status] ? ' ' + hints[response.status] : ''));
             }
             return payload;
         }
@@ -1644,9 +1742,9 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         }
 
         function buildQwenInputs(parameters, prompt, modeText, reference, ratio, steps, seed, random) {
-            const fallback = [prompt, modeText, reference, ratio, steps, seed, random, []];
+            const fallback = [prompt, modeText, reference, ratio, steps, seed, random];
             if (!Array.isArray(parameters) || !parameters.length) return fallback;
-            return parameters.map(parameter => {
+            return parameters.map((parameter, i) => {
                 const name = String(parameter.parameter_name || parameter.label || parameter.name || parameter.component || '').toLowerCase();
                 if (/additional|extra|gallery|multiple.references/.test(name)) return [];
                 if (/prompt|instruction/.test(name)) return prompt;
@@ -1656,7 +1754,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 if (/steps|step/.test(name)) return steps;
                 if (/seed/.test(name)) return seed;
                 if (/random|new.seed/.test(name)) return random;
-                return parameter.parameter_has_default ? parameter.parameter_default : null;
+                return parameter.parameter_has_default ? parameter.parameter_default : (fallback[i] !== undefined ? fallback[i] : null);
             });
         }
 
@@ -1679,19 +1777,39 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             if (token && document.getElementById('rememberHfToken').checked) safeStorageSet('cpuck_image_hf_token', token);
 
             imageStatus('正在连接 Hugging Face Space…');
-            const module = await import('https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.min.js');
-            const client = await module.Client.connect(IMAGE_SPACE_ID, Object.assign({}, token ? { token: token } : {}, { events: ['status', 'data'] }));
-            let info = {};
-            try { info = await client.view_api(); } catch (error) {}
-            const endpoints = info.named_endpoints || {};
-            const endpointKey = Object.keys(endpoints).find(key => /generate/i.test(key)) || '/generate';
+            const module = await import('https://cdn.jsdelivr.net/npm/@gradio/client@2.8.0/dist/index.min.js');
+            const clientOptions = {
+                events: ['status', 'data'],
+                space_status: function (spaceStatus) {
+                    imageStatus('Hugging Face Space · ' + (spaceStatus.message || spaceStatus.status || '正在连接…'));
+                }
+            };
+            if (token) clientOptions.token = token;
+            const client = await module.Client.connect(IMAGE_SPACE_ID, clientOptions);
+            let info;
+            try {
+                info = await client.view_api();
+            } catch (error) {
+                throw new Error('已连接 Hugging Face Space，但读取 API 参数失败：' + (error.message || error));
+            }
+            const endpoints = info && info.named_endpoints ? info.named_endpoints : {};
+            const endpointKey = Object.keys(endpoints).find(key => /(^|\/)generate\/?$/i.test(key));
+            if (!endpointKey) {
+                throw new Error('Qwen Space 没有公开 generate 接口。当前接口：' + (Object.keys(endpoints).join(', ') || '无'));
+            }
             const endpoint = endpointKey.charAt(0) === '/' ? endpointKey : '/' + endpointKey;
             const parameters = endpoints[endpointKey] && endpoints[endpointKey].parameters;
+            if (!Array.isArray(parameters) || !parameters.length) {
+                throw new Error('Qwen Space 未返回 generate 接口参数，无法安全提交任务。');
+            }
             const reference = modeText === 'Edit an image' ? module.handle_file(imageSourceBlob) : null;
             const steps = Number(document.getElementById('qwenSteps').value) || 40;
             const seed = Math.max(0, Math.min(2147483647, Number(document.getElementById('qwenSeed').value) || 42));
             const random = document.getElementById('randomSeed').checked;
             const inputs = buildQwenInputs(parameters, prompt, modeText, reference, imageRatioLabel(document.getElementById('imageAspect').value), steps, seed, random);
+            if (inputs.length !== parameters.length) {
+                throw new Error('Qwen API 参数数量不匹配：页面需要 ' + parameters.length + ' 项，实际生成 ' + inputs.length + ' 项。');
+            }
 
             imageStatus('已连接 Qwen Space，正在提交任务…');
             const job = client.submit(endpoint, inputs);
@@ -1887,18 +2005,6 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             updateImageTaskLabel();
         }
 
-    <\/script>
-</body>
-</html>
-
-    
-</script>
-<script>
-window.addEventListener('DOMContentLoaded', function () {
-    var source = document.getElementById('mdSource');
-    var frame = document.getElementById('mdFrame');
-    frame.srcdoc = source.textContent.replace(/<\\\/script>/g, '<' + '/script>');
-});
-</script>
+    </script>
 </body>
 </html>
