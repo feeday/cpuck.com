@@ -1441,6 +1441,20 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             }
         }
 
+        async function imageBlobDataUrl(blob) {
+            if (!blob || !/^image\//i.test(blob.type || '')) throw new Error('读取对象不是有效图片。');
+            return await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const value = reader.result;
+                    if (typeof value === 'string' && /^data:image\//i.test(value)) resolve(value);
+                    else reject(new Error('图片数据读取失败。'));
+                };
+                reader.onerror = () => reject(new Error('浏览器无法读取该图片文件。'));
+                reader.readAsDataURL(blob);
+            });
+        }
+
         function markdownImageAlt(name) {
             return String(name || '图片')
                 .replace(/[\r\n\[\]()]/g, '-')
@@ -1457,12 +1471,12 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             button.disabled = true;
             button.textContent = '图片处理中…';
             try {
-                const dataUrl = await imageJpegData(imageSourceBlob);
+                const dataUrl = await imageBlobDataUrl(imageSourceBlob);
                 const saved = insertAtCursor('\n![' + markdownImageAlt(imageSourceName) + '](' + dataUrl + ')\n');
                 if (saved === false) {
                     imageStatus('图片已插入 Markdown，但文档较大，浏览器本地缓存可能已满；请立即导出 MD 备份。', 'error');
                 } else {
-                    imageStatus('原图已压缩并嵌入 Markdown，无需图床链接；可继续使用同一张图进行 AI 编辑。', 'success');
+                    imageStatus('原图已完整嵌入 Markdown，保留原格式且无需图床链接；可继续使用同一张图进行 AI 编辑。', 'success');
                 }
             } catch (error) {
                 imageStatus('原图插入失败：' + (error.message || error), 'error');
@@ -1724,11 +1738,11 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                 if (!response.ok) throw new Error('HTTP ' + response.status);
                 const blob = await response.blob();
                 if (!blob.type || !blob.type.startsWith('image/')) throw new Error('返回内容不是图片');
-                const dataUrl = await imageJpegData(blob);
+                const dataUrl = await imageBlobDataUrl(blob);
                 const saved = insertAtCursor('\n![AI 生成图片](' + dataUrl + ')\n');
                 imageStatus(saved === false
                     ? 'AI 图片已插入，但本地缓存空间可能不足；请立即导出 MD 备份。'
-                    : 'AI 生成图已压缩并嵌入 Markdown，可随 MD 一起保存。',
+                    : 'AI 生成图已完整嵌入 Markdown，可随 MD 一起保存。',
                     saved === false ? 'error' : 'success');
             } catch (error) {
                 // 部分图像服务不开放跨域读取：退回插入服务商图片 URL，不让用户丢失结果。
