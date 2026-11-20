@@ -254,7 +254,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
 
         <aside class="panel" id="sidePanel">
             <div class="panel-scroll">
-                <p class="hint">文档编写与排版，查找替换、Imgur 图床直传。</p>
+                <p class="hint">一个图片入口，支持原图插入 Markdown、AI 改图和连续编辑。</p>
                 <div class="workspace-section-title">对话 API 配置</div>
 
                 <div class="form-group">
@@ -360,13 +360,14 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                     <textarea id="imagePrompt" class="glass-input" rows="4" placeholder="描述想生成的画面，或说明如何修改参考图片…"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="imageInput">参考图片（可选）</label>
-                    <div class="image-upload-drop" id="imageUploadDrop"><input id="imageInput" class="glass-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><p class="small">点击选择图片，或将 JPG / PNG / WebP 拖拽到这里</p></div>
+                    <label for="imageInput">图片上传（统一入口）</label>
+                    <div class="image-upload-drop" id="imageUploadDrop"><input id="imageInput" class="glass-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif"><p class="small">选择或拖入一张图片；载入后可插入 MD，也可直接输入指令进行 AI 改图</p></div>
                     <div class="image-source" id="imageSourcePreview">
                         <img id="imageSourceThumb" alt="参考图预览">
                         <div class="image-source-info" id="imageSourceInfo">参考图片已载入</div>
                         <button class="btn secondary" id="removeImageSource" type="button">移除</button>
                     </div>
+                    <button class="btn secondary full" id="insertSourceImageBtn" type="button" disabled style="margin-top:8px">插入原图到 MD</button>
                 </div>
                 <div class="actions">
                     <button class="btn purple" id="generateImageBtn" type="button">✦ 生成图片</button>
@@ -424,24 +425,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
                     <button class="btn secondary" style="height:32px; padding:0 12px; font-size:0.8rem;" onclick="executeReplace()">🔄 替换</button>
                 </div>
 
-                <div class="divider"></div>
 
-                <div class="form-group">
-                    <label for="mediaFile">🖼️ 图床与媒体上传</label>
-                    <input id="mediaFile" class="glass-input" type="file" accept="image/*,video/*" onchange="handleMediaFile(event)">
-                    <div class="media-preview" id="mediaPreview"></div>
-                    <p class="small" id="uploadStatus" style="margin-top:8px; font-weight:bold;"></p>
-                </div>
-
-                <div class="actions-vertical">
-                    <button class="btn purple full" id="imgurUploadBtn" onclick="uploadToImgurAndInsert()">
-                        🚀 传至 Imgur 图床并插入
-                    </button>
-                    <div class="actions">
-                        <button class="btn secondary" onclick="insertSelectedMedia()">插入本地</button>
-                        <a class="btn secondary" href="https://imgur.com/upload" target="_blank" rel="noopener noreferrer">官网传</a>
-                    </div>
-                </div>
 
             </div>
         </aside>
@@ -509,8 +493,6 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             qwenSeed: 'md_editor_qwen_seed'
         };
 
-        const MAGIC_IMGUR_ID = '203da2f300125a1';
-        let selectedMedia = null;
         let chatHistory = [];
         let lastChatReply = '';
 
@@ -554,8 +536,9 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
 
         function handleInput() {
             const text = document.getElementById('markdownInput').value;
-            safeStorageSet(STORAGE_KEYS.doc, text);
+            const saved = safeStorageSet(STORAGE_KEYS.doc, text);
             renderPreview();
+            return saved;
         }
 
         // --- 控制台平滑折叠 ---
@@ -1035,107 +1018,6 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             document.getElementById('docStats').innerHTML = `总:${total} &nbsp;汉:${cn} &nbsp;英:${en} &nbsp;数:${num} &nbsp;标:${punc}`;
         }
 
-        // --- Imgur 直传（含 Base64 防拦截修复） ---
-        function uploadToImgurAndInsert() {
-            if (!selectedMedia) {
-                alert('请先选择一张图片');
-                return;
-            }
-            if (selectedMedia.type.startsWith('video/')) {
-                alert('提示：Imgur 的图片接口主要支持图像。如果是视频，建议使用【插入本地】或通过官方页面上传。');
-            }
-
-            const btn = document.getElementById('imgurUploadBtn');
-            const statusBox = document.getElementById('uploadStatus');
-            const file = selectedMedia.file;
-
-            btn.disabled = true;
-            btn.innerHTML = '⏳ 上传网络图床中...';
-            statusBox.style.color = 'var(--theme-blue)';
-            statusBox.innerText = '正在封装数据并传输...';
-
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-
-            reader.onload = async function(event) {
-                try {
-                    const base64Data = event.target.result.split(',')[1];
-                    const formData = new FormData();
-                    formData.append('image', base64Data);
-                    formData.append('type', 'base64'); // 明确告知 base64 格式，防拦截
-
-                    const response = await fetch('https://api.imgur.com/3/image', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Client-ID ${MAGIC_IMGUR_ID}`
-                        },
-                        body: formData
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        const imageUrl = data.data.link;
-                        const name = file.name.replace(/[\]\[()]/g, '-');
-
-                        // 始终插入 Markdown 语法
-                        insertAtCursor(`\n![${name}](${imageUrl})\n`);
-
-                        statusBox.style.color = 'var(--theme-green)';
-                        statusBox.innerText = '✅ 上传成功！已插入直链。';
-                    } else {
-                        throw new Error(data.data.error || '图床接口拒绝了该请求');
-                    }
-                } catch (error) {
-                    statusBox.style.color = '#ef4444';
-                    statusBox.innerText = `❌ 上传失败: ${error.message}`;
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = '🚀 传至 Imgur 图床并插入';
-                    setTimeout(() => {
-                        if(statusBox.innerText.includes('成功')) statusBox.innerText = '';
-                    }, 4000);
-                }
-            };
-        }
-
-        // --- 本地文件预览与处理 ---
-        function handleMediaFile(event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById('mediaPreview');
-            const statusBox = document.getElementById('uploadStatus');
-
-            preview.innerHTML = '';
-            statusBox.innerText = '';
-            selectedMedia = null;
-            if (!file) return;
-
-            const url = URL.createObjectURL(file);
-            selectedMedia = { file, url, type: file.type };
-            const el = file.type.startsWith('video/') ? document.createElement('video') : document.createElement('img');
-            el.src = url;
-            if (el.tagName === 'VIDEO') el.controls = true;
-            preview.appendChild(el);
-            const info = document.createElement('p');
-            info.className = 'small';
-            info.innerText = `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`;
-            preview.appendChild(info);
-        }
-
-        function insertSelectedMedia() {
-            if (!selectedMedia) { alert('请先选择图片或视频'); return; }
-            const name = selectedMedia.file.name.replace(/[\]\[()]/g, '-');
-
-            if (selectedMedia.type.startsWith('video/')) {
-                insertAtCursor(`\n<video src="${selectedMedia.url}" controls></video>\n`);
-            } else {
-                insertAtCursor(`\n![${name}](${selectedMedia.url})\n`);
-            }
-
-            document.getElementById('uploadStatus').style.color = 'var(--text-tertiary)';
-            document.getElementById('uploadStatus').innerText = '已插入本地缓存链接 (页面刷新后失效)';
-        }
-
         // --- 基础工具与 Markdown 解析 ---
         function escapeHtml(text) {
             return String(text)
@@ -1236,7 +1118,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             area.value = area.value.slice(0, start) + text + area.value.slice(end);
             area.focus();
             area.selectionStart = area.selectionEnd = start + text.length;
-            handleInput();
+            return handleInput();
         }
 
         function wrapSelection(prefix, suffix) {
@@ -1423,7 +1305,12 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         }
 
         function safeStorageSet(key, value) {
-            try { localStorage.setItem(key, value); } catch (error) {}
+            try {
+                localStorage.setItem(key, value);
+                return true;
+            } catch (error) {
+                return false;
+            }
         }
 
         function safeStorageRemove(key) {
@@ -1435,6 +1322,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
         let activeImageModel = 'gpt';
         let imageSourceBlob = null;
         let imageSourceObjectUrl = '';
+        let imageSourceName = '';
         let imageResultUrl = '';
         let imageRunning = false;
         let activeImageTaskId = '';
@@ -1507,10 +1395,12 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             if (!blob) return;
             if (imageSourceObjectUrl) URL.revokeObjectURL(imageSourceObjectUrl);
             imageSourceBlob = blob;
+            imageSourceName = name || '参考图片';
             imageSourceObjectUrl = URL.createObjectURL(blob);
             document.getElementById('imageSourceThumb').src = imageSourceObjectUrl;
-            document.getElementById('imageSourceInfo').textContent = (name || '参考图片') + ' · ' + (blob.size / 1048576).toFixed(2) + ' MB';
+            document.getElementById('imageSourceInfo').textContent = imageSourceName + ' · ' + (blob.size / 1048576).toFixed(2) + ' MB';
             document.getElementById('imageSourcePreview').classList.add('show');
+            document.getElementById('insertSourceImageBtn').disabled = false;
             updateImageTaskLabel();
         }
 
@@ -1518,9 +1408,11 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             if (imageSourceObjectUrl) URL.revokeObjectURL(imageSourceObjectUrl);
             imageSourceObjectUrl = '';
             imageSourceBlob = null;
+            imageSourceName = '';
             document.getElementById('imageInput').value = '';
             document.getElementById('imageSourcePreview').classList.remove('show');
             document.getElementById('imageSourceThumb').removeAttribute('src');
+            document.getElementById('insertSourceImageBtn').disabled = true;
             updateImageTaskLabel();
         }
 
@@ -1549,6 +1441,37 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             }
         }
 
+        function markdownImageAlt(name) {
+            return String(name || '图片')
+                .replace(/[\r\n\[\]()]/g, '-')
+                .replace(/\\/g, '-')
+                .trim() || '图片';
+        }
+
+        async function insertSourceImageIntoMarkdown() {
+            if (!imageSourceBlob) {
+                imageStatus('请先选择一张图片。', 'error');
+                return;
+            }
+            const button = document.getElementById('insertSourceImageBtn');
+            button.disabled = true;
+            button.textContent = '图片处理中…';
+            try {
+                const dataUrl = await imageJpegData(imageSourceBlob);
+                const saved = insertAtCursor('\n![' + markdownImageAlt(imageSourceName) + '](' + dataUrl + ')\n');
+                if (saved === false) {
+                    imageStatus('图片已插入 Markdown，但文档较大，浏览器本地缓存可能已满；请立即导出 MD 备份。', 'error');
+                } else {
+                    imageStatus('原图已压缩并嵌入 Markdown，无需图床链接；可继续使用同一张图进行 AI 编辑。', 'success');
+                }
+            } catch (error) {
+                imageStatus('原图插入失败：' + (error.message || error), 'error');
+            } finally {
+                button.disabled = !imageSourceBlob;
+                button.textContent = '插入原图到 MD';
+            }
+        }
+
         async function imageApiJson(url, options) {
             let response;
             try {
@@ -1561,15 +1484,16 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             try { data = JSON.parse(raw); } catch (error) {
                 throw new Error('接口返回非 JSON（HTTP ' + response.status + '）：' + raw.slice(0, 220));
             }
+            const payload = data && typeof data === 'object' ? data : {};
             if (!response.ok) {
-                const err = data.error;
-                const message = typeof err === 'string' ? err : (err && err.message) || data.message || raw.slice(0, 250);
+                const err = payload.error || (payload.data && payload.data.error);
+                const message = typeof err === 'string' ? err : (err && err.message) || payload.message || raw.slice(0, 250) || '接口未提供错误详情';
                 if (response.status === 403 && /quota is not enough|token quota|insufficient.*(balance|quota)|quota.*(balance|insufficient)/i.test(String(message))) {
                     throw new Error('APIMart 返回 HTTP 403：API Key 的 Token 额度或账户余额不足。');
                 }
                 throw new Error('HTTP ' + response.status + '：' + message);
             }
-            return data;
+            return payload;
         }
 
         function getGeneratedImageUrl(data) {
@@ -1791,9 +1715,32 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             imageStatus('生成完成。可以插入 Markdown、下载图片，或将结果作为下一次编辑的参考图。', 'success');
         }
 
-        function insertGeneratedImageIntoMarkdown() {
+        async function insertGeneratedImageIntoMarkdown() {
             if (!imageResultUrl) return;
-            insertAtCursor('\n![AI 生成图片](' + imageResultUrl + ')\n');
+            const button = document.getElementById('insertImageBtn');
+            button.disabled = true;
+            try {
+                const response = await fetch(imageResultUrl);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const blob = await response.blob();
+                if (!blob.type || !blob.type.startsWith('image/')) throw new Error('返回内容不是图片');
+                const dataUrl = await imageJpegData(blob);
+                const saved = insertAtCursor('\n![AI 生成图片](' + dataUrl + ')\n');
+                imageStatus(saved === false
+                    ? 'AI 图片已插入，但本地缓存空间可能不足；请立即导出 MD 备份。'
+                    : 'AI 生成图已压缩并嵌入 Markdown，可随 MD 一起保存。',
+                    saved === false ? 'error' : 'success');
+            } catch (error) {
+                // 部分图像服务不开放跨域读取：退回插入服务商图片 URL，不让用户丢失结果。
+                if (/^(https?:\/\/|data:image\/)/i.test(String(imageResultUrl))) {
+                    insertAtCursor('\n![AI 生成图片](' + imageResultUrl + ')\n');
+                    imageStatus('图片已按原始链接插入 Markdown；若服务商链接有时效，请同时下载图片备份。', 'success');
+                } else {
+                    imageStatus('AI 图片插入失败：' + (error.message || error), 'error');
+                }
+            } finally {
+                button.disabled = !imageResultUrl;
+            }
         }
 
         async function downloadGeneratedImage() {
@@ -1872,6 +1819,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#
             document.getElementById('downloadImageBtn').addEventListener('click', downloadGeneratedImage);
             document.getElementById('useImageBtn').addEventListener('click', useGeneratedImageAsSource);
             document.getElementById('removeImageSource').addEventListener('click', clearImageSource);
+            document.getElementById('insertSourceImageBtn').addEventListener('click', insertSourceImageIntoMarkdown);
             const imageInput = document.getElementById('imageInput');
             const imageDrop = document.getElementById('imageUploadDrop');
             const acceptImageFile = file => {
