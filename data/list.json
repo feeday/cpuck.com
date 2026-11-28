@@ -40,9 +40,9 @@
     "title": "Aigx",
     "desc": "模型测试编辑器",
     "links": {
-      "http": "https://md.cpuck.com/",
-      "hfCn": "https://labs.google/fx/zh/tools/flow",
-      "hf": "https://chat.openai.com/"
+      "http": "https://chat.openai.com/",
+      "hfCn": "https://md.cpuck.com/",
+      "hf": "https://labs.google/fx/zh/tools/flow"
     },
     "isTop": true,
     "hideOnMobile": true
